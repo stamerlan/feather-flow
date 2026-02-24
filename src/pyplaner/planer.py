@@ -5,6 +5,12 @@ from urllib.parse import urlparse, unquote
 from playwright.sync_api import Route, sync_playwright
 from .calendar import Calendar
 
+try:
+    import pikepdf
+    import io
+except ImportError:
+    pikepdf = None
+
 class Planer:
     def __init__(self, template_path: str | os.PathLike,
                  base: str, calendar: "Calendar" = Calendar()
@@ -85,5 +91,13 @@ class Planer:
             )
 
             browser.close()
+
+        if pikepdf is None:
             return pdf
 
+        with pikepdf.open(io.BytesIO(pdf)) as pike_pdf_obj:
+            bio = io.BytesIO()
+            pike_pdf_obj.save(bio,
+                object_stream_mode=pikepdf.ObjectStreamMode.generate
+            )
+            return bio.getvalue()
