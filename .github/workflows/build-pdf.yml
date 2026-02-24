@@ -1,0 +1,35 @@
+name: Build Feather Flow PDF
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install pyplaner
+        run: pip install .[pikepdf]
+
+      - name: Install Playwright browsers
+        run: python -m playwright install --with-deps chromium
+
+      - name: Generate PDF
+        run: python __main__.py
+
+      - name: Upload ff-2026.pdf
+        uses: actions/upload-artifact@v4
+        with:
+          name: ff-2026-pdf
+          path: ff-2026.pdf
