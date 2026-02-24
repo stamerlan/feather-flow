@@ -16,7 +16,7 @@ with open("ff-2026.html", "w", encoding="utf-8") as f:
     f.write(planer_html)
 
 start_ts = time.perf_counter()
-planner_pdf = planner.pdf(planer_html, debug=True)
+planner_pdf = planner.pdf(planer_html)
 elapsed_sec = time.perf_counter() - start_ts
 print(f"PDF generation took {elapsed_sec:.3f}s")
 
