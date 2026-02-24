@@ -1,6 +1,8 @@
 import os
 import pathlib
+import time
 import jinja2
+from typing import Callable
 from urllib.parse import urlparse, unquote
 from playwright.sync_api import Route, sync_playwright
 from .calendar import Calendar
@@ -56,25 +58,33 @@ class Planer:
             margin_right: str | float | None = None,
             margin_bottom: str | float | None = None,
             margin_left: str | float | None = None,
+            timing_cb: Callable[[str, float], None] | None = None,
             ) -> bytes:
         """Print PDF"""
         if html is None:
             html = self.html()
 
         with sync_playwright() as p:
+            t0 = time.perf_counter()
             browser = p.chromium.launch(args=[
                 # allows file access
                 "--allow-file-access-from-files",
                 "--disable-web-security"
             ])
+            if timing_cb:
+                timing_cb("browser_launch", time.perf_counter() - t0)
 
             page = browser.new_page()
             page.on("requestfailed",
                 lambda r: print(f'Failed to load "{r.url}"'))
-            page.route(f"file://**/*", _asset_route)
+            page.route("file://**/*", _asset_route)
 
+            t0 = time.perf_counter()
             page.set_content(html, wait_until="networkidle")
+            if timing_cb:
+                timing_cb("set_content", time.perf_counter() - t0)
 
+            t0 = time.perf_counter()
             pdf = page.pdf(
                 print_background=True,
                 prefer_css_page_size=True,
@@ -85,12 +95,15 @@ class Planer:
                     "left": margin_left
                 }
             )
+            if timing_cb:
+                timing_cb("page_pdf", time.perf_counter() - t0)
 
             browser.close()
 
         if pikepdf is None:
             return pdf
 
+        t0 = time.perf_counter()
         with pikepdf.open(io.BytesIO(pdf)) as pike_pdf_obj:
             bio = io.BytesIO()
             pike_pdf_obj.remove_unreferenced_resources()
@@ -98,4 +111,6 @@ class Planer:
                 object_stream_mode=pikepdf.ObjectStreamMode.generate,
                 recompress_flate=True
             )
+            if timing_cb:
+                timing_cb("pikepdf", time.perf_counter() - t0)
             return bio.getvalue()
