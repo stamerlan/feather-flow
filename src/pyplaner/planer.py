@@ -80,7 +80,7 @@ class Planer:
             page.route("file://**/*", _asset_route)
 
             t0 = time.perf_counter()
-            page.set_content(html, wait_until="networkidle")
+            page.set_content(html, wait_until="load")
             if timing_cb:
                 timing_cb("set_content", time.perf_counter() - t0)
 
