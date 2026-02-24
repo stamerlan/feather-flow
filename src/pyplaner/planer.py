@@ -97,7 +97,9 @@ class Planer:
 
         with pikepdf.open(io.BytesIO(pdf)) as pike_pdf_obj:
             bio = io.BytesIO()
+            pike_pdf_obj.remove_unreferenced_resources()
             pike_pdf_obj.save(bio,
-                object_stream_mode=pikepdf.ObjectStreamMode.generate
+                object_stream_mode=pikepdf.ObjectStreamMode.generate,
+                recompress_flate=True
             )
             return bio.getvalue()
