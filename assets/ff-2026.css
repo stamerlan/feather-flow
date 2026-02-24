@@ -1,0 +1,244 @@
+/* Print on A4 paper size with no borders */
+@page {
+  size: A4;
+  margin: 0;
+}
+
+/* No default margins */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+/* Container for all elements. A4 page size, the reset is cropped */
+.page {
+  position: relative;
+  width: 210mm;
+  height: 297mm;
+  overflow: hidden;
+  page-break-after: always;
+  break-after: page;
+
+  font-family: "Cormorant Garamond", Georgia, system-ui, serif;
+}
+
+/* Page background:
+ * <img class="background" src="../assets/a4-portrait-bg.webp">
+ */
+.background {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;         /* put behind content */
+}
+
+/* Day page: background image plus writing lines. SVG is full A4 with padding
+ * (top 35mm, bottom 10mm, left/right 5mm) built in; positioned 1:1 on page.
+ */
+.day-background {
+  position: absolute;
+  inset: 0;
+  background-image: url("day-dots.svg"), url("day.webp");
+  background-position: 0 0, center;
+  background-size: 210mm 297mm, cover;
+  background-repeat: no-repeat, no-repeat;
+  z-index: -1;         /* put behind content */
+}
+
+/* No underlying links, use text color */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/******************************************************************************
+ *                                 COVER PAGE                                 *
+ ******************************************************************************/
+.cover-title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 60mm;
+
+  text-align: center;
+  font-family: system-ui;
+  font-size: 33pt;
+  letter-spacing: 16px;
+}
+
+.cover-title-reflection {
+    transform: scaleY(-1);
+    mask-image: linear-gradient(
+        to top,
+        rgba(0,0,0,0.25) 0%,
+        rgba(0,0,0,0.15) 30%,
+        rgba(0,0,0,0.00) 40%
+    );
+    filter: blur(1.2px);
+}
+
+/******************************************************************************
+ *                                  YEAR PAGE                                 *
+ * The second page of the planner - whole year calendar                       *
+ ******************************************************************************/
+.year-title {
+  text-align: center;
+  font-size: 28pt;
+  font-weight: 800;
+  letter-spacing: 5mm;
+  margin-top: 8mm;
+  margin-bottom: 8mm;
+}
+
+.year-grid {
+  margin-left: 5mm;
+  margin-right: 5mm;
+  margin-bottom: 10mm;
+  font-family: "Cormorant Garamond", Georgia, system-ui, serif;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 60mm);
+  grid-gap: 5mm 10mm;
+}
+
+.year-grid-month-name {
+  font-size: 16pt;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 3mm;
+}
+
+.year-grid-month-table {
+  width: 100%;
+  font-size: 16pt;
+  font-weight: 400;
+  text-align: center;
+}
+.year-grid-month-table th {
+  font-weight: 600;
+  font-size: 12pt;
+}
+
+/******************************************************************************
+ *                                 MONTH PAGE                                 *
+ * The page located at the beginning of each month - this month calendar      *
+ ******************************************************************************/
+.month-header {
+  margin: 5mm 5mm 0mm 5mm;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  font-size: 17pt;
+}
+.month-header-months-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 17pt;
+  flex: 1;
+  gap: 0;
+}
+
+.month-year {
+  text-align: center;
+  font-size: 20pt;
+  font-weight: 400;
+}
+
+.month-name {
+  margin: 30mm 0mm 0mm 0mm;
+  text-align: center;
+  font-size: 30pt;
+  font-weight: 800;
+  letter-spacing: 8mm;
+}
+
+.month-table {
+  width: calc(100% - 10mm); /* Subtract left/right margin */
+  margin: 20mm 5mm 0mm 5mm;
+
+  border-collapse: collapse;
+  font-size: 20pt;
+  font-weight: 600;
+  table-layout: fixed;
+  text-align: center;
+}
+.month-table th, .month-table td {
+  padding: 3mm;
+}
+.month-table th {
+  font-weight: 600;
+  letter-spacing: 0.5mm;
+}
+
+/******************************************************************************
+ *                                  DAY PAGE                                  *
+ * Top left corner - day, month, weekday. To the right two rows - months and  *
+ * days within the month.
+ * The rest of the page - rows for writing.
+ ******************************************************************************/
+.day-header {
+  margin: 5mm;
+  display: flex;
+  align-items: stretch;
+  font-style: italic;
+}
+
+.day-header-date {
+  width: 15mm;
+  flex-shrink: 0;
+  text-align: center;
+  margin: 0mm 10mm 0mm 0mm;
+}
+.day-header-day {
+  font-size: 24pt;
+  font-weight: bold;
+  margin: 0;
+}
+.day-header-month {
+  font-size: 16pt;
+  margin: 0;
+}
+.day-header-weekday {
+  font-size: 12pt;
+  margin: 0;
+  opacity: 0.75;
+}
+
+/* header part to the right from the date (.day-header-date).
+ * Consists of links to months pages (.day-header-months-row) on top,
+ * and day numbers at the bottom (.day-header-days-row).
+ */
+.day-header-tables {
+  flex: 1;
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.day-header-months-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 17pt;
+  flex: 1;
+  gap: 0;
+}
+.day-header-days-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 15pt;
+  line-height: 1;
+}
+.day-header-days-row span {
+  white-space: nowrap;
+}

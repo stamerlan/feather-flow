@@ -1,0 +1,122 @@
+import calendar
+from typing import Iterator, Iterable, Sequence
+
+class WeekDay:
+    def __init__(self, day: int, name: str, is_off_day: bool) -> None:
+        self.value      = day
+        self.name       = name
+        self.is_off_day = is_off_day
+
+    def __int__(self) -> int:
+        return self.value
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class Day:
+    def __init__(self, day: int, weekday: WeekDay, id: str) -> None:
+        self.value   = day
+        self.weekday = weekday
+        self.id      = id
+
+    def __int__(self) -> int:
+        return self.value
+
+    def __str__(self) -> str:
+        return str(self.value)
+
+    @property
+    def is_off_day(self) -> bool:
+        return self.weekday.is_off_day
+
+
+class Month:
+    def __init__(self, value: int, name: str, days: Iterable[Day],
+                 table: Iterable[Iterable[Day | None]], id: str) -> None:
+        self.value = value
+        self.name  = name
+        self.days  = days
+        self.table = table
+        self.id    = id
+
+    def __int__(self) -> int:
+        return self.value
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class Year:
+    def __init__(self, year: int, months: Iterable[Month], id: str) -> None:
+        self.value    = year
+        self.months   = months
+        self.id       = id
+
+    def __int__(self) -> int:
+        return self.value
+
+    def __str__(self) -> str:
+        return str(self.value)
+
+    @property
+    def isleap(self) -> bool:
+        return calendar.isleap(self.value)
+
+    def days(self) -> Iterator[Day]:
+        for m in self.months:
+            for d in m.days:
+                yield d
+
+
+class Calendar:
+    def __init__(self, firstweekday = 0) -> None:
+        self.weekdays = (
+            WeekDay(0, "Monday",    False),
+            WeekDay(1, "Tuesday",   False),
+            WeekDay(2, "Wednesday", False),
+            WeekDay(3, "Thursday",  False),
+            WeekDay(4, "Friday",    False),
+            WeekDay(5, "Saturday",  True),
+            WeekDay(6, "Sunday",    True),
+        )
+
+        self.firstweekday = firstweekday
+
+    def year(self, the_year: int) -> Year:
+        """Construct a calendar for a year"""
+        MONTHS = (
+            ( 1, "January",   31),
+            ( 2, "February",  28 if not calendar.isleap(the_year) else 29),
+            ( 3, "March",     31),
+            ( 4, "April",     30),
+            ( 5, "May",       31),
+            ( 6, "June",      30),
+            ( 7, "July",      31),
+            ( 8, "August",    31),
+            ( 9, "September", 30),
+            (10, "October",   31),
+            (11, "November",  30),
+            (12, "December",  31),
+        )
+
+        cal = calendar.Calendar(self.firstweekday)
+
+        months = list[Month]()
+        for month, name, days_cnt in MONTHS:
+            days = list[Day]()
+            for day in range(1, days_cnt + 1):
+                days.append(Day(day,
+                    self.weekdays[calendar.weekday(the_year, month, day)],
+                    f"{the_year}-{month:02d}-{day:02d}"
+                ))
+
+            # Month table
+            table = list[list[Day | None]]()
+            for week in calendar.monthcalendar(the_year, month):
+                row = []
+                for col, day in enumerate(week):
+                    row.append(days[day - 1] if day else None)
+                table.append(row)
+            months.append(Month(month, name, days, table, f"{the_year}-{month:02d}"))
+        return Year(the_year, months, f"{the_year}")

@@ -1,0 +1,125 @@
+%% set year = calendar.year(2026)
+{% set month_backgrounds = (
+  "assets/month-jan.webp", "assets/month-feb.webp", "assets/month-mar.webp",
+  "assets/month-apr.webp", "assets/month-may.webp", "assets/month-jun.webp",
+  "assets/month-jul.webp", "assets/month-aug.webp", "assets/month-sep.webp",
+  "assets/month-oct.webp", "assets/month-nov.webp", "assets/month-dec.webp",
+)
+%}
+
+%% macro day_style(day)
+  {% if day.is_off_day %} style="color: #C00000"{% endif %}
+%% endmacro
+
+%% macro month_table(month)
+  %% for week in month.table
+    <tr>
+      %% for day in week
+        %% if day is not none
+          <td {{- day_style(day) }}><a href="#{{ day.id }}">{{ day }}</a></td>
+        %% else
+          <td></td>
+        %% endif
+      %% endfor
+    </tr>
+  %% endfor
+%% endmacro
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base href="{{ base }}" target="_self">
+  <link rel="stylesheet" href="assets/ff-2026.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital@0;1&display=swap" rel="stylesheet">
+
+</head>
+<body>
+  ## Set opacity to enforce Chromium to rasterize page. Necessary for correct
+  ## reflection effect in generated PDF.
+  <div class="page" style="filter: opacity(100%);">
+    <img class="background" src="assets/cover.webp">
+    <div class="cover-title">
+      Feather Flow {{ year }}
+      <div class="cover-title-reflection">Feather Flow {{ year }}</div>
+    </div>
+  </div>
+
+  <div class="page" id="{{ year.id }}">
+    <img class="background" src="assets/year.webp">
+    <div class="year-title">{{ year }}</div>
+    <div class="year-grid">
+      %% for month in year.months
+      <section style="width: 100%;">
+        <div class="year-grid-month-name"><a href="#{{ month.id }}">{{ month }}</a></div>
+        <table class="year-grid-month-table">
+          <thead>
+            <tr>
+              %% for day in calendar.weekdays
+              <th {{- day_style(day) }}>{{ day.name[0] }}</th>
+              %% endfor
+            </tr>
+          </thead>
+          <tbody>
+            {{ month_table(month) }}
+          </tbody>
+        </table>
+      </section>
+      %% endfor
+    </div>
+  </div>
+
+  %% for month in year.months
+  <div class="page" id="{{ month.id }}">
+    <img class="background" src="{{ month_backgrounds[loop.index0] }}">
+    <div class="month-header">
+      %% for m in year.months
+      <a href="#{{ m.id }}">{{ m.name[:3] }}</a>
+      %% endfor
+    </div>
+    <div class="month-name">{{ month }}</div>
+    <div class="month-year"><a href="#{{ year.id }}">{{ year }}</a></div>
+    <table class="month-table">
+      <thead>
+        <tr>
+          %% for day in calendar.weekdays
+          <th {{- day_style(day) }}>{{ day.name[:3] }}</th>
+          %% endfor
+        </tr>
+      </thead>
+      <tbody>
+        {{ month_table(month) }}
+      </tbody>
+    </table>
+  </div>
+
+  %% for day in month.days
+  <div class="page" id="{{ day.id }}">
+    <div class="day-background"></div>
+    <div class="day-header">
+      <div class="day-header-date">
+        <p class="day-header-day">{{ day }}</p>
+        <p class="day-header-month">{{ month }}</p>
+        <p class="day-header-weekday" {{- day_style(day) }}>{{ day.weekday }}</p>
+      </div>
+
+      <div class="day-header-tables">
+        <div class="day-header-months-row">
+          %% for m in year.months
+          <a href="#{{ m.id }}">{{ m.name[:3] }}</a>
+          %% endfor
+        </div>
+        <div class="day-header-days-row">
+          %% for d in month.days
+          <a href="#{{ d.id }}">{{ d }}</a>
+          %% endfor
+        </div>
+      </div>
+    </div>
+  </div>
+  %% endfor
+
+  %% endfor
+</body>
