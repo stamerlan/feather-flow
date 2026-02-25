@@ -31,10 +31,9 @@ def _asset_route(r: Route) -> None:
 
 class Planer:
     def __init__(self, template_path: str | os.PathLike,
-                 base: str, calendar: "Calendar" = Calendar()
+                 calendar = Calendar()
     ) -> None:
         self._path = pathlib.Path(template_path).absolute()
-        self.base  = base
 
         self._env = jinja2.Environment(
             loader=jinja2.FileSystemLoader(self._path.parent),
@@ -63,9 +62,7 @@ class Planer:
             ) -> bytes:
         """Print PDF"""
         t0 = time.perf_counter()
-        planner_head = markupsafe.Markup('<base href="{}">'.format(
-            markupsafe.Markup.escape(self.base))
-        )
+        planner_head = markupsafe.Markup('<base href="file://.">')
         html = self._template.render(
             planner_head=planner_head,
             calendar=self.calendar
