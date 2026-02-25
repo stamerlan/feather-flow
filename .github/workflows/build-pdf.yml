@@ -26,7 +26,7 @@ jobs:
         run: python -m playwright install --with-deps chromium
 
       - name: Generate PDF
-        run: python __main__.py
+        run: pyplaner pages/ff-2026.html
 
       - name: Upload ff-2026.pdf
         uses: actions/upload-artifact@v4

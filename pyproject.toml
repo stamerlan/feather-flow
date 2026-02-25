@@ -19,3 +19,6 @@ dependencies = [
 
 [project.optional-dependencies]
 pikepdf = ["pikepdf>=10.3"]
+
+[project.scripts]
+pyplaner = "pyplaner.__main__:main"
