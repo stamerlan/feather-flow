@@ -29,10 +29,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <base href="{{ base }}" target="_self">
+  <base href="{{ base }}">
   <link rel="stylesheet" href="assets/ff-2026.css">
   <link rel="stylesheet" href="assets/cormorant-garamond.css">
-
 </head>
 <body>
   ## Set opacity to enforce Chromium to rasterize page. Necessary for correct
@@ -95,7 +94,22 @@
 
   %% for day in month.days
   <div class="page" id="{{ day.id }}">
-    <div class="day-background"></div>
+    <img class="background" src="assets/day.webp" style="z-index: -2;">
+
+    <!-- Dotted lines to write on -->
+    <div class="background" style="z-index: -1;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm" viewBox="0 0 210 297">
+        <defs>
+          <!-- Dot spacing: 8px horizontal, 4px line height + 8mm between lines (8px ~ 2.117mm) -->
+          <pattern id="d" width="2.116666" height="9.058333" patternUnits="userSpaceOnUse">
+            <circle cx="0.5291665" cy="0.5291665" r="0.15875" fill="#404040"/>
+          </pattern>
+        </defs>
+        <!-- A4 with padding: top 40mm, bottom 10mm, left/right 5mm. Dots only in content area. -->
+        <rect x="5" y="40" width="200" height="247" fill="url(#d)"/>
+      </svg>
+    </div>
+
     <div class="day-header">
       <div class="day-header-date">
         <p class="day-header-day">{{ day }}</p>

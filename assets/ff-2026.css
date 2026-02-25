@@ -35,19 +35,6 @@ html, body {
   z-index: -1;         /* put behind content */
 }
 
-/* Day page: background image plus writing lines. SVG is full A4 with padding
- * (top 35mm, bottom 10mm, left/right 5mm) built in; positioned 1:1 on page.
- */
-.day-background {
-  position: absolute;
-  inset: 0;
-  background-image: url("day-dots.svg"), url("day.webp");
-  background-position: 0 0, center;
-  background-size: 210mm 297mm, cover;
-  background-repeat: no-repeat, no-repeat;
-  z-index: -1;         /* put behind content */
-}
-
 /* No underlying links, use text color */
 a {
   color: inherit;
