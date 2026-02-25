@@ -4,3 +4,5 @@ __pycache__/
 /*.html
 /*.pdf
 /build/
+docs/_build/
+docs/docs/
