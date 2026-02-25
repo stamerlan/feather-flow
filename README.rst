@@ -1,16 +1,11 @@
 Feather Flow
 ============
 
-|python| |docs_ci| |pdf_ci|
+|ff2026_pdf|
 
-.. |python| image:: https://img.shields.io/badge/python-3.12%2B-blue?logo=python&logoColor=white
-   :alt: Python 3.12+
-.. |docs_ci| image:: https://github.com/stamerlan/feather-flow/actions/workflows/build-sphinx-docs.yml/badge.svg
-   :target: https://github.com/stamerlan/feather-flow/actions/workflows/build-sphinx-docs.yml
-   :alt: Sphinx Documentation
-.. |pdf_ci| image:: https://github.com/stamerlan/feather-flow/actions/workflows/build-pdf.yml/badge.svg
-   :target: https://github.com/stamerlan/feather-flow/actions/workflows/build-pdf.yml
-   :alt: Build PDF
+.. |ff2026_pdf| image:: https://img.shields.io/badge/Feather_Flow_2026-PDF-blue?logo=adobeacrobatreader&logoColor=white
+   :target: https://github.com/stamerlan/feather-flow/releases/download/latest/ff-2026.pdf
+   :alt: Feather Flow 2026
 
 Feather Flow is a digital planner PDF generator built on top of
 `Jinja2 <https://jinja.palletsprojects.com/>`_ templates and

@@ -7,6 +7,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -28,8 +31,19 @@ jobs:
       - name: Generate PDF
         run: pyplaner pages/ff-2026.html
 
-      - name: Upload ff-2026.pdf
+      - name: Upload artifact (PRs only)
+        if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v4
         with:
           name: ff-2026-pdf
           path: ff-2026.pdf
+
+      - name: Publish to release (main only)
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest PDF Build
+          body: Auto-generated PDF from the latest commit on main.
+          files: ff-2026.pdf
+          prerelease: true
