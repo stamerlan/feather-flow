@@ -1,11 +1,10 @@
 %% set year = calendar.year(2026)
-{% set month_backgrounds = (
+%% set month_backgrounds = (
   "assets/month-jan.webp", "assets/month-feb.webp", "assets/month-mar.webp",
   "assets/month-apr.webp", "assets/month-may.webp", "assets/month-jun.webp",
   "assets/month-jul.webp", "assets/month-aug.webp", "assets/month-sep.webp",
   "assets/month-oct.webp", "assets/month-nov.webp", "assets/month-dec.webp",
 )
-%}
 
 %% macro day_style(day)
   {% if day.is_off_day %} style="color: #C00000"{% endif %}
@@ -28,8 +27,10 @@
 <!doctype html>
 <html>
 <head>
+  ## Planner head is used to inject additional elements into the HTML during
+  ## document generation. For example, to set the base URL into the HTML.
+  {{ planner_head }}
   <meta charset="utf-8">
-  <base href="{{ base }}">
   <link rel="stylesheet" href="assets/ff-2026.css">
   <link rel="stylesheet" href="assets/cormorant-garamond.css">
 </head>

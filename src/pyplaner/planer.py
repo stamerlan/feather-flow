@@ -2,6 +2,7 @@ import os
 import pathlib
 import time
 import jinja2
+import markupsafe
 from typing import Callable
 from urllib.parse import urlparse, unquote
 from playwright.sync_api import Route, sync_playwright
@@ -49,11 +50,11 @@ class Planer:
     def html(self) -> str:
         """Performs parameter substitution and returns resulting HTML"""
         return self._template.render(
-            base=self.base,
+            planner_head="",
             calendar=self.calendar
         )
 
-    def pdf(self, html: str | None = None,
+    def pdf(self,
             margin_top: str | float | None = None,
             margin_right: str | float | None = None,
             margin_bottom: str | float | None = None,
@@ -61,8 +62,16 @@ class Planer:
             timing_cb: Callable[[str, float], None] | None = None,
             ) -> bytes:
         """Print PDF"""
-        if html is None:
-            html = self.html()
+        t0 = time.perf_counter()
+        planner_head = markupsafe.Markup('<base href="{}">'.format(
+            markupsafe.Markup.escape(self.base))
+        )
+        html = self._template.render(
+            planner_head=planner_head,
+            calendar=self.calendar
+        )
+        if timing_cb:
+            timing_cb("html_render", time.perf_counter() - t0)
 
         with sync_playwright() as p:
             t0 = time.perf_counter()
