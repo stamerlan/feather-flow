@@ -1,4 +1,5 @@
-name: Build Sphinx Documentation
+name: Sphinx Documentation
+
 on:
   push:
     branches: [main]

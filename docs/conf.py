@@ -3,7 +3,7 @@
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-import os
+import pathlib
 import shutil
 
 # -- Project information -----------------------------------------------------
@@ -33,8 +33,7 @@ html_theme = 'sphinx_rtd_theme'
 # repository root, e.g. on GitHub).  When Sphinx includes README.rst from
 # docs/index.rst it resolves paths relative to docs/, looking for
 # docs/docs/images/*.  Mirror the images so both contexts find them.
-_confdir = os.path.dirname(os.path.abspath(__file__))
-_mirror = os.path.join(_confdir, 'docs', 'images')
-if not os.path.exists(_mirror):
-    os.makedirs(os.path.join(_confdir, 'docs'), exist_ok=True)
-    shutil.copytree(os.path.join(_confdir, 'images'), _mirror)
+this_dir = pathlib.Path(__file__).parent.absolute()
+mirror_dir = this_dir / 'docs' / 'images'
+mirror_dir.mkdir(parents=True, exist_ok=True)
+shutil.copytree(this_dir / 'images', mirror_dir, dirs_exist_ok=True)
