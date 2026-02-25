@@ -44,6 +44,10 @@ def main() -> None:
         default=None, help="generate PDF output")
     parser.add_argument("-C", "--directory", type=pathlib.Path, default=None,
         metavar="DIR", help="change to DIR before writing output files")
+    parser.add_argument("--pdf-optimize", action=argparse.BooleanOptionalAction,
+        default=True,
+        help="post-process PDF to deduplicate images/streams and strip "
+             "obsolete metadata (default: enabled)")
     parser.add_argument("-q", "--quiet", action="store_true",
         help="suppress informational output")
     args = parser.parse_args()
@@ -94,7 +98,10 @@ def main() -> None:
             else:
                 timing_cb = None # type: ignore[assignment]
             with open(pdf_path, "wb") as f:
-                f.write(planner.pdf(timing_cb=timing_cb))
+                f.write(planner.pdf(
+                    pdf_optimize=args.pdf_optimize,
+                    timing_cb=timing_cb,
+                ))
 
 if __name__ == "__main__":
     main()
