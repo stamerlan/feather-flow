@@ -27,7 +27,7 @@ Optimizations performed
     Then the full object graph is walked starting from each page and every
     reference that points at a duplicate is rewritten to point at the canonical
     copy instead. After this pass the duplicate objects become unreachable and
-    re dropped when pikepdf writes the file.
+    are dropped when pikepdf writes the file.
 
     *Workaround - StreamDecodeLevel fallback:* When pikepdf saves with
     ``object_stream_mode=generate``, the resulting object-stream packaging makes
@@ -82,7 +82,9 @@ def _stream_content_bytes(obj: Any) -> bytes:
     ``StreamDecodeLevel.specialized`` which decodes the stream through
     its filters.
 
-    Raises ``Exception`` if neither level succeeds.
+    :param obj: A pikepdf stream object.
+    :returns: Raw or decoded stream bytes.
+    :raises Exception: If neither decode level succeeds.
     """
     try:
         return bytes(obj.get_stream_buffer(
@@ -98,6 +100,8 @@ def optimize_pdf(pdf: pikepdf.Pdf) -> None:
     Modifies *pdf* in place. See the module docstring for a detailed
     description of each optimization, the workarounds applied, and the
     rationale.
+
+    :param pdf: An open :class:`pikepdf.Pdf` object to optimize in place.
     """
     _deduplicate_images(pdf)
     _strip_and_dedup_resources(pdf)
@@ -106,6 +110,8 @@ def optimize_pdf(pdf: pikepdf.Pdf) -> None:
 
 def _deduplicate_images(pdf: pikepdf.Pdf) -> None:
     """Find duplicate Image XObjects and rewire references.
+
+    :param pdf: An open :class:`pikepdf.Pdf` object to modify in place.
 
     Build a replacement map
     ^^^^^^^^^^^^^^^^^^^^^^^
@@ -219,6 +225,8 @@ def _strip_and_dedup_resources(pdf: pikepdf.Pdf) -> None:
     * Deletes ``/ProcSet`` if present (obsolete since PDF 1.4).
     * Hashes each Form XObject's stored stream bytes and replaces
       duplicates with a reference to one canonical copy.
+
+    :param pdf: An open :class:`pikepdf.Pdf` object to modify in place.
     """
     form_hash_map: dict[bytes, pikepdf.Object] = {}
 

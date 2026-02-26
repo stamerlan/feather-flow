@@ -29,7 +29,7 @@ jobs:
         run: python -m playwright install --with-deps chromium
 
       - name: Generate PDF
-        run: pyplaner pages/ff-2026.html
+        run: pyplaner pages/ff-2026.html --country pl
 
       - name: Upload artifact (PRs only)
         if: github.event_name == 'pull_request'

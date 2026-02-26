@@ -1,5 +1,15 @@
 import calendar
-from typing import Iterator, Iterable, Sequence
+from typing import Iterator, Iterable
+from .dayinfo import DayInfo, DayInfoProvider
+
+_EMPTY_DAY_INFO = DayInfo()
+
+class _EmptyDayInfoProvider(DayInfoProvider):
+    def __init__(self, country_code: str) -> None:
+        pass
+
+    def fetch_day_info(self, year: int) -> dict[str, DayInfo]:
+        return {}
 
 class WeekDay:
     def __init__(self, day: int, name: str, is_off_day: bool) -> None:
@@ -15,10 +25,12 @@ class WeekDay:
 
 
 class Day:
-    def __init__(self, day: int, weekday: WeekDay, id: str) -> None:
+    def __init__(self, day: int, weekday: WeekDay, id: str,
+                 info: DayInfo = _EMPTY_DAY_INFO) -> None:
         self.value   = day
         self.weekday = weekday
         self.id      = id
+        self.info    = info
 
     def __int__(self) -> int:
         return self.value
@@ -28,6 +40,8 @@ class Day:
 
     @property
     def is_off_day(self) -> bool:
+        if self.info.is_off_day is not None:
+            return self.info.is_off_day
         return self.weekday.is_off_day
 
 
@@ -70,7 +84,8 @@ class Year:
 
 
 class Calendar:
-    def __init__(self, firstweekday = 0) -> None:
+    def __init__(self, firstweekday: int = 0,
+                 provider: DayInfoProvider | None = None) -> None:
         self.weekdays = (
             WeekDay(0, "Monday",    False),
             WeekDay(1, "Tuesday",   False),
@@ -82,9 +97,22 @@ class Calendar:
         )
 
         self.firstweekday = firstweekday
+        self._provider: DayInfoProvider = (
+            provider if provider is not None else _EmptyDayInfoProvider("")
+        )
 
     def year(self, the_year: int) -> Year:
-        """Construct a calendar for a year"""
+        """Construct a :class:`Year` calendar object.
+
+        When a provider was supplied at construction time it is queried
+        for supplementary day information (holidays, transferred
+        workdays, etc.).
+
+        :param the_year: Calendar year to build.
+        :returns: Fully populated :class:`Year` instance.
+        """
+        day_info = self._provider.fetch_day_info(the_year) or {}
+
         MONTHS = (
             ( 1, "January",   31),
             ( 2, "February",  28 if not calendar.isleap(the_year) else 29),
@@ -100,15 +128,15 @@ class Calendar:
             (12, "December",  31),
         )
 
-        cal = calendar.Calendar(self.firstweekday)
-
         months = list[Month]()
         for month, name, days_cnt in MONTHS:
             days = list[Day]()
             for day in range(1, days_cnt + 1):
+                date_id = f"{the_year}-{month:02d}-{day:02d}"
                 days.append(Day(day,
                     self.weekdays[calendar.weekday(the_year, month, day)],
-                    f"{the_year}-{month:02d}-{day:02d}"
+                    date_id,
+                    day_info.get(date_id, _EMPTY_DAY_INFO),
                 ))
 
             # Month table
@@ -118,5 +146,7 @@ class Calendar:
                 for col, day in enumerate(week):
                     row.append(days[day - 1] if day else None)
                 table.append(row)
-            months.append(Month(month, name, days, table, f"{the_year}-{month:02d}"))
+            months.append(
+                Month(month, name, days, table, f"{the_year}-{month:02d}")
+            )
         return Year(the_year, months, f"{the_year}")

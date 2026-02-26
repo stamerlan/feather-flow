@@ -99,6 +99,11 @@ Generate both HTML and PDF::
 
     pyplaner --html --pdf pages/ff-2026.html
 
+Generate a PDF with public holidays for a given country (ISO 3166-1 alpha-2
+code). The built-in providers are used by default::
+
+    pyplaner pages/ff-2026.html --country pl
+
 Suppress progress output::
 
     pyplaner -q pages/ff-2026.html
