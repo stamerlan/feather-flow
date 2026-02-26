@@ -1,9 +1,9 @@
 %% set year = calendar.year(2026)
 %% set month_backgrounds = (
-  "assets/month-jan.webp", "assets/month-feb.webp", "assets/month-mar.webp",
-  "assets/month-apr.webp", "assets/month-may.webp", "assets/month-jun.webp",
-  "assets/month-jul.webp", "assets/month-aug.webp", "assets/month-sep.webp",
-  "assets/month-oct.webp", "assets/month-nov.webp", "assets/month-dec.webp",
+  "assets/month-jan.png", "assets/month-feb.png", "assets/month-mar.png",
+  "assets/month-apr.png", "assets/month-may.png", "assets/month-jun.png",
+  "assets/month-jul.png", "assets/month-aug.png", "assets/month-sep.png",
+  "assets/month-oct.png", "assets/month-nov.png", "assets/month-dec.png",
 )
 
 %% macro day_style(day)
@@ -38,7 +38,7 @@
   ## Set opacity to enforce Chromium to rasterize page. Necessary for correct
   ## reflection effect in generated PDF.
   <div class="page" style="filter: opacity(100%);">
-    <img class="background" src="assets/cover.webp">
+    <img class="background" src="assets/cover.png">
     <div class="cover-title">
       Feather Flow {{ year }}
       <div class="cover-title-reflection">Feather Flow {{ year }}</div>
@@ -46,7 +46,7 @@
   </div>
 
   <div class="page" id="{{ year.id }}">
-    <img class="background" src="assets/year.webp">
+    <img class="background" src="assets/year.png">
     <div class="year-title">{{ year }}</div>
     <div class="year-grid">
       %% for month in year.months
@@ -95,7 +95,7 @@
 
   %% for day in month.days
   <div class="page" id="{{ day.id }}">
-    <img class="background" src="assets/day.webp" style="z-index: -2;">
+    <img class="background" src="assets/day.png" style="z-index: -2;">
 
     <!-- Dotted lines to write on -->
     <div class="background" style="z-index: -1;">

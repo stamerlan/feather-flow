@@ -23,8 +23,8 @@ html, body {
   font-family: "Cormorant Garamond", Georgia, system-ui, serif;
 }
 
-/* Page background:
- * <img class="background" src="../assets/a4-portrait-bg.webp">
+/* Page background. Use with img tag:
+ * <img class="background" src="assets/a4-portrait-bg.png">
  */
 .background {
   position: absolute;
