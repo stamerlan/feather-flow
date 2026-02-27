@@ -65,19 +65,21 @@ self-contained directory that keeps the project's dependencies isolated from the
 system Python and from other projects. This avoids version conflicts and lets
 you remove everything cleanly by simply deleting the ``.venv`` folder.
 
-Create and activate a virtual environment, then install the package.
+Create and activate a virtual environment, then install the package in editable
+mode. An editable install (``-e``) creates a link to the source tree instead of
+copying files, so code changes take effect immediately without reinstalling.
 
 On **Linux / macOS**::
 
     python -m venv .venv
     source .venv/bin/activate
-    pip install .
+    pip install -e .
 
 On **Windows**::
 
     python -m venv .venv
     .venv\Scripts\activate
-    pip install .
+    pip install -e .
 
 Playwright requires a browser binary. Install it once after the package is
 installed::
@@ -86,7 +88,7 @@ installed::
 
 To enable PDF optimization, install the optional ``pikepdf`` extra::
 
-    pip install .[pikepdf]
+    pip install -e .[pikepdf]
 
 Usage
 -----
@@ -118,7 +120,7 @@ The project uses `Sphinx <https://www.sphinx-doc.org/>`_ with the
 
 Install the documentation dependencies::
 
-    pip install .[docs]
+    pip instal -e .[docs]
 
 Build the HTML docs.
 
