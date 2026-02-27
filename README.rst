@@ -88,7 +88,7 @@ installed::
 
 To enable PDF optimization, install the optional ``pikepdf`` extra::
 
-    pip install -e .[pikepdf]
+    pip install -e .[pdf-opt]
 
 Usage
 -----

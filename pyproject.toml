@@ -18,7 +18,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-pikepdf = ["pikepdf>=10.3"]
+pdf-opt = ["pikepdf>=10.3"]
 docs = ["sphinx>=7.0", "sphinx-rtd-theme>=2.0"]
 
 [project.scripts]
