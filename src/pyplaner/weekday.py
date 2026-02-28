@@ -1,6 +1,6 @@
-WEEKDAY_NAMES: tuple[str, ...] = (
-    "monday", "tuesday", "wednesday", "thursday",
-    "friday", "saturday", "sunday",
+from itertools import chain
+from .translations import (
+    DEFAULT_LANGUAGE, WEEKDAY_NAMES, WEEKDAY_SHORT_NAMES, WEEKDAY_LETTERS
 )
 
 # Countries where the week starts on Sunday (6).
@@ -21,9 +21,12 @@ _SATURDAY_START: frozenset[str] = frozenset((
 
 
 class WeekDay:
-    def __init__(self, day: int, name: str, is_off_day: bool) -> None:
+    def __init__(self, day: int, name: str, short_name: str,
+                 letter: str, is_off_day: bool) -> None:
         self.value      = day
         self.name       = name
+        self.short_name = short_name
+        self.letter     = letter
         self.is_off_day = is_off_day
 
     def __int__(self) -> int:
@@ -58,8 +61,14 @@ class WeekDay:
         :raises ValueError: If *value* is not a recognized weekday.
         """
         low = value.strip().lower()
-        if low in WEEKDAY_NAMES:
-            return WEEKDAY_NAMES.index(low)
+
+        for weekdays in chain(WEEKDAY_NAMES.values(),
+                              WEEKDAY_SHORT_NAMES.values()):
+            names = [s.lower() for s in weekdays]
+            try:
+                return names.index(low)
+            except ValueError:
+                continue
 
         try:
             n = int(low)
@@ -72,4 +81,14 @@ class WeekDay:
         raise ValueError(
             f"Invalid weekday {value!r}. Use a name "
             f"(monday..sunday) or a number (0=monday .. 6=sunday)."
+        )
+
+    @staticmethod
+    def all_weekdays(lang: str = DEFAULT_LANGUAGE)-> tuple["WeekDay", ...]:
+        return tuple(
+            WeekDay(i, WEEKDAY_NAMES[lang][i],
+                WEEKDAY_SHORT_NAMES[lang][i],
+                WEEKDAY_LETTERS[lang][i],
+                i >= 5)
+            for i in range(7)
         )

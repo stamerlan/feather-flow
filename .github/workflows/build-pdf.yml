@@ -32,10 +32,13 @@ jobs:
         run: pyplaner pages/ff-2026.html --country pl --pdf ff-2026-pl.pdf
 
       - name: Generate PDF (Belarus)
-        run: pyplaner pages/ff-2026.html --country by --pdf ff-2026-by.pdf
+        run: pyplaner pages/ff-2026.html --lang ru --country by --pdf ff-2026-by.pdf
 
       - name: Generate PDF (US)
         run: pyplaner pages/ff-2026.html --country us --pdf ff-2026-us.pdf
+
+      - name: Generate PDF (Korea)
+        run: pyplaner pages/ff-2026.html --lang kr --country kr --pdf ff-2026-kr.pdf
 
       - name: Upload artifacts (PRs only)
         if: github.event_name == 'pull_request'
@@ -46,6 +49,7 @@ jobs:
             ff-2026-pl.pdf
             ff-2026-by.pdf
             ff-2026-us.pdf
+            ff-2026-kr.pdf
 
       - name: Move latest tag to HEAD
         if: github.ref == 'refs/heads/main'
@@ -64,4 +68,5 @@ jobs:
             ff-2026-pl.pdf
             ff-2026-by.pdf
             ff-2026-us.pdf
+            ff-2026-kr.pdf
           prerelease: true

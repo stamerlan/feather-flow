@@ -155,7 +155,11 @@ Each item in ``year.months``.
    * - ``name``
      - string
      - ``"January"``
-     - Full month name.
+     - Full month name (translated when ``--lang`` is used).
+   * - ``short_name``
+     - string
+     - ``"Jan"``
+     - Abbreviated month name (translated when ``--lang`` is used).
    * - ``days``
      - list
      - (28-31 Day objects)
@@ -296,7 +300,16 @@ Each item in ``calendar.weekdays`` or accessed through ``day.weekday``.
    * - ``name``
      - string
      - ``"Monday"``
-     - Full weekday name.
+     - Full weekday name (translated when ``--lang`` is used).
+   * - ``short_name``
+     - string
+     - ``"Mon"``
+     - Abbreviated weekday name (translated when ``--lang`` is used).
+   * - ``letter``
+     - string
+     - ``"M"``
+     - Single-letter weekday label (translated when ``--lang`` is used).
+       Suitable for compact calendar grids.
    * - ``is_off_day``
      - bool
      - ``false``
@@ -316,9 +329,9 @@ Common patterns:
      - Output
    * - ``{{ day.weekday }}``
      - ``Wednesday``
-   * - ``{{ day.weekday.name[:3] }}``
+   * - ``{{ day.weekday.short_name }}``
      - ``Wed``
-   * - ``{{ day.weekday.name[0] }}``
+   * - ``{{ day.weekday.letter }}``
      - ``W``
 
 
@@ -370,6 +383,7 @@ Quick cheat sheet
     Month
       .value             -> 1
       .name              -> "January"
+      .short_name        -> "Jan"
       .days              -> [Day(1), Day(2), ..., Day(31)]
       .table             -> [[None, None, ..., Day], ...]
       .id                -> "2026-01"
@@ -383,6 +397,8 @@ Quick cheat sheet
     WeekDay
       .value             -> 0
       .name              -> "Monday"
+      .short_name        -> "Mon"
+      .letter            -> "M"
       .is_off_day        -> false
 
 

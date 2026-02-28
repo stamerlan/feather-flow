@@ -137,11 +137,12 @@ Use square brackets to access items by position. Positions start at zero, so
 ``year.months[0]`` is January and ``year.months[11]`` is December.
 
 
-String slicing
---------------
+Short names
+-----------
 
-You can slice strings the same way you slice lists. This is handy for
-abbreviations.
+Month and WeekDay objects have dedicated ``short_name`` properties for
+abbreviated display. WeekDay also has a ``letter`` property for single-character
+labels. These work correctly across all languages set via ``--lang``.
 
 **Template:**
 
@@ -149,7 +150,7 @@ abbreviations.
 
    %% set year = calendar.year(2026)
    %% set january = year.months[0]
-   <th>{{ january.name[:3] }}</th>
+   <th>{{ january.short_name }}</th>
 
 **Output:**
 
@@ -157,8 +158,11 @@ abbreviations.
 
    <th>Jan</th>
 
-``[:3]`` means "the first three characters". This is handy for showing short
-month and weekday names in calendar tables.
+.. tip::
+
+   Prefer ``short_name`` and ``letter`` over string slicing (``name[:3]``,
+   ``name[0]``). Slicing by character count does not produce correct
+   abbreviations in all languages.
 
 
 String representation

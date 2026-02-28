@@ -1,6 +1,10 @@
 import calendar
 from typing import Iterator, Iterable
 from .dayinfo import DayInfo, DayInfoProvider
+from .translations import (
+    MONTH_NAMES, MONTH_SHORT_NAMES,
+    DEFAULT_LANGUAGE,
+)
 from .weekday import WeekDay
 
 _EMPTY_DAY_INFO = DayInfo()
@@ -34,13 +38,15 @@ class Day:
 
 
 class Month:
-    def __init__(self, value: int, name: str, days: Iterable[Day],
+    def __init__(self, value: int, name: str, short_name: str,
+                 days: Iterable[Day],
                  table: Iterable[Iterable[Day | None]], id: str) -> None:
-        self.value = value
-        self.name  = name
-        self.days  = days
-        self.table = table
-        self.id    = id
+        self.value      = value
+        self.name       = name
+        self.short_name = short_name
+        self.days       = days
+        self.table      = table
+        self.id         = id
 
     def __int__(self) -> int:
         return self.value
@@ -73,24 +79,18 @@ class Year:
 
 class Calendar:
     def __init__(self, firstweekday: int = 0,
-                 provider: DayInfoProvider | None = None) -> None:
-        self._all_weekdays = (
-            WeekDay(0, "Monday",    False),
-            WeekDay(1, "Tuesday",   False),
-            WeekDay(2, "Wednesday", False),
-            WeekDay(3, "Thursday",  False),
-            WeekDay(4, "Friday",    False),
-            WeekDay(5, "Saturday",  True),
-            WeekDay(6, "Sunday",    True),
+                 provider: DayInfoProvider | None = None,
+                 lang: str = DEFAULT_LANGUAGE) -> None:
+        self._all_weekdays = WeekDay.all_weekdays(lang)
+        self._lang = lang
+        self._cal = calendar.Calendar(firstweekday)
+        self._provider: DayInfoProvider = (
+            provider if provider is not None else _EmptyDayInfoProvider("")
         )
 
         self.firstweekday = firstweekday
         n = firstweekday
         self.weekdays = self._all_weekdays[n:] + self._all_weekdays[:n]
-        self._cal = calendar.Calendar(firstweekday)
-        self._provider: DayInfoProvider = (
-            provider if provider is not None else _EmptyDayInfoProvider("")
-        )
 
     def year(self, the_year: int) -> Year:
         """Construct a :class:`Year` calendar object.
@@ -104,23 +104,27 @@ class Calendar:
         """
         day_info = self._provider.fetch_day_info(the_year) or {}
 
+        month_names = MONTH_NAMES[self._lang]
+        month_short = MONTH_SHORT_NAMES[self._lang]
         MONTHS = (
-            ( 1, "January",   31),
-            ( 2, "February",  28 if not calendar.isleap(the_year) else 29),
-            ( 3, "March",     31),
-            ( 4, "April",     30),
-            ( 5, "May",       31),
-            ( 6, "June",      30),
-            ( 7, "July",      31),
-            ( 8, "August",    31),
-            ( 9, "September", 30),
-            (10, "October",   31),
-            (11, "November",  30),
-            (12, "December",  31),
+            ( 1, month_names[ 0], month_short[ 0], 31),
+            ( 2, month_names[ 1], month_short[ 1],
+                28 if not calendar.isleap(the_year) else 29
+            ),
+            ( 3, month_names[ 2], month_short[ 2], 31),
+            ( 4, month_names[ 3], month_short[ 3], 30),
+            ( 5, month_names[ 4], month_short[ 4], 31),
+            ( 6, month_names[ 5], month_short[ 5], 30),
+            ( 7, month_names[ 6], month_short[ 6], 31),
+            ( 8, month_names[ 7], month_short[ 7], 31),
+            ( 9, month_names[ 8], month_short[ 8], 30),
+            (10, month_names[ 9], month_short[ 9], 31),
+            (11, month_names[10], month_short[10], 30),
+            (12, month_names[11], month_short[11], 31),
         )
 
         months = list[Month]()
-        for month, name, days_cnt in MONTHS:
+        for month, name, short_name, days_cnt in MONTHS:
             days = list[Day]()
             for day in range(1, days_cnt + 1):
                 date_id = f"{the_year}-{month:02d}-{day:02d}"
@@ -138,6 +142,7 @@ class Calendar:
                     row.append(days[day - 1] if day else None)
                 table.append(row)
             months.append(
-                Month(month, name, days, table, f"{the_year}-{month:02d}")
+                Month(month, name, short_name, days, table,
+                      f"{the_year}-{month:02d}")
             )
         return Year(the_year, months, f"{the_year}")

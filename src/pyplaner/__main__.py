@@ -5,6 +5,7 @@ import textwrap
 from .calendar import Calendar
 from .dayinfo import DayInfoProvider
 from .planer import Planer
+from .translations import SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE
 from .weekday import WeekDay
 
 def main() -> None:
@@ -75,6 +76,10 @@ def main() -> None:
         help="load custom day-info provider classes from the given Python "
              "module (may be specified multiple times); "
              "default: pyplaner.providers")
+    parser.add_argument("-l", "--lang", default=DEFAULT_LANGUAGE,
+        choices=SUPPORTED_LANGUAGES,
+        help="display language for weekday and month names "
+             f"(default: {DEFAULT_LANGUAGE})")
     parser.add_argument("-q", "--quiet", action="store_true",
         help="suppress informational output")
     args = parser.parse_args()
@@ -122,7 +127,8 @@ def main() -> None:
         firstweekday = 0
 
     # Generate the output files.
-    calendar = Calendar(firstweekday=firstweekday, provider=dayinfo)
+    calendar = Calendar(firstweekday=firstweekday, provider=dayinfo,
+        lang=args.lang)
     planner = Planer(args.file, calendar=calendar)
 
     if args.html is not None:
