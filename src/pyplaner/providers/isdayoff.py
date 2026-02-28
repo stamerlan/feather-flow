@@ -5,7 +5,7 @@ import warnings
 
 from ..dayinfo import DayInfo, DayInfoProvider
 
-_SUPPORTED_CC = frozenset(("ru", "ua", "by", "kz", "uz", "tr", "ge", "us"))
+_SUPPORTED_CC = frozenset(("ru", "ua", "by", "kz", "uz", "tr", "ge"))
 
 
 class IsDayOffProvider(DayInfoProvider):
