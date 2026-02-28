@@ -8,8 +8,8 @@ produce. Keep it open while you design - it answers "what can I put inside
 
 **Key topics**
 
-* The two variables injected into every template (``calendar`` and
-  ``planner_head``).
+* The variables injected into every template (``calendar``, ``planner_head``
+  and ``lang``).
 * Year, Month, Day, WeekDay objects and their properties.
 * The ``month.table`` grid explained visually.
 * String representation shortcuts.
@@ -19,7 +19,7 @@ produce. Keep it open while you design - it answers "what can I put inside
 Injected variables
 ------------------
 
-pyplaner passes exactly two variables to your template:
+pyplaner passes these variables to your template:
 
 .. list-table::
    :header-rows: 1
@@ -36,6 +36,11 @@ pyplaner passes exactly two variables to your template:
      - string
      - HTML to inject in ``<head>``. Empty for HTML output, contains a
        ``<base>`` tag for PDF output. Always include it.
+   * - ``lang``
+     - string
+     - The active display language code (e.g. ``"en"``, ``"ru"``, ``"kr"``),
+       set by ``--lang``. Use it to apply language-specific CSS such as font
+       families, font sizes or layout adjustments.
 
 
 Calendar
@@ -61,6 +66,10 @@ The ``calendar`` object itself has two things you will use:
    * - ``calendar.firstweekday``
      - int
      - The first day of the week as a number (0 = Monday ... 6 = Sunday).
+   * - ``calendar.lang``
+     - string
+     - The active display language code (same value as the top-level ``lang``
+       variable).
 
 ``calendar.weekdays`` example (default, Monday start):
 
@@ -368,10 +377,13 @@ Quick cheat sheet
 
 ::
 
+    lang                 -> "en"  (set by --lang)
+
     calendar
       .year(2026)        -> Year
       .weekdays          -> (Mon, Tue, ..., Sun)  *rotated by --first-weekday*
       .firstweekday      -> 0  (0=Mon .. 6=Sun)
+      .lang              -> "en"
 
     Year
       .value             -> 2026

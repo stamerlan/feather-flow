@@ -82,7 +82,7 @@ class Calendar:
                  provider: DayInfoProvider | None = None,
                  lang: str = DEFAULT_LANGUAGE) -> None:
         self._all_weekdays = WeekDay.all_weekdays(lang)
-        self._lang = lang
+        self.lang = lang
         self._cal = calendar.Calendar(firstweekday)
         self._provider: DayInfoProvider = (
             provider if provider is not None else _EmptyDayInfoProvider("")
@@ -104,8 +104,8 @@ class Calendar:
         """
         day_info = self._provider.fetch_day_info(the_year) or {}
 
-        month_names = MONTH_NAMES[self._lang]
-        month_short = MONTH_SHORT_NAMES[self._lang]
+        month_names = MONTH_NAMES[self.lang]
+        month_short = MONTH_SHORT_NAMES[self.lang]
         MONTHS = (
             ( 1, month_names[ 0], month_short[ 0], 31),
             ( 2, month_names[ 1], month_short[ 1],

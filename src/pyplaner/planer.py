@@ -67,7 +67,8 @@ class Planer:
         """
         return self._template.render(
             planner_head="",
-            calendar=self.calendar
+            calendar=self.calendar,
+            lang=self.calendar.lang,
         )
 
     def pdf(self,
@@ -95,7 +96,8 @@ class Planer:
         planner_head = markupsafe.Markup('<base href="file://.">')
         html = self._template.render(
             planner_head=planner_head,
-            calendar=self.calendar
+            calendar=self.calendar,
+            lang=self.calendar.lang,
         )
         if timing_cb:
             timing_cb("html_render", time.perf_counter() - t0)
