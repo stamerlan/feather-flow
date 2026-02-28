@@ -28,15 +28,30 @@ jobs:
       - name: Install Playwright browsers
         run: python -m playwright install --with-deps chromium
 
-      - name: Generate PDF
-        run: pyplaner pages/ff-2026.html --country pl
+      - name: Generate PDF (Poland)
+        run: pyplaner pages/ff-2026.html --country pl --pdf ff-2026-pl.pdf
 
-      - name: Upload artifact (PRs only)
+      - name: Generate PDF (Belarus)
+        run: pyplaner pages/ff-2026.html --country by --pdf ff-2026-by.pdf
+
+      - name: Generate PDF (US)
+        run: pyplaner pages/ff-2026.html --country us --pdf ff-2026-us.pdf
+
+      - name: Upload artifacts (PRs only)
         if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v4
         with:
-          name: ff-2026-pdf
-          path: ff-2026.pdf
+          name: ff-2026-pdfs
+          path: |
+            ff-2026-pl.pdf
+            ff-2026-by.pdf
+            ff-2026-us.pdf
+
+      - name: Move latest tag to HEAD
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git tag -f latest
+          git push -f origin latest
 
       - name: Publish to release (main only)
         if: github.ref == 'refs/heads/main'
@@ -45,5 +60,8 @@ jobs:
           tag_name: latest
           name: Latest PDF Build
           body: Auto-generated PDF from the latest commit on main.
-          files: ff-2026.pdf
+          files: |
+            ff-2026-pl.pdf
+            ff-2026-by.pdf
+            ff-2026-us.pdf
           prerelease: true

@@ -4,7 +4,7 @@ Feather Flow
 |ff2026_pdf|
 
 .. |ff2026_pdf| image:: https://img.shields.io/badge/Feather_Flow_2026-PDF-blue?logo=adobeacrobatreader&logoColor=white
-   :target: https://github.com/stamerlan/feather-flow/releases/download/latest/ff-2026.pdf
+   :target: https://github.com/stamerlan/feather-flow/releases/tag/latest
    :alt: Feather Flow 2026
 
 Feather Flow is a digital planner PDF generator built on top of
