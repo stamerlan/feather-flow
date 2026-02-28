@@ -33,6 +33,26 @@
   <meta charset="utf-8">
   <link rel="stylesheet" href="assets/ff-2026.css">
   <link rel="stylesheet" href="assets/cormorant-garamond.css">
+  %% if lang == "kr"
+  <link rel="stylesheet" href="assets/noto-serif-kr.css">
+  <style>
+    .page {
+      font-family: "Noto Serif KR", "Cormorant Garamond", Georgia, system-ui, serif;
+    }
+    .year-grid {
+      font-family: "Noto Serif KR", "Cormorant Garamond", Georgia, system-ui, serif;
+    }
+    .month-name {
+      letter-spacing: 3mm;
+    }
+    .year-grid-month-table td {
+      font-size: 13pt;
+    }
+    .day-header-days-row {
+      font-size: 12pt;
+    }
+  </style>
+  %% endif
 </head>
 <body>
   ## Set opacity to enforce Chromium to rasterize page. Necessary for correct
