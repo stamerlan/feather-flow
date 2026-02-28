@@ -55,9 +55,14 @@ The ``calendar`` object itself has two things you will use:
      - Build a Year object for the given year number.
    * - ``calendar.weekdays``
      - tuple
-     - Seven WeekDay objects, Monday through Sunday.
+     - Seven WeekDay objects starting from the configured first day of the week.
+       Defaults to Monday through Sunday; changes when ``--first-weekday`` or
+       ``--country`` is used.
+   * - ``calendar.firstweekday``
+     - int
+     - The first day of the week as a number (0 = Monday ... 6 = Sunday).
 
-``calendar.weekdays`` example:
+``calendar.weekdays`` example (default, Monday start):
 
 **Template:**
 
@@ -78,6 +83,18 @@ The ``calendar`` object itself has two things you will use:
    Friday
    Saturday
    Sunday
+
+When ``--first-weekday sunday`` is used, the same loop outputs:
+
+.. code-block:: text
+
+   Sunday
+   Monday
+   Tuesday
+   Wednesday
+   Thursday
+   Friday
+   Saturday
 
 
 Year
@@ -160,18 +177,22 @@ Understanding ``month.table``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``month.table`` is a list of weeks. Each week is a list of seven slots - one per
-weekday (Monday through Sunday). A slot contains a Day object or ``None`` if
-that weekday falls outside the month.
+weekday, ordered to match ``calendar.weekdays``. A slot contains a Day object or
+``None`` if that weekday falls outside the month.
 
-January 2026 starts on Thursday. The table looks like this::
+The column order depends on the configured first day of the week.
 
-    Week  Mon   Tue   Wed   Thu   Fri   Sat   Sun
-    ----  ----  ----  ----  ----  ----  ----  ----
-    0     None  None  None  1     2     3     4
-    1     5     6     7     8     9     10    11
-    2     12    13    14    15    16    17    18
-    3     19    20    21    22    23    24    25
-    4     26    27    28    29    30    31    None
+January 2026 starts on Thursday. With the default Monday start the table looks
+like this::
+
+    Mon   Tue   Wed   Thu   Fri   Sat   Sun
+    ----  ----  ----  ----  ----  ----  ----
+    None  None  None  1     2     3     4
+    5     6     7     8     9     10    11
+    12    13    14    15    16    17    18
+    19    20    21    22    23    24    25
+    26    27    28    29    30    31    None
+
 
 In your template you loop over weeks (rows) and then over days (cells). Check
 for ``None`` before printing:
@@ -336,7 +357,8 @@ Quick cheat sheet
 
     calendar
       .year(2026)        -> Year
-      .weekdays          -> (Mon, Tue, ..., Sun)
+      .weekdays          -> (Mon, Tue, ..., Sun)  *rotated by --first-weekday*
+      .firstweekday      -> 0  (0=Mon .. 6=Sun)
 
     Year
       .value             -> 2026

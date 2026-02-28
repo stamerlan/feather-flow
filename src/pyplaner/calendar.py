@@ -1,6 +1,7 @@
 import calendar
 from typing import Iterator, Iterable
 from .dayinfo import DayInfo, DayInfoProvider
+from .weekday import WeekDay
 
 _EMPTY_DAY_INFO = DayInfo()
 
@@ -10,19 +11,6 @@ class _EmptyDayInfoProvider(DayInfoProvider):
 
     def fetch_day_info(self, year: int) -> dict[str, DayInfo]:
         return {}
-
-class WeekDay:
-    def __init__(self, day: int, name: str, is_off_day: bool) -> None:
-        self.value      = day
-        self.name       = name
-        self.is_off_day = is_off_day
-
-    def __int__(self) -> int:
-        return self.value
-
-    def __str__(self) -> str:
-        return self.name
-
 
 class Day:
     def __init__(self, day: int, weekday: WeekDay, id: str,
@@ -86,7 +74,7 @@ class Year:
 class Calendar:
     def __init__(self, firstweekday: int = 0,
                  provider: DayInfoProvider | None = None) -> None:
-        self.weekdays = (
+        self._all_weekdays = (
             WeekDay(0, "Monday",    False),
             WeekDay(1, "Tuesday",   False),
             WeekDay(2, "Wednesday", False),
@@ -97,6 +85,9 @@ class Calendar:
         )
 
         self.firstweekday = firstweekday
+        n = firstweekday
+        self.weekdays = self._all_weekdays[n:] + self._all_weekdays[:n]
+        self._cal = calendar.Calendar(firstweekday)
         self._provider: DayInfoProvider = (
             provider if provider is not None else _EmptyDayInfoProvider("")
         )
@@ -134,14 +125,14 @@ class Calendar:
             for day in range(1, days_cnt + 1):
                 date_id = f"{the_year}-{month:02d}-{day:02d}"
                 days.append(Day(day,
-                    self.weekdays[calendar.weekday(the_year, month, day)],
+                    self._all_weekdays[calendar.weekday(the_year, month, day)],
                     date_id,
                     day_info.get(date_id, _EMPTY_DAY_INFO),
                 ))
 
-            # Month table
+            # Month table (columns match self.weekdays order)
             table = list[list[Day | None]]()
-            for week in calendar.monthcalendar(the_year, month):
+            for week in self._cal.monthdayscalendar(the_year, month):
                 row = []
                 for col, day in enumerate(week):
                     row.append(days[day - 1] if day else None)

@@ -5,6 +5,7 @@ import textwrap
 from .calendar import Calendar
 from .dayinfo import DayInfoProvider
 from .planer import Planer
+from .weekday import WeekDay
 
 def main() -> None:
     parser = argparse.ArgumentParser(
@@ -34,7 +35,10 @@ def main() -> None:
                   Generate PDF with Polish public holidays.
 
               pyplaner planner.html --provider my_holidays --country us
-                  Use a custom provider to fetch holidays / off-days."""),
+                  Use a custom provider to fetch holidays / off-days.
+
+              pyplaner planner.html --country us
+                  Holidays for the US; week automatically starts on Sunday."""),
     )
     parser.add_argument("files", nargs="+", type=pathlib.Path,
         metavar="FILE", help="planner template file(s)")
@@ -50,8 +54,17 @@ def main() -> None:
         help=(
             "ISO 3166-1 alpha-2 country code for holidays / off-days "
             "(e.g., PL, US, DE, FR, etc.). "
+            "Also sets the first day of the week for that country "
+            "unless --first-weekday is given explicitly. "
             "Uses the built-in providers by default; combine with "
             "--provider to use a custom provider instead."
+        ))
+    parser.add_argument("-w", "--first-weekday", default=None, metavar="DAY",
+        help=(
+            "first day of the week: name (monday, tuesday, ..., sunday) "
+            "or number (0=monday .. 6=sunday). "
+            "Overrides the country default when --country is also set. "
+            "Default: monday"
         ))
     parser.add_argument("--provider", action="append",
         metavar="MODULE",
@@ -92,8 +105,16 @@ def main() -> None:
                 f"No day-info provider found for country {args.country!r}."
             )
 
+    # Resolve first weekday: explicit flag > country default > Monday.
+    if args.first_weekday is not None:
+        firstweekday = WeekDay.parse_weekday(args.first_weekday)
+    elif args.country:
+        firstweekday = WeekDay.first_weekday_for_country(args.country)
+    else:
+        firstweekday = 0
+
     # Generate the output files.
-    calendar = Calendar(provider=dayinfo)
+    calendar = Calendar(firstweekday=firstweekday, provider=dayinfo)
 
     for path in args.files:
         planner = Planer(path, calendar=calendar)
