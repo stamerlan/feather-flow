@@ -2,6 +2,8 @@ import argparse
 import pathlib
 import sys
 import textwrap
+
+from . import __version__
 from .calendar import Calendar
 from .dayinfo import DayInfoProvider
 from .planer import Planer
@@ -43,6 +45,8 @@ def main() -> None:
               pyplaner planner.html --country us
                   Holidays for the US; week automatically starts on Sunday."""),
     )
+    parser.add_argument("-v", "--version", action="version",
+        version=f"%(prog)s {__version__}")
     parser.add_argument("file", type=pathlib.Path,
         metavar="FILE", help="planner template file")
     parser.add_argument("--html", nargs="?", const=True, default=None,
