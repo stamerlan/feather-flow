@@ -19,6 +19,17 @@ _SATURDAY_START: frozenset[str] = frozenset((
     "om", "qa", "sd", "sy", "ae",
 ))
 
+# Countries where the weekend is Friday–Saturday (4, 5) instead of Sat–Sun.
+_FRIDAY_SATURDAY_OFF: frozenset[str] = frozenset((
+    "ae", "af", "bh", "bd", "dj", "dz", "eg", "iq", "ir", "jo",
+    "kw", "ly", "mv", "om", "ps", "qa", "sa", "sd", "so", "sy", "ye",
+))
+
+# Countries where only Friday (4) is the weekly day off.
+_FRIDAY_ONLY_OFF: frozenset[str] = frozenset(("mr",))
+
+_DEFAULT_COUNTRY = "gb"
+
 
 class WeekDay:
     def __init__(self, day: int, name: str, short_name: str,
@@ -50,6 +61,33 @@ class WeekDay:
         if cc in _SATURDAY_START:
             return 5
         return 0
+
+    @staticmethod
+    def create(day: int, country: str | None = None,
+               lang: str | None = None) -> "WeekDay":
+        """Create a :class:`WeekDay` for the given weekday number and country.
+
+        The *country* determines which days of the week are considered off
+        days (e.g. Friday-Saturday for ``AE``, Saturday-Sunday for ``GB``).
+
+        :param day: Weekday number (0 = Monday ... 6 = Sunday).
+        :param country: ISO 3166-1 alpha-2 country code (case-insensitive).
+            Defaults to Saturday-Sunday weekend when ``None``.
+        :param lang: Language for weekday names. Defaults to
+            :data:`DEFAULT_LANGUAGE` when ``None``.
+        """
+        if lang is None:
+            lang = DEFAULT_LANGUAGE
+        cc = (country or _DEFAULT_COUNTRY).lower()
+        if cc in _FRIDAY_SATURDAY_OFF:
+            is_off = day in (4, 5)
+        elif cc in _FRIDAY_ONLY_OFF:
+            is_off = day == 4
+        else:
+            is_off = day >= 5
+        return WeekDay(day, WEEKDAY_NAMES[lang][day],
+                       WEEKDAY_SHORT_NAMES[lang][day],
+                       WEEKDAY_LETTERS[lang][day], is_off)
 
     @staticmethod
     def parse_weekday(value: str) -> int:
@@ -84,11 +122,7 @@ class WeekDay:
         )
 
     @staticmethod
-    def all_weekdays(lang: str = DEFAULT_LANGUAGE)-> tuple["WeekDay", ...]:
-        return tuple(
-            WeekDay(i, WEEKDAY_NAMES[lang][i],
-                WEEKDAY_SHORT_NAMES[lang][i],
-                WEEKDAY_LETTERS[lang][i],
-                i >= 5)
-            for i in range(7)
-        )
+    def all_weekdays(lang: str | None = None,
+                     country: str | None = None,
+                     ) -> tuple["WeekDay", ...]:
+        return tuple(WeekDay.create(i, country, lang) for i in range(7))

@@ -128,7 +128,7 @@ def main() -> None:
 
     # Generate the output files.
     calendar = Calendar(firstweekday=firstweekday, provider=dayinfo,
-        lang=args.lang)
+        lang=args.lang, country=args.country)
     planner = Planer(args.file, calendar=calendar)
 
     if args.html is not None:

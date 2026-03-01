@@ -80,9 +80,10 @@ class Year:
 class Calendar:
     def __init__(self, firstweekday: int = 0,
                  provider: DayInfoProvider | None = None,
-                 lang: str = DEFAULT_LANGUAGE) -> None:
-        self._all_weekdays = WeekDay.all_weekdays(lang)
-        self.lang = lang
+                 lang: str | None = None,
+                 country: str | None = None) -> None:
+        self._all_weekdays = WeekDay.all_weekdays(lang, country)
+        self.lang = lang or DEFAULT_LANGUAGE
         self._cal = calendar.Calendar(firstweekday)
         self._provider: DayInfoProvider = (
             provider if provider is not None else _EmptyDayInfoProvider("")
