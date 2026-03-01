@@ -1,7 +1,9 @@
+import io
 import os
 import pathlib
 import time
-from typing import Callable
+from contextlib import contextmanager
+from typing import Callable, Iterator
 from urllib.parse import urlparse, unquote
 
 import jinja2
@@ -13,9 +15,17 @@ from .calendar import Calendar
 try:
     import pikepdf
     from .optimize_pdf import optimize_pdf
-    import io
 except ImportError:
     pikepdf = None  # type: ignore[assignment]
+
+
+@contextmanager
+def _timed(phase: str,
+           cb: Callable[[str, float], None] | None) -> Iterator[None]:
+    t0 = time.perf_counter()
+    yield
+    if cb:
+        cb(phase, time.perf_counter() - t0)
 
 
 def _asset_route(r: Route) -> None:
@@ -45,8 +55,10 @@ class Planer:
     """
 
     def __init__(self, template_path: str | os.PathLike,
-                 calendar = Calendar()
+                 calendar: Calendar | None = None,
     ) -> None:
+        if calendar is None:
+            calendar = Calendar()
         self._path = pathlib.Path(template_path).absolute()
 
         self._env = jinja2.Environment(
@@ -92,65 +104,54 @@ class Planer:
             after each processing stage.
         :returns: PDF file content as bytes.
         """
-        t0 = time.perf_counter()
-        planner_head = markupsafe.Markup('<base href="file://.">')
-        html = self._template.render(
-            planner_head=planner_head,
-            calendar=self.calendar,
-            lang=self.calendar.lang,
-        )
-        if timing_cb:
-            timing_cb("html_render", time.perf_counter() - t0)
+        with _timed("html_render", timing_cb):
+            planner_head = markupsafe.Markup('<base href="file://.">')
+            html = self._template.render(
+                planner_head=planner_head,
+                calendar=self.calendar,
+                lang=self.calendar.lang,
+            )
 
         with sync_playwright() as p:
-            t0 = time.perf_counter()
-            browser = p.chromium.launch(args=[
-                # allows file access
-                "--allow-file-access-from-files",
-                "--disable-web-security"
-            ])
-            if timing_cb:
-                timing_cb("browser_launch", time.perf_counter() - t0)
+            with _timed("browser_launch", timing_cb):
+                browser = p.chromium.launch(args=[
+                    "--allow-file-access-from-files",
+                    "--disable-web-security",
+                ])
 
             page = browser.new_page()
             page.on("requestfailed",
                 lambda r: print(f'Failed to load "{r.url}"'))
             page.route("file://**/*", _asset_route)
 
-            t0 = time.perf_counter()
-            page.set_content(html, wait_until="load")
-            page.evaluate("() => document.fonts.ready")
-            if timing_cb:
-                timing_cb("set_content", time.perf_counter() - t0)
+            with _timed("set_content", timing_cb):
+                page.set_content(html, wait_until="load")
+                page.evaluate("() => document.fonts.ready")
 
-            t0 = time.perf_counter()
-            pdf = page.pdf(
-                print_background=True,
-                prefer_css_page_size=True,
-                margin={
-                    "top": margin_top,
-                    "right": margin_right,
-                    "bottom": margin_bottom,
-                    "left": margin_left
-                }
-            )
-            if timing_cb:
-                timing_cb("page_pdf", time.perf_counter() - t0)
+            with _timed("page_pdf", timing_cb):
+                pdf = page.pdf(
+                    print_background=True,
+                    prefer_css_page_size=True,
+                    margin={
+                        "top": margin_top,
+                        "right": margin_right,
+                        "bottom": margin_bottom,
+                        "left": margin_left,
+                    },
+                )
 
             browser.close()
 
         if pikepdf is None:
             return pdf
 
-        t0 = time.perf_counter()
-        with pikepdf.open(io.BytesIO(pdf)) as pike_pdf_obj:
-            if pdf_optimize:
-                optimize_pdf(pike_pdf_obj)
-            bio = io.BytesIO()
-            pike_pdf_obj.save(bio,
-                object_stream_mode=pikepdf.ObjectStreamMode.generate,
-                recompress_flate=True
-            )
-            if timing_cb:
-                timing_cb("pikepdf", time.perf_counter() - t0)
-            return bio.getvalue()
+        with _timed("pikepdf", timing_cb):
+            with pikepdf.open(io.BytesIO(pdf)) as pike_pdf_obj:
+                if pdf_optimize:
+                    optimize_pdf(pike_pdf_obj)
+                bio = io.BytesIO()
+                pike_pdf_obj.save(bio,
+                    object_stream_mode=pikepdf.ObjectStreamMode.generate,
+                    recompress_flate=True,
+                )
+                return bio.getvalue()

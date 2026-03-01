@@ -131,7 +131,7 @@ The project uses `Sphinx <https://www.sphinx-doc.org/>`_ with the
 
 Install the documentation dependencies::
 
-    pip instal -e .[docs]
+    pip install -e .[docs]
 
 Build the HTML docs.
 

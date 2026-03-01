@@ -14,7 +14,7 @@ class IsDayOffProvider(DayInfoProvider):
     Provides complete workday/off-day data including public holidays and
     transferred workdays. Free, no API key required.
 
-    Supported countries: RU, UA, BY, KZ, UZ, TR, GE, US.
+    Supported countries: RU, UA, BY, KZ, UZ, TR, GE.
     """
 
     def __init__(self, country_code: str, *, timeout: float = 10) -> None:

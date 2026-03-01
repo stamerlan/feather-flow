@@ -1,4 +1,4 @@
-import calendar
+import calendar as _stdlib_calendar
 from typing import Iterator, Iterable
 from .dayinfo import DayInfo, DayInfoProvider
 from .translations import (
@@ -15,6 +15,7 @@ class _EmptyDayInfoProvider(DayInfoProvider):
 
     def fetch_day_info(self, year: int) -> dict[str, DayInfo]:
         return {}
+
 
 class Day:
     def __init__(self, day: int, weekday: WeekDay, id: str,
@@ -69,7 +70,7 @@ class Year:
 
     @property
     def isleap(self) -> bool:
-        return calendar.isleap(self.value)
+        return _stdlib_calendar.isleap(self.value)
 
     def days(self) -> Iterator[Day]:
         for m in self.months:
@@ -84,7 +85,7 @@ class Calendar:
                  country: str | None = None) -> None:
         self._all_weekdays = WeekDay.all_weekdays(lang, country)
         self.lang = lang or DEFAULT_LANGUAGE
-        self._cal = calendar.Calendar(firstweekday)
+        self._cal = _stdlib_calendar.Calendar(firstweekday)
         self._provider: DayInfoProvider = (
             provider if provider is not None else _EmptyDayInfoProvider("")
         )
@@ -107,43 +108,31 @@ class Calendar:
 
         month_names = MONTH_NAMES[self.lang]
         month_short = MONTH_SHORT_NAMES[self.lang]
-        MONTHS = (
-            ( 1, month_names[ 0], month_short[ 0], 31),
-            ( 2, month_names[ 1], month_short[ 1],
-                28 if not calendar.isleap(the_year) else 29
-            ),
-            ( 3, month_names[ 2], month_short[ 2], 31),
-            ( 4, month_names[ 3], month_short[ 3], 30),
-            ( 5, month_names[ 4], month_short[ 4], 31),
-            ( 6, month_names[ 5], month_short[ 5], 30),
-            ( 7, month_names[ 6], month_short[ 6], 31),
-            ( 8, month_names[ 7], month_short[ 7], 31),
-            ( 9, month_names[ 8], month_short[ 8], 30),
-            (10, month_names[ 9], month_short[ 9], 31),
-            (11, month_names[10], month_short[10], 30),
-            (12, month_names[11], month_short[11], 31),
-        )
 
-        months = list[Month]()
-        for month, name, short_name, days_cnt in MONTHS:
-            days = list[Day]()
+        months: list[Month] = []
+        for month_num in range(1, 13):
+            days_cnt = _stdlib_calendar.monthrange(the_year, month_num)[1]
+            name       = month_names[month_num - 1]
+            short_name = month_short[month_num - 1]
+
+            days: list[Day] = []
             for day in range(1, days_cnt + 1):
-                date_id = f"{the_year}-{month:02d}-{day:02d}"
+                date_id = f"{the_year}-{month_num:02d}-{day:02d}"
                 days.append(Day(day,
-                    self._all_weekdays[calendar.weekday(the_year, month, day)],
+                    self._all_weekdays[
+                        _stdlib_calendar.weekday(the_year, month_num, day)],
                     date_id,
                     day_info.get(date_id, _EMPTY_DAY_INFO),
                 ))
 
-            # Month table (columns match self.weekdays order)
-            table = list[list[Day | None]]()
-            for week in self._cal.monthdayscalendar(the_year, month):
-                row = []
-                for col, day in enumerate(week):
-                    row.append(days[day - 1] if day else None)
-                table.append(row)
+            table: list[list[Day | None]] = []
+            for week in self._cal.monthdayscalendar(the_year, month_num):
+                table.append([
+                    days[d - 1] if d else None for d in week
+                ])
+
             months.append(
-                Month(month, name, short_name, days, table,
-                      f"{the_year}-{month:02d}")
+                Month(month_num, name, short_name, days, table,
+                      f"{the_year}-{month_num:02d}")
             )
         return Year(the_year, months, f"{the_year}")

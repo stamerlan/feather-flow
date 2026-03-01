@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pyplaner"
 version = "0.1.0"
-description = "A chicken-planner PDF generation library"
+description = "A digital planner PDF generation library"
 authors = [
     { name = "Vlad Vovchenko", email = "vlad.vovchenko93@gmail.com" }
 ]
