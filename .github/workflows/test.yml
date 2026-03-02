@@ -1,0 +1,49 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -e .[test,pdf-opt]
+
+      - name: Run tests
+        run: >
+          pytest
+          --cov
+          --cov-report=term
+          --cov-report=xml:coverage.xml
+
+      - name: Generate coverage badge
+        if: github.ref == 'refs/heads/main'
+        run: |
+          pip install genbadge[coverage]
+          mkdir -p badges
+          genbadge coverage -i coverage.xml -o badges/coverage.svg
+
+      - name: Publish badge
+        if: github.ref == 'refs/heads/main'
+        run: |
+          cd badges
+          git init -b badges
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote add origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
+          git add coverage.svg
+          git commit -m "Update coverage badge"
+          git push -f origin badges

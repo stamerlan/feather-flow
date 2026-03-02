@@ -1,11 +1,19 @@
 Feather Flow
 ============
 
-|ff2026_pdf|
+|ff2026_pdf| |tests| |coverage|
 
 .. |ff2026_pdf| image:: https://img.shields.io/badge/Feather_Flow_2026-PDF-blue?logo=adobeacrobatreader&logoColor=white
    :target: https://github.com/stamerlan/feather-flow/releases/tag/latest
    :alt: Feather Flow 2026
+
+.. |tests| image:: https://github.com/stamerlan/feather-flow/actions/workflows/test.yml/badge.svg
+   :target: https://github.com/stamerlan/feather-flow/actions/workflows/test.yml
+   :alt: Tests
+
+.. |coverage| image:: https://raw.githubusercontent.com/stamerlan/feather-flow/badges/coverage.svg
+   :target: https://github.com/stamerlan/feather-flow/actions/workflows/test.yml
+   :alt: Coverage
 
 Feather Flow is a digital planner PDF generator built on top of
 `Jinja2 <https://jinja.palletsprojects.com/>`_ templates and
