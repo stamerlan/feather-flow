@@ -1,7 +1,7 @@
 import pytest
 
 from pyplaner.calendar import Calendar
-from pyplaner.planer import Planer, _timed, _asset_route
+from pyplaner.planer import Planer, _asset_route
 
 
 @pytest.fixture()
@@ -61,21 +61,6 @@ def test_planner_head_empty_in_html(tmp_path):
     html = planer.html()
     assert html.strip() == "OK"
 
-
-def test_timed_calls_callback():
-    """_timed context manager invokes the callback with phase name and elapsed time."""
-    results = []
-    with _timed("test_phase", lambda phase, t: results.append((phase, t))):
-        pass
-    assert len(results) == 1
-    assert results[0][0] == "test_phase"
-    assert results[0][1] >= 0
-
-
-def test_timed_no_callback():
-    """_timed with callback=None completes without error."""
-    with _timed("test_phase", None):
-        pass
 
 
 def test_asset_route_windows_path():

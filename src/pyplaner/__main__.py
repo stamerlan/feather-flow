@@ -7,6 +7,7 @@ from . import __version__
 from .calendar import Calendar
 from .dayinfo import DayInfoProvider
 from .planer import Planer
+from .progress import create_tracker
 from .translations import SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE
 from .weekday import WeekDay
 
@@ -84,8 +85,11 @@ def main() -> None:
         choices=SUPPORTED_LANGUAGES,
         help="display language for weekday and month names "
              f"(default: {DEFAULT_LANGUAGE})")
-    parser.add_argument("-q", "--quiet", action="store_true",
+    verbosity = parser.add_mutually_exclusive_group()
+    verbosity.add_argument("-q", "--quiet", action="store_true",
         help="suppress informational output")
+    verbosity.add_argument("--verbose", action="store_true",
+        help="print per-job durations after each stage")
     args = parser.parse_args()
 
     # Determine which formats to generate.
@@ -134,26 +138,20 @@ def main() -> None:
     calendar = Calendar(firstweekday=firstweekday, provider=dayinfo,
         lang=args.lang, country=args.country)
     planner = Planer(args.file, calendar=calendar)
+    tracker = create_tracker(quiet=args.quiet, verbose=args.verbose)
 
     if args.html is not None:
-        if not args.quiet:
-            print(f"Generating {args.html}...")
-        with open(args.html, "w", encoding="utf-8") as f:
-            f.write(planner.html())
+        with tracker(f"Generating {args.html}"):
+            with open(args.html, "w", encoding="utf-8") as f:
+                f.write(planner.html(tracker=tracker))
 
     if args.pdf is not None:
-        if not args.quiet:
-            print(f"Generating {args.pdf}...")
-            timing_cb = (lambda phase, seconds:
-                print(f"  {phase:15s}: {seconds:.3f}s")
-            )
-        else:
-            timing_cb = None # type: ignore[assignment]
-        with open(args.pdf, "wb") as f:
-            f.write(planner.pdf(
-                pdf_optimize=args.pdf_optimize,
-                timing_cb=timing_cb,
-            ))
+        with tracker(f"Generating {args.pdf}"):
+            with open(args.pdf, "wb") as f:
+                f.write(planner.pdf(
+                    pdf_optimize=args.pdf_optimize,
+                    tracker=tracker,
+                ))
 
 if __name__ == "__main__":
     main()

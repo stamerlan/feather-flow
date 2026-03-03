@@ -1,9 +1,6 @@
 import io
 import os
 import pathlib
-import time
-from contextlib import contextmanager
-from typing import Callable, Iterator
 from urllib.parse import urlparse, unquote
 
 import jinja2
@@ -11,21 +8,13 @@ import markupsafe
 from playwright.sync_api import Route, sync_playwright
 
 from .calendar import Calendar
+from .progress import ProgressTracker, QuietTracker
 
 try:
     import pikepdf
     from .optimize_pdf import optimize_pdf
 except ImportError:
     pikepdf = None  # type: ignore[assignment]
-
-
-@contextmanager
-def _timed(phase: str,
-           cb: Callable[[str, float], None] | None) -> Iterator[None]:
-    t0 = time.perf_counter()
-    yield
-    if cb:
-        cb(phase, time.perf_counter() - t0)
 
 
 def _asset_route(r: Route) -> None:
@@ -72,11 +61,17 @@ class Planer:
         self._template = self._env.get_template(self._path.name)
         self.calendar = calendar
 
-    def html(self) -> str:
+    def html(self,
+             tracker: ProgressTracker | None = None,
+             ) -> str:
         """Render the template and return the resulting HTML string.
 
+        :param tracker: Optional progress tracker.
         :returns: Rendered HTML.
         """
+        if tracker is None:
+            tracker = QuietTracker()
+        tracker.job("html render")
         return self._template.render(
             planner_head="",
             calendar=self.calendar,
@@ -89,7 +84,7 @@ class Planer:
             margin_bottom: str | float | None = None,
             margin_left: str | float | None = None,
             pdf_optimize: bool = True,
-            timing_cb: Callable[[str, float], None] | None = None,
+            tracker: ProgressTracker | None = None,
             ) -> bytes:
         """Render the template and return a PDF as raw bytes.
 
@@ -100,58 +95,65 @@ class Planer:
         :param pdf_optimize: If ``True`` (default) and ``pikepdf`` is
             available, post-process the PDF to deduplicate images and
             strip obsolete metadata.
-        :param timing_cb: Optional callback invoked with ``(phase, seconds)``
-            after each processing stage.
+        :param tracker: Optional progress tracker.
         :returns: PDF file content as bytes.
         """
-        with _timed("html_render", timing_cb):
-            planner_head = markupsafe.Markup('<base href="file://.">')
-            html = self._template.render(
-                planner_head=planner_head,
-                calendar=self.calendar,
-                lang=self.calendar.lang,
-            )
+        if tracker is None:
+            tracker = QuietTracker()
+
+        job_count = 4
+        if pikepdf is not None:
+            job_count += 1
+        tracker.set_job_count(job_count)
+
+        tracker.job("html render")
+        planner_head = markupsafe.Markup('<base href="file://.">')
+        html = self._template.render(
+            planner_head=planner_head,
+            calendar=self.calendar,
+            lang=self.calendar.lang,
+        )
 
         with sync_playwright() as p:
-            with _timed("browser_launch", timing_cb):
-                browser = p.chromium.launch(args=[
-                    "--allow-file-access-from-files",
-                    "--disable-web-security",
-                ])
+            tracker.job("browser launch")
+            browser = p.chromium.launch(args=[
+                "--allow-file-access-from-files",
+                "--disable-web-security",
+            ])
 
             page = browser.new_page()
             page.on("requestfailed",
                 lambda r: print(f'Failed to load "{r.url}"'))
             page.route("file://**/*", _asset_route)
 
-            with _timed("set_content", timing_cb):
-                page.set_content(html, wait_until="load")
-                page.evaluate("() => document.fonts.ready")
+            tracker.job("set content")
+            page.set_content(html, wait_until="load")
+            page.evaluate("() => document.fonts.ready")
 
-            with _timed("page_pdf", timing_cb):
-                pdf = page.pdf(
-                    print_background=True,
-                    prefer_css_page_size=True,
-                    margin={
-                        "top": margin_top,
-                        "right": margin_right,
-                        "bottom": margin_bottom,
-                        "left": margin_left,
-                    },
-                )
+            tracker.job("page pdf")
+            pdf = page.pdf(
+                print_background=True,
+                prefer_css_page_size=True,
+                margin={
+                    "top": margin_top,
+                    "right": margin_right,
+                    "bottom": margin_bottom,
+                    "left": margin_left,
+                },
+            )
 
             browser.close()
 
         if pikepdf is None:
             return pdf
 
-        with _timed("pikepdf", timing_cb):
-            with pikepdf.open(io.BytesIO(pdf)) as pike_pdf_obj:
-                if pdf_optimize:
-                    optimize_pdf(pike_pdf_obj)
-                bio = io.BytesIO()
-                pike_pdf_obj.save(bio,
-                    object_stream_mode=pikepdf.ObjectStreamMode.generate,
-                    recompress_flate=True,
-                )
-                return bio.getvalue()
+        tracker.job("pikepdf")
+        with pikepdf.open(io.BytesIO(pdf)) as pike_pdf_obj:
+            if pdf_optimize:
+                optimize_pdf(pike_pdf_obj)
+            bio = io.BytesIO()
+            pike_pdf_obj.save(bio,
+                object_stream_mode=pikepdf.ObjectStreamMode.generate,
+                recompress_flate=True,
+            )
+            return bio.getvalue()
