@@ -94,9 +94,9 @@ installed::
 
     playwright install chromium
 
-To enable PDF optimization, install the optional ``pikepdf`` extra::
+To enable PDF optimization and progress bars, install the ``full`` extra::
 
-    pip install -e .[pdf-opt]
+    pip install -e .[full]
 
 Usage
 -----
@@ -137,9 +137,9 @@ Building the Documentation
 The project uses `Sphinx <https://www.sphinx-doc.org/>`_ with the
 `Read the Docs <https://sphinx-rtd-theme.readthedocs.io/>`_ theme.
 
-Install the documentation dependencies::
+Install the development dependencies (includes documentation and test tools)::
 
-    pip install -e .[docs]
+    pip install -e .[dev]
 
 Build the HTML docs.
 

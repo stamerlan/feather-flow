@@ -23,7 +23,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install pyplaner
-        run: pip install .[pdf-opt,progress]
+        run: pip install .[full]
 
       - name: Install Playwright browsers
         run: python -m playwright install --with-deps chromium
