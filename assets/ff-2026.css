@@ -57,6 +57,8 @@ a:hover {
   font-family: system-ui;
   font-size: 33pt;
   letter-spacing: 16px;
+
+  color: purple;
 }
 
 .cover-title-reflection {

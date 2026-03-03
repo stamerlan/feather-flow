@@ -20,13 +20,16 @@ dependencies = [
 [project.optional-dependencies]
 docs = ["sphinx>=7.0", "sphinx-rtd-theme>=2.0"]
 test = ["pytest>=9.0", "pytest-cov>=7.0"]
+watch = ["livereload>=2.7"]
 full = [
     "pikepdf>=10.3",
     "tqdm>=4.67",
+    "pyplaner[watch]",
 ]
 dev = [
     "pyplaner[docs]",
     "pyplaner[test]",
+    "pyplaner[watch]",
 ]
 
 [project.scripts]
