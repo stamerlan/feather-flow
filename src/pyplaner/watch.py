@@ -4,15 +4,31 @@ Uses the ``livereload`` library for file watching, HTTP serving,
 and automatic browser reload via WebSocket.
 """
 
+import logging
 import pathlib
 import sys
 from datetime import datetime
 
 from livereload import Server
+from livereload.handlers import StaticFileHandler as _BaseSFH
 
 from .calendar import Calendar
+
+
 from .planer import Planer
 from .progress import QuietTracker
+
+
+class _NoCacheStaticHandler(_BaseSFH):
+    """Disable browser caching for all static files.
+
+    Inherits from livereload's ``StaticFileHandler`` which already
+    disables 304 responses (``should_return_304`` returns ``False``).
+    This guarantees every response carries the ``no-store`` directive.
+    """
+
+    def set_extra_headers(self, path):
+        self.set_header("Cache-Control", "no-store")
 
 
 def _timestamp() -> str:
@@ -94,6 +110,20 @@ def watch(
             sys.stdout.flush()
 
     server = Server()
+    server._setup_logging = lambda: None
+    server.SFH = _NoCacheStaticHandler
+
+    logging.getLogger("livereload").setLevel(logging.WARNING)
+    logging.getLogger("tornado").setLevel(logging.WARNING)
+
+    access_log = logging.getLogger("tornado.access")
+    access_log.setLevel(logging.INFO)
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(logging.Formatter(
+        "%(asctime)s %(message)s", datefmt="%H:%M:%S",
+    ))
+    access_log.addHandler(handler)
+    access_log.propagate = False
 
     cwd = pathlib.Path.cwd().resolve()
     tpl_parent = template_path.resolve().parent
@@ -102,12 +132,11 @@ def watch(
     def ignore_output(path):
         return pathlib.Path(path).resolve() == output_resolved
 
-    server.watch(str(cwd), on_change, ignore=ignore_output)
-    if not _is_subpath(tpl_parent, cwd):
-        server.watch(
-            str(tpl_parent), on_change,
-            ignore=ignore_output,
-        )
+    server.watch(
+        str(tpl_parent / "*.html"), on_change,
+        ignore=ignore_output,
+    )
+    server.watch(str(cwd), ignore=ignore_output)
 
     server.serve(
         root=str(cwd),

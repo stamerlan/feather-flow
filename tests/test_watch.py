@@ -1,9 +1,7 @@
 import pathlib
 import sys
-from unittest.mock import MagicMock, patch
-
+from unittest.mock import patch
 import pytest
-
 from pyplaner.watch import _rebuild, _is_subpath, watch
 
 
@@ -116,27 +114,20 @@ def test_watch_registers_cwd(
         assert str(tmp_path.resolve()) in watched
 
 
-def test_watch_registers_tpl_parent_outside_cwd(
-    tmp_path, monkeypatch,
+def test_watch_rebuilds_only_on_html(
+    simple_template, tmp_path, monkeypatch,
 ):
-    """Template parent is watched when outside CWD."""
-    cwd = tmp_path / "workdir"
-    cwd.mkdir()
-    tpl_dir = tmp_path / "templates"
-    tpl_dir.mkdir()
-    tpl = tpl_dir / "planner.html"
-    tpl.write_text(
-        "<html>{{ planner_head }}</html>",
-        encoding="utf-8",
-    )
-    monkeypatch.chdir(cwd)
-    out = cwd / "planner.html"
+    """Template glob has a rebuild callback; CWD watch does not."""
+    monkeypatch.chdir(tmp_path)
+    out = tmp_path / "planner.html"
     from pyplaner.calendar import Calendar
 
     with patch("pyplaner.watch.Server") as MockSrv:
         srv_inst = MockSrv.return_value
-        watch(tpl, Calendar(), out)
-        watched = [
-            c.args[0] for c in srv_inst.watch.call_args_list
-        ]
-        assert str(tpl_dir.resolve()) in watched
+        watch(simple_template, Calendar(), out)
+        calls = srv_inst.watch.call_args_list
+        tpl_call = calls[0]
+        cwd_call = calls[1]
+        assert tpl_call.args[0].endswith("*.html")
+        assert tpl_call.args[1] is not None
+        assert len(cwd_call.args) == 1
