@@ -1,7 +1,7 @@
 ; pytest-cov settings
 [run]
 branch = True
-source = src/pyplaner
+source = src/pyplanner
 
 [report]
 ; Regexes for lines to exclude from consideration

@@ -34,12 +34,12 @@ def _asset_route(r: Route) -> None:
     r.fulfill(path=path)
 
 
-class Planer:
+class Planner:
     """Render a Jinja2/HTML planner template into HTML or PDF.
 
     :param path: Path to the Jinja2/HTML template file.
     :param planner_dir: Base URL or path to the template directory.
-    :param calendar: :class:`~pyplaner.calendar.Calendar` instance used for
+    :param calendar: :class:`~pyplanner.calendar.Calendar` instance used for
         template rendering.
     """
 

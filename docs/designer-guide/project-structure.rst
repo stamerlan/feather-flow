@@ -9,7 +9,7 @@ the rendering pipeline.
 
 * Repository folder layout.
 * Where to put templates and assets.
-* How pyplaner turns a template into HTML or PDF.
+* How pyplanner turns a template into HTML or PDF.
 
 
 Folder layout
@@ -32,8 +32,8 @@ After you clone the repository you will see a structure like this::
     |           |-- cormorant-garamond-normal-latin.woff2
     |           +-- cormorant-garamond-italic-latin.woff2
     |
-    |-- src/pyplaner/           <-- Python source (you rarely
-    |   |-- ...                     need to touch this)
+    |-- src/pyplanner/           <-- Python source (you rarely
+    |   |-- ...                      need to touch this)
     |
     +-- docs/                   <-- Sphinx documentation
 
@@ -58,7 +58,7 @@ with all stylesheets, images and fonts the template needs.
 The rendering pipeline
 ----------------------
 
-When you run pyplaner it follows these steps:
+When you run pyplanner it follows these steps:
 
 1. **Load the template** from the planner directory.
 2. **Inject template variables** - ``base``, ``calendar`` and ``lang`` become
@@ -78,7 +78,7 @@ When you run pyplaner it follows these steps:
     planners/my-planner/
     |-- my-planner.html  --+
     +-- assets/            |   +----------+   +---------------+
-        |-- my.css         +-->| pyplaner |-->| my-planner.pdf|
+        |-- my.css         +-->| pyplanner |-->| my-planner.pdf|
         +-- back.png           +----------+   +---------------+
                                (Jinja2 +       (in current
                                 Playwright)     directory)
@@ -86,7 +86,7 @@ When you run pyplaner it follows these steps:
 .. warning::
 
    The output files are written to the directory where you run the command. If
-   you run ``pyplaner --html my-planner.html`` from the planner directory, the
+   you run ``pyplanner --html my-planner.html`` from the planner directory, the
    output lands in the planner directory and overwrites the template file.
 
 

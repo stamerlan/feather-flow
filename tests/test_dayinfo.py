@@ -3,7 +3,7 @@ import types
 
 import pytest
 
-from pyplaner.dayinfo import DayInfo, DayInfoProvider
+from pyplanner.dayinfo import DayInfo, DayInfoProvider
 
 
 # -- DayInfo --
@@ -81,8 +81,8 @@ def test_is_provider_class_rejects_non_callable():
 # -- load --
 
 def test_load_builtin_providers():
-    """load('pyplaner.providers') discovers IsDayOff and NagerDate providers."""
-    classes = DayInfoProvider.load("pyplaner.providers")
+    """load('pyplanner.providers') discovers IsDayOff and NagerDate providers."""
+    classes = DayInfoProvider.load("pyplanner.providers")
     assert len(classes) >= 2
     names = {c.__name__ for c in classes}
     assert "IsDayOffProvider" in names

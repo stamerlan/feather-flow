@@ -1,6 +1,6 @@
 import time
 import pytest
-from pyplaner.progress import (
+from pyplanner.progress import (
     QuietTracker, SimpleProgressTracker, TtyProgressTracker, create_tracker
 )
 

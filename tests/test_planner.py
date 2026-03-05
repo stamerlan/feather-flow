@@ -1,7 +1,7 @@
 import pytest
 
-from pyplaner.calendar import Calendar
-from pyplaner.planer import Planer, _asset_route
+from pyplanner.calendar import Calendar
+from pyplanner.planner import Planner, _asset_route
 
 
 @pytest.fixture()
@@ -21,23 +21,23 @@ def simple_template(tmp_path):
 
 
 def test_html_renders_template(simple_template):
-    """Planer.html() renders Jinja2 variables and loops into HTML."""
+    """Planner.html() renders Jinja2 variables and loops into HTML."""
     cal = Calendar(lang="en")
-    planer = Planer(simple_template, calendar=cal)
-    html = planer.html()
+    planner = Planner(simple_template, calendar=cal)
+    html = planner.html()
     assert "<h1>en</h1>" in html
     assert "<p>2026</p>" in html
 
 
 def test_html_default_calendar(simple_template):
-    """Planer creates a default Calendar when none is provided."""
-    planer = Planer(simple_template)
-    html = planer.html()
+    """Planner creates a default Calendar when none is provided."""
+    planner = Planner(simple_template)
+    html = planner.html()
     assert "<h1>en</h1>" in html
 
 
 def test_html_russian_lang(tmp_path):
-    """Planer.html() renders Russian month names with lang='ru'."""
+    """Planner.html() renders Russian month names with lang='ru'."""
     tpl = tmp_path / "tpl.html"
     tpl.write_text(
         "%% set year = calendar.year(2026)\n"
@@ -47,8 +47,8 @@ def test_html_russian_lang(tmp_path):
         encoding="utf-8",
     )
     cal = Calendar(lang="ru")
-    planer = Planer(tpl, calendar=cal)
-    html = planer.html()
+    planner = Planner(tpl, calendar=cal)
+    html = planner.html()
     assert "\u042f\u043d\u0432\u0430\u0440\u044c" in html
 
 
@@ -62,8 +62,8 @@ def test_base_is_template_directory(tmp_path):
         '<a href="#page1">link</a>',
         encoding="utf-8",
     )
-    planer = Planer(tpl)
-    html = planer.html()
+    planner = Planner(tpl)
+    html = planner.html()
     expected = sub.as_uri() + "/assets/style.css"
     assert expected in html
     assert 'href="#page1"' in html

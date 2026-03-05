@@ -1,6 +1,6 @@
 import pytest
 
-from pyplaner.weekday import WeekDay
+from pyplanner.weekday import WeekDay
 
 
 def test_weekday_value():

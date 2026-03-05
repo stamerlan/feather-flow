@@ -5,7 +5,7 @@ import pytest
 pikepdf = pytest.importorskip("pikepdf")
 
 from pikepdf import Name, Page
-from pyplaner.optimize_pdf import (
+from pyplanner.optimize_pdf import (
     optimize_pdf,
     _stream_content_bytes,
     _deduplicate_images,

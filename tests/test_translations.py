@@ -1,6 +1,6 @@
 import pytest
 
-from pyplaner.translations import (
+from pyplanner.translations import (
     DEFAULT_LANGUAGE,
     SUPPORTED_LANGUAGES,
     WEEKDAY_NAMES,

@@ -3,9 +3,9 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 
-from pyplaner.dayinfo import DayInfo
-from pyplaner.providers.isdayoff import IsDayOffProvider
-from pyplaner.providers.nagerdate import NagerDateProvider
+from pyplanner.dayinfo import DayInfo
+from pyplanner.providers.isdayoff import IsDayOffProvider
+from pyplanner.providers.nagerdate import NagerDateProvider
 
 
 # -- IsDayOffProvider --

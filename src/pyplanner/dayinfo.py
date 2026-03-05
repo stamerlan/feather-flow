@@ -22,7 +22,7 @@ class DayInfoProvider(ABC):
 
     Custom providers: any importable Python module that contains one or more
     classes with a ``fetch_day_info(self, year)`` method can be loaded via
-    :meth:`load`. Plugin modules do not need to depend on pyplaner; classes
+    :meth:`load`. Plugin modules do not need to depend on pyplanner; classes
     are discovered at runtime by duck typing.
 
     Example standalone plugin (e.g. ``my_holidays.py``)::
@@ -46,7 +46,7 @@ class DayInfoProvider(ABC):
 
     Usage::
 
-        pyplaner planner.html --provider my_holidays --country us
+        pyplanner planner.html --provider my_holidays --country us
     """
 
     @staticmethod

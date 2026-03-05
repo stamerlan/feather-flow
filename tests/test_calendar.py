@@ -2,9 +2,9 @@ import calendar as stdlib_calendar
 
 import pytest
 
-from pyplaner.calendar import Calendar, Year, Month, Day
-from pyplaner.dayinfo import DayInfo, DayInfoProvider
-from pyplaner.weekday import WeekDay
+from pyplanner.calendar import Calendar, Year, Month, Day
+from pyplanner.dayinfo import DayInfo, DayInfoProvider
+from pyplanner.weekday import WeekDay
 
 
 class _StubProvider(DayInfoProvider):

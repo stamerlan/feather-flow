@@ -18,7 +18,7 @@ Feather Flow
 Feather Flow is a digital planner PDF generator built on top of
 `Jinja2 <https://jinja.palletsprojects.com/>`_ templates and
 `Playwright <https://playwright.dev/python/>`_. Design your planner pages in
-HTML/CSS, feed them to **pyplaner**, and get a print-ready PDF.
+HTML/CSS, feed them to **pyplanner**, and get a print-ready PDF.
 
 |cover| |year| |month| |day|
 
@@ -101,36 +101,36 @@ To enable PDF optimization and progress bars, install the ``full`` extra::
 Usage
 -----
 
-Generate a PDF from a template. You can pass the planner directory - pyplaner
+Generate a PDF from a template. You can pass the planner directory - pyplanner
 looks for ``<dirname>/<dirname>.html`` inside it::
 
-    pyplaner planners/ff-2026
+    pyplanner planners/ff-2026
 
 Generate HTML instead of PDF::
 
-    pyplaner planners/ff-2026 --html
+    pyplanner planners/ff-2026 --html
 
 Generate a PDF with public holidays for a given country (ISO 3166-1 alpha-2
 code). The built-in providers are used by default. When ``--country`` is given,
 the first day of the week is set automatically based on the country's
 convention::
 
-    pyplaner planners/ff-2026 --country pl
+    pyplanner planners/ff-2026 --country pl
 
 Set the first day of the week explicitly (name or number 0-6, where 0 = Monday
 and 6 = Sunday). This overrides any country default::
 
-    pyplaner planners/ff-2026 --first-weekday sunday
+    pyplanner planners/ff-2026 --first-weekday sunday
 
 Combine a country with an explicit first weekday::
 
-    pyplaner planners/ff-2026 --country us --first-weekday monday
+    pyplanner planners/ff-2026 --country us --first-weekday monday
 
 Suppress progress output::
 
-    pyplaner -q planners/ff-2026
+    pyplanner -q planners/ff-2026
 
-Run ``pyplaner --help`` for the full list of options.
+Run ``pyplanner --help`` for the full list of options.
 
 Building the Documentation
 --------------------------

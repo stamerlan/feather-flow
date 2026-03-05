@@ -83,7 +83,7 @@ Use ``set`` to create a variable that you can reuse later.
 
    <h1>Planner 2026</h1>
 
-The ``calendar`` object is provided by pyplaner (see :doc:`data-reference` for
+The ``calendar`` object is provided by pyplanner (see :doc:`data-reference` for
 the full list). Calling ``calendar.year(2026)`` creates a ``Year`` object that
 knows everything about that year - its months, days, whether it is a leap year
 and more.
@@ -313,7 +313,7 @@ The cover shows both the month name and the year dynamically:
 
 Regenerate and check::
 
-    pyplaner planners/mini-planner --html
+    pyplanner planners/mini-planner --html
 
 The title should now read "Mini Planner - January 2026".
 

@@ -1,7 +1,7 @@
 Data Reference
 ==============
 
-Every template receives a small set of objects from pyplaner. This page is a
+Every template receives a small set of objects from pyplanner. This page is a
 complete reference of those objects, their properties and the values they
 produce. Keep it open while you design - it answers "what can I put inside
 ``{{ }}``?".
@@ -19,7 +19,7 @@ produce. Keep it open while you design - it answers "what can I put inside
 Injected variables
 ------------------
 
-pyplaner passes these variables to your template:
+pyplanner passes these variables to your template:
 
 .. list-table::
    :header-rows: 1

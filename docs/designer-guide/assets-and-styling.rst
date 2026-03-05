@@ -51,7 +51,7 @@ Path rules
    * - ``href="#page1"``
      - ``href="{{ base }}/#page1"`` (don't prefix internal links)
 
-Always prefix files paths with ``{{ base }}/``. Pyplaner sets this variable to
+Always prefix files paths with ``{{ base }}/``. Pyplanner sets this variable to
 the correct path prefix for the current output target so that the browser can
 find every file.
 
@@ -320,7 +320,7 @@ update automatically.
 
 Regenerate::
 
-    pyplaner planners/mini-planner --html
+    pyplanner planners/mini-planner --html
 
 You should see 33 pages: 1 cover + 1 month calendar + 31 day pages. Each day
 page has a square grid background and a header with the day number, month name

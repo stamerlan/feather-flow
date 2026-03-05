@@ -7,14 +7,14 @@ import textwrap
 from . import __version__
 from .calendar import Calendar
 from .dayinfo import DayInfoProvider
-from .planer import Planer
+from .planner import Planner
 from .progress import create_tracker
 from .translations import SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE
 from .weekday import WeekDay
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        prog="pyplaner",
+        prog="pyplanner",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description=textwrap.dedent("""\
             Generate digital planner files from Jinja2/HTML templates.
@@ -25,19 +25,19 @@ def main() -> None:
             format (default: PDF). Use -o to set a custom output filename."""),
         epilog=textwrap.dedent("""\
             examples:
-              pyplaner planners/ff-2026
+              pyplanner planners/ff-2026
                   Generate ff-2026.pdf in the current directory.
 
-              pyplaner planners/ff-2026 --html
+              pyplanner planners/ff-2026 --html
                   Generate ff-2026.html instead of PDF.
 
-              pyplaner planners/ff-2026 -o planner.pdf
+              pyplanner planners/ff-2026 -o planner.pdf
                   Generate PDF with a custom output filename.
 
-              pyplaner planners/ff-2026 --country pl
+              pyplanner planners/ff-2026 --country pl
                   Generate PDF with Polish public holidays.
 
-              pyplaner planners/ff-2026 --country us
+              pyplanner planners/ff-2026 --country us
                   Holidays for the US; week starts on Sunday."""),
     )
     parser.add_argument("-v", "--version", action="version",
@@ -78,7 +78,7 @@ def main() -> None:
         metavar="MODULE",
         help="load custom day-info provider classes from the given Python "
              "module (may be specified multiple times); "
-             "default: pyplaner.providers")
+             "default: pyplanner.providers")
     parser.add_argument("-l", "--lang", default=DEFAULT_LANGUAGE,
         choices=SUPPORTED_LANGUAGES,
         help="display language for weekday and month names "
@@ -101,7 +101,7 @@ def main() -> None:
     dayinfo: DayInfoProvider | None = None
     if args.country:
         if args.provider is None:
-            args.provider = ["pyplaner.providers"]
+            args.provider = ["pyplanner.providers"]
 
         for mod_name in args.provider:
             try:
@@ -149,7 +149,7 @@ def main() -> None:
 
     calendar = Calendar(firstweekday=firstweekday, provider=dayinfo,
         lang=args.lang, country=args.country)
-    planner = Planer(args.file, planner_dir=base, calendar=calendar)
+    planner = Planner(args.file, planner_dir=base, calendar=calendar)
     tracker = create_tracker(quiet=args.quiet, verbose=args.verbose)
 
     if args.html:

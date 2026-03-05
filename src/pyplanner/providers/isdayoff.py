@@ -38,7 +38,7 @@ class IsDayOffProvider(DayInfoProvider):
 
         :param year: Calendar year to fetch data for.
         :returns: Mapping of ``YYYY-MM-DD`` strings to
-            :class:`~pyplaner.dayinfo.DayInfo` instances, or ``None`` if the
+            :class:`~pyplanner.dayinfo.DayInfo` instances, or ``None`` if the
             request fails or the response is unusable.
         """
         url = f"https://isdayoff.ru/api/getdata?year={year}&cc={self._cc}"

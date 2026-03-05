@@ -33,7 +33,7 @@ Generate the HTML file
 
 From the repository root run::
 
-    pyplaner planners/mini-planner --html
+    pyplanner planners/mini-planner --html
 
 This creates ``mini-planner.html`` in the repository root. The file contains
 the fully rendered HTML - no Jinja2 syntax remains, just plain HTML that any
@@ -72,7 +72,7 @@ With Live Server running your workflow looks like this:
 
 2. **Regenerate** the HTML. Switch to the terminal and run::
 
-       pyplaner planners/mini-planner --html
+       pyplanner planners/mini-planner --html
 
 3. **View** - Live Server detects that ``mini-planner.html`` changed on disk
    and reloads the browser automatically.
@@ -87,7 +87,7 @@ Why not edit the generated file directly?
 -----------------------------------------
 
 The generated HTML is a *build artifact*. It is overwritten every time you run
-pyplaner. Any changes you make to it will be lost on the next regeneration.
+pyplanner. Any changes you make to it will be lost on the next regeneration.
 Always edit the source template.
 
 .. warning::
@@ -128,7 +128,7 @@ Do and don't summary
 
    * - Do
      - Don't
-   * - Run pyplaner from the repository root.
+   * - Run pyplanner from the repository root.
      - ``cd`` into the planner directory (output overwrites the template).
    * - Open the generated file with Live Server.
      - Open the template file (it contains Jinja2 syntax the browser cannot

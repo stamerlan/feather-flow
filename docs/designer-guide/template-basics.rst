@@ -11,7 +11,7 @@ cover page with a background image and a title.
 * The ``base`` variable and how it keeps asset paths working.
 * The ``.page`` div pattern and page sizing.
 * Adding a full-page background image.
-* Generating the HTML output with pyplaner.
+* Generating the HTML output with pyplanner.
 
 
 Minimal template
@@ -62,7 +62,7 @@ Every template receives a ``base`` variable. Prefix every asset path with it:
    <link rel="stylesheet" href="{{ base }}/assets/my-style.css">
    <img src="{{ base }}/assets/cover.png">
 
-Pyplaner sets ``base`` to the template's directory path so that asset references
+Pyplanner sets ``base`` to the template's directory path so that asset references
 work regardless of where the output file is written. For PDF generation it
 becomes an absolute ``file://`` URI so the headless browser can find every
 asset.
@@ -160,7 +160,7 @@ Generate and preview
 
 From the repository root run::
 
-    pyplaner planners/mini-planner --html
+    pyplanner planners/mini-planner --html
 
 A file called ``mini-planner.html`` (the rendered output) appears in the
 repository root. Open it in your browser.
