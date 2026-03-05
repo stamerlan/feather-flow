@@ -10,7 +10,7 @@ from pyplaner.__main__ import main
 def simple_template(tmp_path):
     tpl = tmp_path / "planner.html"
     tpl.write_text(
-        "<html>{{ planner_head }}\n"
+        "<html>\n"
         "%% for y in range(2026, 2027)\n"
         "%% set year = calendar.year(y)\n"
         "{{ year }}\n"
@@ -22,10 +22,11 @@ def simple_template(tmp_path):
 
 
 def test_generates_html(simple_template, tmp_path):
-    """--html with an explicit path writes rendered HTML to that file."""
+    """--html -o writes rendered HTML to the given file."""
     out = tmp_path / "out.html"
     with patch.object(sys, "argv", [
-        "pyplaner", str(simple_template), "--html", str(out), "-q",
+        "pyplaner", str(simple_template),
+        "--html", "-o", str(out), "-q",
     ]):
         main()
     assert out.exists()
@@ -33,8 +34,47 @@ def test_generates_html(simple_template, tmp_path):
     assert "2026" in content
 
 
+def test_directory_input(tmp_path):
+    """Passing a directory resolves to <dir>/<dirname>.html."""
+    planner_dir = tmp_path / "myplanner"
+    planner_dir.mkdir()
+    tpl = planner_dir / "myplanner.html"
+    tpl.write_text(
+        "<html>{{ calendar.year(2026) }}</html>",
+        encoding="utf-8",
+    )
+    out = tmp_path / "out.html"
+    with patch.object(sys, "argv", [
+        "pyplaner", str(planner_dir),
+        "--html", "-o", str(out), "-q",
+    ]):
+        main()
+    assert out.exists()
+    assert "2026" in out.read_text(encoding="utf-8")
+
+
+def test_html_base_resolves_asset_paths(tmp_path):
+    """base variable resolves to the planner directory."""
+    planner_dir = tmp_path / "myplanner"
+    planner_dir.mkdir()
+    tpl = planner_dir / "myplanner.html"
+    tpl.write_text(
+        '<link href="{{ base }}/assets/style.css">',
+        encoding="utf-8",
+    )
+    out = tmp_path / "out.html"
+    with patch.object(sys, "argv", [
+        "pyplaner", str(planner_dir),
+        "--html", "-o", str(out), "-q",
+    ]):
+        main()
+    content = out.read_text(encoding="utf-8")
+    assert "myplanner/assets/style.css" in content
+    assert "//assets" not in content
+
+
 def test_default_html_filename(simple_template, tmp_path, monkeypatch):
-    """--html without a filename defaults to <template_stem>.html."""
+    """--html without -o defaults to <template_stem>.html."""
     monkeypatch.chdir(tmp_path)
     with patch.object(sys, "argv", [
         "pyplaner", str(simple_template), "--html", "-q",
@@ -65,7 +105,7 @@ def test_country_sets_provider(simple_template, tmp_path):
     out = tmp_path / "out.html"
     with patch.object(sys, "argv", [
         "pyplaner", str(simple_template),
-        "--html", str(out),
+        "--html", "-o", str(out),
         "--country", "ru",
         "-q",
     ]):
@@ -100,7 +140,7 @@ def test_explicit_weekday_override(simple_template, tmp_path):
     out = tmp_path / "out.html"
     with patch.object(sys, "argv", [
         "pyplaner", str(simple_template),
-        "--html", str(out),
+        "--html", "-o", str(out),
         "--first-weekday", "sunday",
         "-q",
     ]):
@@ -113,7 +153,7 @@ def test_numeric_weekday(simple_template, tmp_path):
     out = tmp_path / "out.html"
     with patch.object(sys, "argv", [
         "pyplaner", str(simple_template),
-        "--html", str(out),
+        "--html", "-o", str(out),
         "--first-weekday", "6",
         "-q",
     ]):
@@ -126,7 +166,7 @@ def test_russian_language(simple_template, tmp_path):
     out = tmp_path / "out.html"
     with patch.object(sys, "argv", [
         "pyplaner", str(simple_template),
-        "--html", str(out),
+        "--html", "-o", str(out),
         "--lang", "ru",
         "-q",
     ]):
