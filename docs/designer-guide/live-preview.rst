@@ -9,10 +9,9 @@ regenerate.
 **Key topics**
 
 * Installing the Live Server extension for VS Code.
-* Generating HTML output to the current directory.
+* Generating HTML output from the repository root.
 * Opening the generated file with Live Server.
 * The edit - regenerate - reload loop.
-* Tips for keeping asset paths working.
 
 
 Install Live Server
@@ -34,28 +33,19 @@ Generate the HTML file
 
 From the repository root run::
 
-    pyplaner --html pages/mini-planner.html
+    pyplaner planners/mini-planner --html
 
-This creates ``mini-planner.html`` in the current working directory (the
-repository root). The file contains the fully rendered HTML - no Jinja2 syntax
-remains, just plain HTML that any browser can display.
-
-.. tip::
-
-   Use ``--html`` if you want only the HTML file and want to skip the slower PDF
-   step entirely.
-
+This creates ``mini-planner.html`` in the repository root. The file contains
+the fully rendered HTML - no Jinja2 syntax remains, just plain HTML that any
+browser can display. Asset paths work because the ``{{ base }}/`` variable is
+set to the template directory.
 
 Open with Live Server
 ---------------------
 
-1. Make sure you have opened the repository root folder in VS Code
-   (**File > Open Folder** and select ``feather-flow/``). This is important
-   because Live Server serves files relative to the workspace root, and your
-   template references assets with paths like ``assets/mini-cover.png``.
+1. Open the repository root in VS Code (**File > Open Folder**).
 
-2. In the VS Code Explorer panel find the generated ``mini-planner.html`` file
-   (it is at the repository root, not inside ``pages/``).
+2. In the VS Code Explorer panel find the generated ``mini-planner.html``.
 
 3. Right-click the file and choose **Open with Live Server**.
 
@@ -64,8 +54,8 @@ Open with Live Server
    :align: center
 
 Your default browser opens with the planner. Background images, fonts and
-stylesheets should all load correctly because Live Server serves from the
-workspace root where the ``assets/`` folder lives.
+stylesheets should all load correctly because asset paths include the full
+relative path to the planner directory via ``{{ base }}/``.
 
 .. image:: ../images/live-server-browser.png
    :width: 80%
@@ -77,15 +67,15 @@ The edit - regenerate - reload loop
 
 With Live Server running your workflow looks like this:
 
-1. **Edit** the template in ``pages/mini-planner.html`` (change a color, add a
-   div, adjust spacing).
+1. **Edit** the template ``planners/mini-planner/mini-planner.html`` (change a
+   color, add a div, adjust spacing).
 
 2. **Regenerate** the HTML. Switch to the terminal and run::
 
-       pyplaner --html pages/mini-planner.html
+       pyplaner planners/mini-planner --html
 
-3. **View** - Live Server detects that ``mini-planner.html`` changed on disk and
-   reloads the browser automatically.
+3. **View** - Live Server detects that ``mini-planner.html`` changed on disk
+   and reloads the browser automatically.
 
 .. tip::
 
@@ -96,14 +86,13 @@ With Live Server running your workflow looks like this:
 Why not edit the generated file directly?
 -----------------------------------------
 
-The generated ``mini-planner.html`` is a *build artifact*. It is overwritten
-every time you run pyplaner. Any changes you make to it will be lost on the next
-regeneration. Always edit the source template in ``pages/``.
+The generated HTML is a *build artifact*. It is overwritten every time you run
+pyplaner. Any changes you make to it will be lost on the next regeneration.
+Always edit the source template.
 
 .. warning::
 
-   Never edit the generated HTML file. Edit the template in ``pages/`` and
-   regenerate.
+   Never edit the generated HTML file. Edit the template and regenerate.
 
 
 Troubleshooting
@@ -112,9 +101,9 @@ Troubleshooting
 Images or fonts are missing in the browser
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Make sure you opened the repository root as the VS Code workspace. If you opened
-a subfolder (such as ``pages/``) the relative path ``assets/mini-cover.png``
-will not resolve because ``assets/`` is not inside ``pages/``.
+Make sure you opened the repository root as the VS Code workspace. The generated
+HTML references assets via ``{{ base }}/`` which expands to the template
+directory path, so Live Server must be able to reach those files.
 
 Live Server does not reload
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -123,17 +112,11 @@ Check that Live Server is still running (look for the port number in the VS Code
 status bar, for example ``Port: 5500``). If it stopped, right-click the HTML
 file and choose **Open with Live Server** again.
 
-Also confirm that the output file is in the workspace root. pyplaner writes to
-the current working directory, so if you ``cd pages`` before running the command
-the HTML will end up inside ``pages/`` and Live Server may not detect the change
-at the root level.
-
 Browser shows Jinja2 syntax
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-You are opening the template file (``pages/mini-planner.html``) instead of the
-generated file (``mini-planner.html`` at the repository root). Open the
-generated file instead.
+You are opening the template file instead of the generated file. The generated
+output is in the repository root, not inside the planner directory.
 
 
 Do and don't summary
@@ -145,18 +128,15 @@ Do and don't summary
 
    * - Do
      - Don't
-   * - Open the repository root as the VS Code workspace.
-     - Open a subfolder - asset paths will break.
+   * - Run pyplaner from the repository root.
+     - ``cd`` into the planner directory (output overwrites the template).
    * - Open the generated file with Live Server.
      - Open the template file (it contains Jinja2 syntax the browser cannot
        understand).
-   * - Edit the template in ``pages/``.
+   * - Edit the template, then regenerate.
      - Edit the generated HTML (it is overwritten on every build).
    * - Use ``--html`` for faster iteration.
      - Generate PDF every time (much slower).
-   * - Run pyplaner from the repository root.
-     - ``cd`` into a subdirectory before running (output lands in the wrong
-       place).
 
 
 Summary
@@ -164,9 +144,9 @@ Summary
 
 You have completed the Designer Guide. Here is a recap of what you learned:
 
-1. **Project structure** - templates in ``pages/``, assets in ``assets/``,
-   output to the current directory.
-2. **Template basics** - the ``.page`` div, ``planner_head``, background images.
+1. **Project structure** - each planner in its own directory under
+   ``planners/``, assets alongside the template.
+2. **Template basics** - the ``.page`` div, asset paths, background images.
 3. **Jinja2 variables** - ``{{ }}``, ``%% set``, dot notation, filters,
    comments.
 4. **Loops and conditionals** - ``for``/``endfor``, ``if``/``endif``,

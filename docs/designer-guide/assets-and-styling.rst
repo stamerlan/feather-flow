@@ -9,7 +9,7 @@ PDF.
 **Key topics**
 
 * Where to store CSS, images and fonts.
-* How asset paths work (relative to the template directory).
+* How asset paths work (relative to the planner directory).
 * Key CSS classes: ``@page``, ``.page``, ``.back``.
 * Page breaks.
 * Custom fonts with ``@font-face``.
@@ -19,21 +19,20 @@ PDF.
 Where assets live
 -----------------
 
-All assets go in the ``assets/`` folder at the repository root. Templates live
-in ``pages/``. The two folders are siblings::
+All assets go in the ``assets/`` subfolder inside the planner directory::
 
-    feather-flow/
-    |-- assets/
-    |   |-- cover.png
-    |   |-- my-planner.css
-    |   +-- cormorant-garamond.woff2
-    |
-    +-- pages/
-        +-- mini-planner.html
+    planners/
+    +-- mini-planner/
+        |-- mini-planner.html
+        +-- assets/
+            |-- cover.png
+            |-- mini-planner.css
+            +-- cormorant-garamond.woff2
 
 This layout matters because paths inside your template are resolved relative to
-the project root directory. Since ``assets/`` sits next to ``pages/``, the
-correct relative path from any template to any asset is ``assets/<filename>``.
+the planner directory (where the template lives). Since ``assets/`` sits right
+next to the template, the correct relative path from the template to any asset
+is ``{{ base }}/assets/<filename>``.
 
 
 Path rules
@@ -45,18 +44,16 @@ Path rules
 
    * - Do
      - Don't
-   * - ``href="assets/my.css"``
+   * - ``href="{{ base }}/assets/my.css"``
      - ``href="/assets/my.css"`` (leading slash - breaks PDF)
-   * - ``src="assets/mini-cover.png"``
-     - ``src="C:/repo/assets/mini-cover.png"`` (absolute - breaks
-       on other machines)
-   * - ``src="assets/mini-cover.png"``
-     - ``src="../assets/mini-cover.png"`` (wrong - assets is a
-       sibling of pages, not a parent)
+   * - ``src="{{ base }}/assets/cover.png"``
+     - ``src="C:/repo/assets/cover.png"`` (absolute - breaks on other machines)
+   * - ``href="#page1"``
+     - ``href="{{ base }}/#page1"`` (don't prefix internal links)
 
-The path ``assets/my.css`` works because pyplaner resolves it relative to the
-current working directory that contains this project. During PDF generation the
-headless browser intercepts these paths and loads the files from disk.
+Always prefix files paths with ``{{ base }}/``. Pyplaner sets this variable to
+the correct path prefix for the current output target so that the browser can
+find every file.
 
 .. warning::
 
@@ -72,9 +69,8 @@ Use a standard ``<link>`` tag inside ``<head>``:
 .. code-block:: html+jinja
 
    <head>
-     {{ planner_head }}
      <meta charset="utf-8">
-     <link rel="stylesheet" href="assets/my-planner.css">
+     <link rel="stylesheet" href="{{ base }}/assets/my-planner.css">
    </head>
 
 You can link multiple stylesheets. For example you might have one for layout and
@@ -82,8 +78,8 @@ one for fonts:
 
 .. code-block:: html+jinja
 
-   <link rel="stylesheet" href="assets/my-planner.css">
-   <link rel="stylesheet" href="assets/cormorant-garamond.css">
+   <link rel="stylesheet" href="{{ base }}/assets/my-planner.css">
+   <link rel="stylesheet" href="{{ base }}/assets/cormorant-garamond.css">
 
 
 Adding images
@@ -94,7 +90,7 @@ Background images use ``<img class="back">``:
 .. code-block:: html+jinja
 
    <div class="page">
-     <img class="back" src="assets/mini-cover.png">
+     <img class="back" src="{{ base }}/assets/cover.png">
      <h1>My Planner</h1>
    </div>
 
@@ -103,7 +99,7 @@ the ``back`` class:
 
 .. code-block:: html+jinja
 
-   <img src="assets/icon-star.png"
+   <img src="{{ base }}/assets/icon-star.png"
         style="width: 10mm; height: 10mm;">
 
 .. tip::
@@ -196,8 +192,7 @@ Custom fonts
 ------------
 
 Place font files in ``assets/`` and create a small CSS file for them.
-
-``assets/cormorant-garamond.css`` from the project:
+``assets/cormorant-garamond.css`` from the Feather Flow 2026 planner:
 
 .. code-block:: css
 
@@ -225,7 +220,7 @@ Link the font CSS from your template:
 .. code-block:: html+jinja
 
    <link rel="stylesheet"
-         href="assets/cormorant-garamond.css">
+         href="{{ base }}/assets/cormorant-garamond.css">
 
 Then use the font in your styles:
 
@@ -251,9 +246,9 @@ Do and don't summary
 
    * - Do
      - Don't
-   * - Put all assets in ``assets/``.
+   * - Put all assets in ``assets/`` inside the planner directory.
      - Scatter files across random directories.
-   * - Use relative paths: ``assets/my.css``.
+   * - Use relative paths: ``{{ base }}/assets/my.css``.
      - Use absolute paths or leading slashes.
    * - Use ``@page { size: A4; margin: 0; }`` for paper size.
      - Set paper size through other means.
@@ -267,8 +262,8 @@ Update the Mini Planner
 -----------------------
 
 Add day pages to the Mini Planner. Each day gets its own page with a background
-image and a header. Open ``pages/mini-planner.html`` and add the following after
-the month calendar div, just before ``</body>``:
+image and a header. Open ``planners/mini-planner/mini-planner.html`` and add
+the following after the month calendar div, just before ``</body>``:
 
 .. code-block:: html+jinja
 
@@ -277,7 +272,7 @@ the month calendar div, just before ``</body>``:
    <div class="page" id="{{ day.id }}">
 
      ## Put header index behind grid
-     <img class="back" src="assets/mini-page.png"
+     <img class="back" src="{{ base }}/assets/page.png"
           style="z-index: -2;">
 
      ## Square grid graph paper
@@ -325,11 +320,11 @@ update automatically.
 
 Regenerate::
 
-    pyplaner --html pages/mini-planner.html
+    pyplaner planners/mini-planner --html
 
-You should see 33 pages: 1 cover + 1 month calendar + 31 day pages.
-Each day page has a square grid background and a header with the day
-number, month name and weekday.
+You should see 33 pages: 1 cover + 1 month calendar + 31 day pages. Each day
+page has a square grid background and a header with the day number, month name
+and weekday.
 
 .. image:: ../images/mini-planner-day-page.png
    :width: 60%

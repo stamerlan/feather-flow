@@ -271,7 +271,8 @@ the comment to survive into the final HTML.
 Update the Mini Planner
 -----------------------
 
-Open ``pages/mini-planner.html`` and add variables for the year and the month.
+Open ``planners/mini-planner/mini-planner.html`` and add variables for the year
+and the month.
 Our Mini Planner covers a single month, so we pick January (``year.months[0]``).
 The cover shows both the month name and the year dynamically:
 
@@ -282,10 +283,10 @@ The cover shows both the month name and the year dynamically:
    <!doctype html>
    <html>
    <head>
-     {{ planner_head }}
      <meta charset="utf-8">
      <style>
        @page { size: 139.7mm 215.9mm; margin: 0; }
+       html, body { margin: 0; padding: 0; height: 100%; }
        .page {
          position: relative;
          width: 139.7mm; height: 215.9mm;
@@ -302,7 +303,7 @@ The cover shows both the month name and the year dynamically:
    </head>
    <body>
      <div class="page">
-       <img class="back" src="assets/mini-cover.png">
+       <img class="back" src="{{ base }}/assets/cover.png">
        <h1 style="text-align: center; padding-top: 70mm;">
          Mini Planner - {{ month }} {{ year }}
        </h1>
@@ -312,7 +313,7 @@ The cover shows both the month name and the year dynamically:
 
 Regenerate and check::
 
-    pyplaner --html pages/mini-planner.html
+    pyplaner planners/mini-planner --html
 
 The title should now read "Mini Planner - January 2026".
 

@@ -101,33 +101,34 @@ To enable PDF optimization and progress bars, install the ``full`` extra::
 Usage
 -----
 
-Generate a PDF from a template::
+Generate a PDF from a template. You can pass the planner directory - pyplaner
+looks for ``<dirname>/<dirname>.html`` inside it::
 
-    pyplaner pages/ff-2026.html
+    pyplaner planners/ff-2026
 
-Generate both HTML and PDF::
+Generate HTML instead of PDF::
 
-    pyplaner --html --pdf pages/ff-2026.html
+    pyplaner planners/ff-2026 --html
 
 Generate a PDF with public holidays for a given country (ISO 3166-1 alpha-2
 code). The built-in providers are used by default. When ``--country`` is given,
 the first day of the week is set automatically based on the country's
 convention::
 
-    pyplaner pages/ff-2026.html --country pl
+    pyplaner planners/ff-2026 --country pl
 
 Set the first day of the week explicitly (name or number 0-6, where 0 = Monday
 and 6 = Sunday). This overrides any country default::
 
-    pyplaner pages/ff-2026.html --first-weekday sunday
+    pyplaner planners/ff-2026 --first-weekday sunday
 
 Combine a country with an explicit first weekday::
 
-    pyplaner pages/ff-2026.html --country us --first-weekday monday
+    pyplaner planners/ff-2026 --country us --first-weekday monday
 
 Suppress progress output::
 
-    pyplaner -q pages/ff-2026.html
+    pyplaner -q planners/ff-2026
 
 Run ``pyplaner --help`` for the full list of options.
 

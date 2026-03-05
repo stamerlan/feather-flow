@@ -8,7 +8,7 @@ cover page with a background image and a title.
 **Key topics**
 
 * Minimal HTML boilerplate for a planner template.
-* The ``planner_head`` variable and why it is required.
+* The ``base`` variable and how it keeps asset paths working.
 * The ``.page`` div pattern and page sizing.
 * Adding a full-page background image.
 * Generating the HTML output with pyplaner.
@@ -17,18 +17,20 @@ cover page with a background image and a title.
 Minimal template
 ----------------
 
-Create a new file ``pages/mini-planner.html`` with the following content. Our
-Mini Planner uses half-letter paper (5.5 x 8.5 in):
+Create a new file ``planners/mini-planner/mini-planner.html`` with the following
+content. The ``planners/mini-planner/`` directory and its ``assets/`` subfolder
+already exist in the repository with pre-made background images. Our Mini
+Planner uses half-letter paper (5.5 x 8.5 in):
 
 .. code-block:: html+jinja
 
    <!doctype html>
    <html>
    <head>
-     {{ planner_head }}
      <meta charset="utf-8">
      <style>
        @page { size: 139.7mm 215.9mm; margin: 0; }
+       html, body { margin: 0; padding: 0; height: 100%; }
        .page {
          position: relative;
          width: 139.7mm; height: 215.9mm;
@@ -50,28 +52,20 @@ Mini Planner uses half-letter paper (5.5 x 8.5 in):
 There are a few things to notice here.
 
 
-``planner_head``
-~~~~~~~~~~~~~~~~
+The ``base`` variable
+~~~~~~~~~~~~~~~~~~~~~
 
-Every template receives a variable called ``planner_head``. You must put it
-inside ``<head>``:
+Every template receives a ``base`` variable. Prefix every asset path with it:
 
 .. code-block:: html+jinja
 
-   <head>
-     {{ planner_head }}
-     ...
-   </head>
+   <link rel="stylesheet" href="{{ base }}/assets/my-style.css">
+   <img src="{{ base }}/assets/cover.png">
 
-When you generate HTML this variable is an empty string, so it does nothing.
-When you generate a PDF it contains a ``<base>`` tag that tells the browser
-where to find your assets. If you forget it, images and fonts will be missing
-from the PDF.
-
-.. warning::
-
-   Always include ``{{ planner_head }}`` inside ``<head>``. Without it PDF
-   generation will fail to load assets.
+Pyplaner sets ``base`` to the template's directory path so that asset references
+work regardless of where the output file is written. For PDF generation it
+becomes an absolute ``file://`` URI so the headless browser can find every
+asset.
 
 
 The ``.page`` div
@@ -83,6 +77,7 @@ Every planner page lives inside a ``<div class="page">``. Look at the
 .. code-block:: css
 
    @page { size: 139.7mm 215.9mm; margin: 0; }
+   html, body { margin: 0; padding: 0; height: 100%; }
    .page {
      position: relative;
      width: 139.7mm; height: 215.9mm;
@@ -94,6 +89,9 @@ Every planner page lives inside a ``<div class="page">``. Look at the
 The ``@page`` rule tells the PDF generator which paper size to use. The
 ``.page`` class sets the div to exactly the same dimensions so the browser
 preview matches the printed page.
+``html, body { margin: 0; padding: 0; height: 100%; }`` removes default margins
+and padding and sets the height to 100% to ensure the
+page fills the entire viewport.
 
 * ``page-break-after: always`` separates pages in the PDF - each ``.page`` div
   becomes one printed page.
@@ -128,7 +126,7 @@ Add this rule to the ``<style>`` block and then use it inside a ``.page`` div:
 .. code-block:: html+jinja
 
    <div class="page">
-     <img class="back" src="assets/mini-cover.png">
+     <img class="back" src="{{ base }}/assets/cover.png">
      <h1 style="text-align: center; padding-top: 70mm;">
        Mini Planner
      </h1>
@@ -143,17 +141,16 @@ scales the image to fill the page without distortion.
 Linking a stylesheet
 ~~~~~~~~~~~~~~~~~~~~
 
-When your ``<style>`` block grows large you can move the CSS into a
-separate file in ``assets/`` and link it with a normal ``<link>``
-tag. Paths are relative to the project root (the current working
-directory where pyplaner writes the output):
+When your ``<style>`` block grows large you can move the CSS into a separate
+file in ``assets/`` and link it with a normal ``<link>`` tag. Paths should start
+with ``{{ base }}/`` so that the browser can find the file:
 
 .. code-block:: html+jinja
 
-   <link rel="stylesheet" href="assets/mini-planner.css">
+   <link rel="stylesheet" href="{{ base }}/assets/mini-planner.css">
 
-The generated HTML lands in the repository root. The ``assets/`` folder is a
-direct child of the root, so the path is simply ``assets/<filename>``.
+The ``assets/`` folder sits right next to the template inside the planner
+directory, so the path is simply ``assets/<filename>``.
 
 See :doc:`assets-and-styling` for the full explanation of path rules.
 
@@ -163,10 +160,10 @@ Generate and preview
 
 From the repository root run::
 
-    pyplaner --html pages/mini-planner.html
+    pyplaner planners/mini-planner --html
 
-A file called ``mini-planner.html`` appears in the current directory.
-Open it in your browser.
+A file called ``mini-planner.html`` (the rendered output) appears in the
+repository root. Open it in your browser.
 
 .. image:: ../images/mini-planner-cover.png
    :width: 60%
@@ -190,8 +187,8 @@ Do and don't
 
    * - Do
      - Don't
-   * - Include ``{{ planner_head }}`` inside ``<head>``.
-     - Leave it out - PDF will miss assets.
+   * - Prefix asset paths with ``{{ base }}/``.
+     - Use absolute paths or leading slashes (``/assets/...``).
    * - Wrap every page in ``<div class="page">``.
      - Put multiple pages in one div.
    * - Move large CSS blocks into a separate file.
@@ -208,10 +205,10 @@ After this page your template looks like this:
    <!doctype html>
    <html>
    <head>
-     {{ planner_head }}
      <meta charset="utf-8">
      <style>
        @page { size: 139.7mm 215.9mm; margin: 0; }
+       html, body { margin: 0; padding: 0; height: 100%; }
        .page {
          position: relative;
          width: 139.7mm; height: 215.9mm;
@@ -228,7 +225,7 @@ After this page your template looks like this:
    </head>
    <body>
      <div class="page">
-       <img class="back" src="assets/mini-cover.png">
+       <img class="back" src="{{ base }}/assets/cover.png">
        <h1 style="text-align: center; padding-top: 70mm;">
          Mini Planner
        </h1>
@@ -236,8 +233,9 @@ After this page your template looks like this:
    </body>
    </html>
 
-One page, one background, one title, half-letter paper. Next we add
-dynamic content.
+One page, one background, one title, half-letter paper. The ``{{ base }}/``
+prefix ensures the image path works regardless of where the output file is
+written. Next we add dynamic content.
 
 
 What is next

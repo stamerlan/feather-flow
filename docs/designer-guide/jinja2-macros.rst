@@ -111,7 +111,7 @@ whitespace before the output:
 
 .. code-block:: html+jinja
 
-   <th {{- day_style(day) }}>{{ day.name[:3] }}</th>
+   <th {{- day_style(day) }}>{{ day.short_name }}</th>
 
 **Output for a weekday:**
 
@@ -225,9 +225,9 @@ Do and don't summary
 Update the Mini Planner
 -----------------------
 
-Refactor the month calendar from the previous page. Move the off-day styling and
-the table rows into macros. Your ``pages/mini-planner.html`` should now look
-like this:
+Refactor the month calendar from the previous page. Move the off-day styling
+and the table rows into macros. Your ``planners/mini-planner/mini-planner.html``
+should now look like this:
 
 .. code-block:: html+jinja
 
@@ -255,10 +255,10 @@ like this:
    <!doctype html>
    <html>
    <head>
-     {{ planner_head }}
      <meta charset="utf-8">
      <style>
        @page { size: 139.7mm 215.9mm; margin: 0; }
+       html, body { margin: 0; padding: 0; height: 100%; }
        .page {
          position: relative;
          width: 139.7mm; height: 215.9mm;
@@ -277,7 +277,7 @@ like this:
 
      ## -- Cover page --
      <div class="page">
-       <img class="back" src="assets/mini-cover.png">
+       <img class="back" src="{{ base }}/assets/cover.png">
        <h1 style="text-align: center; padding-top: 70mm;">
          Mini Planner - {{ month }} {{ year }}
        </h1>
@@ -285,7 +285,7 @@ like this:
 
      ## -- Month calendar --
      <div class="page" id="{{ month.id }}">
-       <img class="back" src="assets/mini-calendar.png">
+       <img class="back" src="{{ base }}/assets/calendar.png">
        <h2 style="text-align: center; margin-top: 15mm;
                   font-size: 22pt; letter-spacing: 5mm;">
          {{ month }}
@@ -301,7 +301,7 @@ like this:
          <thead>
            <tr>
              %% for wd in calendar.weekdays
-             <th style="color: {{ day_color(wd) }}">{{ wd.name[:3] }}</th>
+             <th style="color: {{ day_color(wd) }}">{{ wd.short_name }}</th>
              %% endfor
            </tr>
          </thead>
@@ -316,15 +316,14 @@ like this:
 
 Regenerate::
 
-    pyplaner --html pages/mini-planner.html
+    pyplaner planners/mini-planner --html
 
-The output should look the same as before, but the template is now
-shorter and easier to maintain. The ``day_color`` macro can be
-reused on day pages later.
+The output should look the same as before, but the template is now shorter and
+easier to maintain. The ``day_color`` macro can be reused on day pages later.
 
 
 What is next
 ------------
 
-Continue to :doc:`data-reference` for a complete list of every
-object and property available in your templates.
+Continue to :doc:`data-reference` for a complete list of every object and
+property available in your templates.

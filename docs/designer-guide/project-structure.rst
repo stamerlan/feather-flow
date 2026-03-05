@@ -18,61 +18,36 @@ Folder layout
 After you clone the repository you will see a structure like this::
 
     feather-flow/
-    |-- assets/
-    |   |-- cover.png
-    |   |-- year.png
-    |   |-- day.png
-    |   |-- month-jan.png
-    |   |-- month-feb.png
-    |   |-- ...
-    |   |-- cormorant-garamond.css
-    |   |-- cormorant-garamond-normal-latin.woff2
-    |   +-- cormorant-garamond-italic-latin.woff2
-    |
-    |-- pages/
-    |   +-- (your templates go here)
+    |-- planners/
+    |   +-- ff-2026/
+    |       |-- ff-2026.html
+    |       +-- assets/
+    |           |-- ff-2026.css
+    |           |-- cover.png
+    |           |-- year.png
+    |           |-- day.png
+    |           |-- jan.png
+    |           |-- ...
+    |           |-- cormorant-garamond.css
+    |           |-- cormorant-garamond-normal-latin.woff2
+    |           +-- cormorant-garamond-italic-latin.woff2
     |
     |-- src/pyplaner/           <-- Python source (you rarely
     |   |-- ...                     need to touch this)
     |
     +-- docs/                   <-- Sphinx documentation
 
-The two folders you will work with most are:
+Each planner lives in its own self-contained directory under ``planners/``.
+The directory holds the Jinja2/HTML template and an ``assets/`` subfolder
+with all stylesheets, images and fonts the template needs.
 
-``pages/``
-    Contains Jinja2/HTML template files. Each template describes the full
-    planner - cover, calendars, day pages and so on. You can have several
-    templates side by side.
+``planners/<name>/<name>.html``
+    The Jinja2/HTML template file that describes the full planner - cover,
+    calendars, day pages and so on.
 
-``assets/``
-    Contains everything the templates reference - stylesheets, background images
-    and font files.
-
-
-Where to put new files
-----------------------
-
-Follow these simple rules:
-
-.. list-table::
-   :header-rows: 1
-   :widths: 30 40 30
-
-   * - File type
-     - Location
-     - Example
-   * - Template
-     - ``pages/``
-     - ``pages/mini-planner.html``
-   * - Stylesheet
-     - ``assets/``
-     - ``assets/mini-planner.css``
-   * - Background image
-     - ``assets/``
-     - ``assets/mini-cover.png``
-   * - Font file
-     - ``assets/``
-     - ``assets/myfont.woff2``
+``planners/<name>/assets/``
+    Everything the template references - stylesheets, background images and font
+    files.
 
 .. tip::
 
@@ -85,32 +60,34 @@ The rendering pipeline
 
 When you run pyplaner it follows these steps:
 
-1. **Load the template** from ``pages/``.
-2. **Inject calendar data** - a ``calendar`` object and a helper string called
-   ``planner_head`` become available inside the template.
+1. **Load the template** from the planner directory.
+2. **Inject template variables** - ``base``, ``calendar`` and ``lang`` become
+   available inside the template.
 3. **Render with Jinja2** - loops, variables and macros in the template are
    evaluated and plain HTML is produced.
 4. **Write the output** to the current working directory.
 
    * ``--html`` flag - writes an ``.html`` file you can open in any browser.
    * ``--pdf`` flag (the default) - opens the HTML in a headless Chromium
-     browser and prints it to PDF.
+     browser and prints it to PDF. Asset paths are resolved relative to the
+     template's directory so the PDF is correct regardless of where you run the
+     command.
 
 ::
 
-    +------------------+     +----------+     +-------------+
-    | pages/my.html    |---->| pyplaner |---->| my.html     |
-    | assets/my.css    |     |          |     | my.pdf      |
-    | assets/back.png  |     +----------+     +-------------+
-    +------------------+      (Jinja2 +        (in current
-                               Playwright)      directory)
+    planners/my-planner/
+    |-- my-planner.html  --+
+    +-- assets/            |   +----------+   +---------------+
+        |-- my.css         +-->| pyplaner |-->| my-planner.pdf|
+        +-- back.png           +----------+   +---------------+
+                               (Jinja2 +       (in current
+                                Playwright)     directory)
 
 .. warning::
 
-   The output files are written to the directory where you run the command, not
-   next to the template. If you run ``pyplaner pages/my-planner.html`` from the
-   repository root the output lands in the repository root as
-   ``my-planner.html`` or ``my-planner.pdf``.
+   The output files are written to the directory where you run the command. If
+   you run ``pyplaner --html my-planner.html`` from the planner directory, the
+   output lands in the planner directory and overwrites the template file.
 
 
 What is next

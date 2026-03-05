@@ -8,8 +8,8 @@ produce. Keep it open while you design - it answers "what can I put inside
 
 **Key topics**
 
-* The variables injected into every template (``calendar``, ``planner_head``
-  and ``lang``).
+* The variables injected into every template (``base``, ``calendar`` and
+  ``lang``).
 * Year, Month, Day, WeekDay objects and their properties.
 * The ``month.table`` grid explained visually.
 * String representation shortcuts.
@@ -28,14 +28,18 @@ pyplaner passes these variables to your template:
    * - Name
      - Type
      - Description
+   * - ``base``
+     - string
+     - Path prefix pointing to the template directory. Prefix every ``src``
+       and ``href`` attribute with ``{{ base }}/`` so that asset paths resolve
+       correctly regardless of where the output file is written.
+
+       Don't prepend ``{{ base }}/`` to links within the same page (starting
+       with ``#``).
    * - ``calendar``
      - Calendar
      - Entry point for all calendar data. Use it to build a Year object and to
        access weekday names.
-   * - ``planner_head``
-     - string
-     - HTML to inject in ``<head>``. Empty for HTML output, contains a
-       ``<base>`` tag for PDF output. Always include it.
    * - ``lang``
      - string
      - The active display language code (e.g. ``"en"``, ``"ru"``, ``"kr"``),

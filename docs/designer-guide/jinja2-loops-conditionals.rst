@@ -165,20 +165,20 @@ images can be stored in a tuple and accessed by position using ``loop.index0``:
 .. code-block:: html+jinja
 
    %% set month_backgrounds = (
-     "assets/month-jan.png",
-     "assets/month-feb.png",
-     "assets/month-mar.png",
+     "assets/jan.png",
+     "assets/feb.png",
+     "assets/mar.png",
    )
 
    %% for month in year.months
    <div class="page">
-     <img class="back" src="{{ month_backgrounds[loop.index0] }}">
+     <img class="back" src="{{ base }}/{{ month_backgrounds[loop.index0] }}">
      <h2>{{ month }}</h2>
    </div>
    %% endfor
 
 On the first iteration ``loop.index0`` is 0, so it picks
-``assets/month-jan.png``. On the second it is 1, and so on.
+``assets/jan.png``. On the second it is 1, and so on.
 
 .. tip::
 
@@ -197,9 +197,9 @@ Conditionals let you show or hide HTML based on a condition.
 
    %% for day in calendar.weekdays
    %% if day.is_off_day
-   <th style="color: red;">{{ day.name[:3] }}</th>
+   <th style="color: red;">{{ day.short_name }}</th>
    %% else
-   <th>{{ day.name[:3] }}</th>
+   <th>{{ day.short_name }}</th>
    %% endif
    %% endfor
 
@@ -226,9 +226,8 @@ For short checks you can write the condition on one line:
 
 .. code-block:: html+jinja
 
-   <th{{ ' style="color: red;"'
-         if day.is_off_day else '' }}>
-     {{ day.name[:3] }}
+   <th{{ ' style="color: red;"' if day.is_off_day else '' }}>
+     {{ day.short_name }}
    </th>
 
 This produces the same result as the block form above but is more compact.
@@ -314,13 +313,13 @@ Update the Mini Planner
 -----------------------
 
 Add a second page that shows a calendar table for the month. Open
-``pages/mini-planner.html`` and add the following after the cover
-page div (before ``</body>``):
+``planners/mini-planner/mini-planner.html`` and add the following
+after the cover page div (before ``</body>``):
 
 .. code-block:: html+jinja
 
    <div class="page" id="{{ month.id }}">
-     <img class="back" src="assets/mini-calendar.png">
+     <img class="back" src="{{ base }}/assets/calendar.png">
      <h2 style="text-align: center; margin-top: 15mm;
                 font-size: 22pt; letter-spacing: 5mm;">
        {{ month }}
@@ -337,9 +336,9 @@ page div (before ``</body>``):
          <tr>
            %% for wd in calendar.weekdays
            %% if wd.is_off_day
-           <th style="color: red;">{{ wd.name[:3] }}</th>
+           <th style="color: red;">{{ wd.short_name }}</th>
            %% else
-           <th>{{ wd.name[:3] }}</th>
+           <th>{{ wd.short_name }}</th>
            %% endif
            %% endfor
          </tr>
@@ -369,7 +368,7 @@ This uses three nested concepts you learned on this page:
 
 Regenerate::
 
-    pyplaner --html pages/mini-planner.html
+    pyplaner planners/mini-planner --html
 
 You should now see two pages - the cover and a month calendar.
 
