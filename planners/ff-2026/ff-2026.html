@@ -1,9 +1,9 @@
 %% set year = calendar.year(2026)
 %% set month_backgrounds = (
-  "assets/month-jan.png", "assets/month-feb.png", "assets/month-mar.png",
-  "assets/month-apr.png", "assets/month-may.png", "assets/month-jun.png",
-  "assets/month-jul.png", "assets/month-aug.png", "assets/month-sep.png",
-  "assets/month-oct.png", "assets/month-nov.png", "assets/month-dec.png",
+  "assets/jan.png", "assets/feb.png", "assets/mar.png",
+  "assets/apr.png", "assets/may.png", "assets/jun.png",
+  "assets/jul.png", "assets/aug.png", "assets/sep.png",
+  "assets/oct.png", "assets/nov.png", "assets/dec.png",
 )
 
 %% macro day_style(day)
@@ -27,14 +27,11 @@
 <!doctype html>
 <html>
 <head>
-  ## Planner head is used to inject additional elements into the HTML during
-  ## document generation. For example, to set the base URL into the HTML.
-  {{ planner_head }}
   <meta charset="utf-8">
-  <link rel="stylesheet" href="assets/ff-2026.css">
-  <link rel="stylesheet" href="assets/cormorant-garamond.css">
+  <link rel="stylesheet" href="{{ base }}/assets/ff-2026.css">
+  <link rel="stylesheet" href="{{ base }}/assets/cormorant-garamond.css">
   %% if lang == "kr"
-  <link rel="stylesheet" href="assets/noto-serif-kr.css">
+  <link rel="stylesheet" href="{{ base }}/assets/noto-serif-kr.css">
   <style>
     .page {
       font-family: "Noto Serif KR", "Cormorant Garamond", Georgia, system-ui, serif;
@@ -58,7 +55,7 @@
   ## Set opacity to enforce Chromium to rasterize page. Necessary for correct
   ## reflection effect in generated PDF.
   <div class="page" style="filter: opacity(100%);">
-    <img class="background" src="assets/cover.png">
+    <img class="background" src="{{ base }}/assets/cover.png">
     <div class="cover-title">
       Feather Flow {{ year }}
       <div class="cover-title-reflection">Feather Flow {{ year }}</div>
@@ -66,7 +63,7 @@
   </div>
 
   <div class="page" id="{{ year.id }}">
-    <img class="background" src="assets/year.png">
+    <img class="background" src="{{ base }}/assets/year.png">
     <div class="year-title">{{ year }}</div>
     <div class="year-grid">
       %% for month in year.months
@@ -91,7 +88,7 @@
 
   %% for month in year.months
   <div class="page" id="{{ month.id }}">
-    <img class="background" src="{{ month_backgrounds[loop.index0] }}">
+    <img class="background" src="{{ base }}/{{ month_backgrounds[loop.index0] }}">
     <div class="month-header">
       %% for m in year.months
       <a href="#{{ m.id }}">{{ m.short_name }}</a>
@@ -115,7 +112,7 @@
 
   %% for day in month.days
   <div class="page" id="{{ day.id }}">
-    <img class="background" src="assets/day.png" style="z-index: -2;">
+    <img class="background" src="{{ base }}/assets/day.png" style="z-index: -2;">
 
     <!-- Dotted lines to write on -->
     <div class="background" style="z-index: -1;">

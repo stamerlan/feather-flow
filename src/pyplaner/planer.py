@@ -4,7 +4,6 @@ import pathlib
 from urllib.parse import urlparse, unquote
 
 import jinja2
-import markupsafe
 from playwright.sync_api import Route, sync_playwright
 
 from .calendar import Calendar
@@ -38,32 +37,37 @@ def _asset_route(r: Route) -> None:
 class Planer:
     """Render a Jinja2/HTML planner template into HTML or PDF.
 
-    :param template_path: Path to the Jinja2/HTML template file.
+    :param path: Path to the Jinja2/HTML template file.
+    :param planner_dir: Base URL or path to the template directory.
     :param calendar: :class:`~pyplaner.calendar.Calendar` instance used for
         template rendering.
     """
 
-    def __init__(self, template_path: str | os.PathLike,
+    def __init__(self, path: str | os.PathLike,
+                 planner_dir: str | os.PathLike | None = None,
                  calendar: Calendar | None = None,
     ) -> None:
         if calendar is None:
             calendar = Calendar()
-        self._path = pathlib.Path(template_path).absolute()
+        self.calendar = calendar
+
+        self.path = pathlib.Path(path).absolute()
+
+        if planner_dir is None:
+            planner_dir = self.path.parent.as_uri()
+        self.planner_dir = str(planner_dir)
 
         self._env = jinja2.Environment(
-            loader=jinja2.FileSystemLoader(self._path.parent),
+            loader=jinja2.FileSystemLoader(self.path.parent),
             autoescape=jinja2.select_autoescape(),
             trim_blocks=True,
             lstrip_blocks=True,
             line_statement_prefix="%%",
             line_comment_prefix="##"
         )
-        self._template = self._env.get_template(self._path.name)
-        self.calendar = calendar
+        self._template = self._env.get_template(self.path.name)
 
-    def html(self,
-             tracker: ProgressTracker | None = None,
-             ) -> str:
+    def html(self, tracker: ProgressTracker | None = None) -> str:
         """Render the template and return the resulting HTML string.
 
         :param tracker: Optional progress tracker.
@@ -73,7 +77,7 @@ class Planer:
             tracker = QuietTracker()
         tracker.job("html render")
         return self._template.render(
-            planner_head="",
+            base=self.planner_dir,
             calendar=self.calendar,
             lang=self.calendar.lang,
         )
@@ -107,9 +111,8 @@ class Planer:
         tracker.set_job_count(job_count)
 
         tracker.job("html render")
-        planner_head = markupsafe.Markup('<base href="file://.">')
         html = self._template.render(
-            planner_head=planner_head,
+            base=self.planner_dir,
             calendar=self.calendar,
             lang=self.calendar.lang,
         )

@@ -10,7 +10,6 @@ def simple_template(tmp_path):
     tpl.write_text(
         "<html><body>\n"
         "<h1>{{ calendar.lang }}</h1>\n"
-        "{{ planner_head }}\n"
         "%% for year_num in range(2026, 2027)\n"
         "%% set year = calendar.year(year_num)\n"
         "<p>{{ year }}</p>\n"
@@ -50,17 +49,24 @@ def test_html_russian_lang(tmp_path):
     cal = Calendar(lang="ru")
     planer = Planer(tpl, calendar=cal)
     html = planer.html()
-    assert "Январь" in html
+    assert "\u042f\u043d\u0432\u0430\u0440\u044c" in html
 
 
-def test_planner_head_empty_in_html(tmp_path):
-    """planner_head is an empty string in html() output."""
-    tpl = tmp_path / "tpl.html"
-    tpl.write_text("{{ planner_head }}OK", encoding="utf-8")
+def test_base_is_template_directory(tmp_path):
+    """base is set to the template's parent directory."""
+    sub = tmp_path / "planner"
+    sub.mkdir()
+    tpl = sub / "tpl.html"
+    tpl.write_text(
+        '<link href="{{ base }}/assets/style.css">'
+        '<a href="#page1">link</a>',
+        encoding="utf-8",
+    )
     planer = Planer(tpl)
     html = planer.html()
-    assert html.strip() == "OK"
-
+    expected = sub.as_uri() + "/assets/style.css"
+    assert expected in html
+    assert 'href="#page1"' in html
 
 
 def test_asset_route_windows_path():
