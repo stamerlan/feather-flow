@@ -7,7 +7,7 @@
 )
 
 %% macro day_style(day)
-  {% if day.is_off_day %} style="color: #C00000"{% endif %}
+  {% if day.is_off_day %}color: #C00000{% endif %}
 %% endmacro
 
 %% macro month_table(month)
@@ -15,7 +15,7 @@
     <tr>
       %% for day in week
         %% if day is not none
-          <td {{- day_style(day) }}><a href="#{{ day.id }}">{{ day }}</a></td>
+          <td style="{{ day_style(day) }}"><a href="#{{ day.id }}">{{ day }}</a></td>
         %% else
           <td></td>
         %% endif
@@ -32,23 +32,7 @@
   <link rel="stylesheet" href="{{ base }}/assets/cormorant-garamond.css">
   %% if lang == "kr"
   <link rel="stylesheet" href="{{ base }}/assets/noto-serif-kr.css">
-  <style>
-    .page {
-      font-family: "Noto Serif KR", "Cormorant Garamond", Georgia, system-ui, serif;
-    }
-    .year-grid {
-      font-family: "Noto Serif KR", "Cormorant Garamond", Georgia, system-ui, serif;
-    }
-    .month-name {
-      letter-spacing: 3mm;
-    }
-    .year-grid-month-table td {
-      font-size: 13pt;
-    }
-    .day-header-days-row {
-      font-size: 12pt;
-    }
-  </style>
+  <link rel="stylesheet" href="{{ base }}/assets/ff-2026-kr.css">
   %% endif
 </head>
 <body>
@@ -73,7 +57,7 @@
           <thead>
             <tr>
               %% for day in calendar.weekdays
-              <th {{- day_style(day) }}>{{ day.letter }}</th>
+              <th style="{{ day_style(day) }}">{{ day.letter }}</th>
               %% endfor
             </tr>
           </thead>
@@ -100,7 +84,7 @@
       <thead>
         <tr>
           %% for day in calendar.weekdays
-          <th {{- day_style(day) }}>{{ day.short_name }}</th>
+          <th style="{{ day_style(day) }}">{{ day.short_name }}</th>
           %% endfor
         </tr>
       </thead>
@@ -132,7 +116,7 @@
       <div class="day-header-date">
         <p class="day-header-day">{{ day }}</p>
         <p class="day-header-month">{{ month }}</p>
-        <p class="day-header-weekday" {{- day_style(day) }}>{{ day.weekday }}</p>
+        <p class="day-header-weekday" style="{{ day_style(day) }}">{{ day.weekday }}</p>
       </div>
 
       <div class="day-header-tables">

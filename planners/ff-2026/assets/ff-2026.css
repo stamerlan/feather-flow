@@ -52,8 +52,7 @@ a:hover {
   bottom: 40mm;
 
   text-align: center;
-  font-family: system-ui;
-  font-size: 33pt;
+  font-size: 40pt;
   letter-spacing: 16px;
 }
 
@@ -81,7 +80,6 @@ a:hover {
   margin-left: 5mm;
   margin-right: 5mm;
   margin-bottom: 10mm;
-  font-family: "Cormorant Garamond", Georgia, system-ui, serif;
   overflow: hidden;
   display: grid;
   grid-template-columns: repeat(auto-fill, 60mm);

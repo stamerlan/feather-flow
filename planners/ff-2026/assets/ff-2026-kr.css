@@ -1,0 +1,16 @@
+.page {
+  font-family: "Noto Serif KR", "Cormorant Garamond", Georgia, system-ui, serif;
+}
+.cover-title {
+  /* Use original font for the cover title */
+  font-family: "Cormorant Garamond", Georgia, system-ui, serif;
+}
+.month-name {
+  letter-spacing: 3mm;
+}
+.year-grid-month-table td {
+  font-size: 13pt;
+}
+.day-header-days-row {
+  font-size: 12pt;
+}
