@@ -1,14 +1,11 @@
-import io
 import os
 import pathlib
 from urllib.parse import urlparse, unquote
 
 import jinja2
-import pikepdf
 from playwright.sync_api import Route, sync_playwright
 
 from .calendar import Calendar
-from .optimize_pdf import optimize_pdf
 from .progress import ProgressTracker, QuietTracker
 
 
@@ -83,15 +80,12 @@ class Planner:
 
     def pdf(self,
             base: str | None = None,
-            pdf_optimize: bool = True,
             tracker: ProgressTracker | None = None,
             ) -> bytes:
         """Render the template and return a PDF as raw bytes.
 
-        :param base: Base URL used to resolve assets paths. If not provided,
-            the planner directory is used.
-        :param pdf_optimize: If ``True`` (default), post-process the PDF
-            to deduplicate images and strip obsolete metadata.
+        :param base: Base URL used to resolve assets paths. If not provided, the
+            planner directory is used.
         :param tracker: Optional progress tracker.
         :returns: PDF file content as bytes.
         """
@@ -100,7 +94,7 @@ class Planner:
         if base is None:
             base = self.path.parent.as_uri()
 
-        tracker.set_job_count(5)
+        tracker.set_job_count(4)
 
         tracker.job("html render")
         html = self._env.get_template(self.path.name).render(
@@ -130,13 +124,4 @@ class Planner:
 
             browser.close()
 
-        tracker.job("pikepdf")
-        with pikepdf.open(io.BytesIO(pdf)) as pike_pdf_obj:
-            if pdf_optimize:
-                optimize_pdf(pike_pdf_obj)
-            bio = io.BytesIO()
-            pike_pdf_obj.save(bio,
-                object_stream_mode=pikepdf.ObjectStreamMode.generate,
-                recompress_flate=True,
-            )
-            return bio.getvalue()
+        return pdf

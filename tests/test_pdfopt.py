@@ -5,8 +5,8 @@ import pytest
 pikepdf = pytest.importorskip("pikepdf")
 
 from pikepdf import Name, Page
-from pyplanner.optimize_pdf import (
-    optimize_pdf,
+from pyplanner.pdfopt import (
+    optimize,
     _stream_content_bytes,
     _deduplicate_images,
     _strip_and_dedup_resources,
@@ -118,8 +118,8 @@ def test_deduplicate_form_xobjects():
     assert p0_fm.objgen == p1_fm.objgen
 
 
-def test_optimize_pdf_full_pipeline():
-    """optimize_pdf runs all stages without error and strips ProcSet."""
+def test_optimize_full_pipeline():
+    """optimize runs all stages and strips ProcSet."""
     pdf = pikepdf.new()
     img_data = b"\x89PNG\r\n" + b"\x00" * 100
 
@@ -135,10 +135,12 @@ def test_optimize_pdf_full_pipeline():
         )
         pdf.pages.append(_make_page(pdf, resources, b"q /Im0 Do Q"))
 
-    pdf = _roundtrip(pdf)
-    optimize_pdf(pdf)
+    buf = io.BytesIO()
+    pdf.save(buf)
+    result = optimize(buf.getvalue())
 
-    for page in pdf.pages:
-        res = page.get(Name.Resources)
-        if res is not None:
-            assert Name.ProcSet not in res
+    with pikepdf.open(io.BytesIO(result)) as out:
+        for page in out.pages:
+            res = page.get(Name.Resources)
+            if res is not None:
+                assert Name.ProcSet not in res

@@ -79,7 +79,8 @@ def test_default_html_filename(simple_template, tmp_path, monkeypatch):
 
 def test_no_flags_generates_pdf_by_default(simple_template):
     """No --html/--pdf flag generates PDF by default."""
-    with patch("pyplanner.__main__.Planner") as mock_planner_cls:
+    with patch("pyplanner.__main__.Planner") as mock_planner_cls, \
+         patch("pyplanner.__main__.optimize", side_effect=lambda d: d):
         mock_instance = MagicMock()
         mock_instance.pdf.return_value = b"%PDF-1.4"
         mock_planner_cls.return_value = mock_instance

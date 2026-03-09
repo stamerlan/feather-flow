@@ -6,8 +6,9 @@ SVG rasterizations, transparency masks - are embedded as *separate* PDF objects
 on every page. For a 365-day planner, this multiplies the same few images by
 hundreds of times.
 
-This module provides :func:`optimize_pdf`, which rewrites the in-memory
-``pikepdf.Pdf`` to eliminate that redundancy before it is saved to disk.
+This module provides :func:`optimize`, which accepts raw PDF bytes, rewrites the
+internal structure to eliminate that redundancy, and returns the optimized PDF
+bytes.
 
 Optimizations performed
 -----------------------
@@ -66,6 +67,7 @@ Optimizations performed
     same way as for images above.
 """
 import hashlib
+import io
 from typing import Any
 
 import pikepdf
@@ -92,20 +94,6 @@ def _stream_content_bytes(obj: Any) -> bytes:
     except Exception:
         return bytes(obj.get_stream_buffer(
             decode_level=StreamDecodeLevel.specialized))
-
-
-def optimize_pdf(pdf: pikepdf.Pdf) -> None:
-    """Deduplicate images, strip ProcSets, and merge identical Forms.
-
-    Modifies *pdf* in place. See the module docstring for a detailed
-    description of each optimization, the workarounds applied, and the
-    rationale.
-
-    :param pdf: An open :class:`pikepdf.Pdf` object to optimize in place.
-    """
-    _deduplicate_images(pdf)
-    _strip_and_dedup_resources(pdf)
-    pdf.remove_unreferenced_resources()
 
 
 def _deduplicate_images(pdf: pikepdf.Pdf) -> None:
@@ -269,3 +257,27 @@ def _strip_and_dedup_resources(pdf: pikepdf.Pdf) -> None:
         resources = page.get(Name.Resources)
         if resources is not None:
             _process_resources(resources)
+
+
+def optimize(pdf_bytes: bytes) -> bytes:
+    """Deduplicate images, strip ProcSets, and merge identical Forms.
+
+    Opens the given PDF bytes with pikepdf, applies all optimization passes
+    described in the module docstring, and returns the re-serialized PDF bytes.
+
+    :param pdf_bytes: Raw PDF file content.
+    :returns: Optimized PDF file content.
+    """
+    with pikepdf.open(io.BytesIO(pdf_bytes)) as pdf:
+        _deduplicate_images(pdf)
+        _strip_and_dedup_resources(pdf)
+        pdf.remove_unreferenced_resources()
+        buf = io.BytesIO()
+        pdf.save(
+            buf,
+            object_stream_mode=(
+                pikepdf.ObjectStreamMode.generate
+            ),
+            recompress_flate=True,
+        )
+        return buf.getvalue()

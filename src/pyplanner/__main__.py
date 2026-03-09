@@ -7,6 +7,7 @@ from . import __version__
 from .calendar import Calendar
 from .dayinfo import DayInfoProvider
 from .liveserver import watch
+from .pdfopt import optimize
 from .planner import Planner
 from .progress import create_tracker
 from .translations import SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE
@@ -57,7 +58,7 @@ def main(argv: list[str] | None = None) -> None:
     parser.add_argument("-o", "--output", default=None, metavar="FILE",
         help="output filename (default: <template_stem>.pdf or "
              "<template_stem>.html depending on format)")
-    parser.add_argument("--pdf-optimize", action=argparse.BooleanOptionalAction,
+    parser.add_argument("--opt", action=argparse.BooleanOptionalAction,
         default=True,
         help="post-process PDF to deduplicate images/streams and strip "
              "obsolete metadata (default: enabled)")
@@ -164,11 +165,12 @@ def main(argv: list[str] | None = None) -> None:
                 f.write(planner.html(base=base, tracker=tracker))
     else:
         with tracker(f"Generating {output}"):
+            pdf_bytes = planner.pdf(tracker=tracker)
+            if args.opt:
+                tracker.job("optimize pdf")
+                pdf_bytes = optimize(pdf_bytes)
             with open(output, "wb") as f:
-                f.write(planner.pdf(
-                    pdf_optimize=args.pdf_optimize,
-                    tracker=tracker,
-                ))
+                f.write(pdf_bytes)
 
 
 if __name__ == "__main__":
