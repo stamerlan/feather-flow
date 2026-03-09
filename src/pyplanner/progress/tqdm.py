@@ -1,42 +1,23 @@
 import sys
-from typing import Any, Self
-
+from typing import Self
+from tqdm.auto import tqdm
 from .base import BaseTracker
-
-_tqdm: Any = None
-try:
-    from tqdm.auto import tqdm
-    _tqdm = tqdm
-except ImportError:
-    pass
 
 
 class TqdmTracker(BaseTracker):
     """Progress tracker backed by *tqdm*.
 
     Delegates all visual output to a ``tqdm`` progress bar.
-
-    _tqdm_bar : Any (tqdm instance or None)
-        The live tqdm bar created in ``__enter__`` and closed in ``__exit__``.
-        Typed as ``Any`` because tqdm is an optional dependency.
     """
 
-    @staticmethod
-    def is_available() -> bool:
-        """Return ``True`` if tqdm is installed."""
-        return _tqdm is not None
-
     def __init__(self, *, verbose: bool = False) -> None:
-        """Raise ``RuntimeError`` if tqdm is not installed."""
-        if _tqdm is None:
-            raise RuntimeError("tqdm is not available")
         super().__init__(verbose=verbose)
-        self._tqdm_bar: Any = None
+        self._tqdm_bar: tqdm[None] | None = None
 
     def __enter__(self) -> Self:
         """Create the tqdm bar and start the refresh thread."""
         self.reset_stage()
-        self._tqdm_bar = _tqdm(
+        self._tqdm_bar = tqdm(
             total=self.job_count or None,
             desc=self.stage_name,
             bar_format="{desc}: {n_fmt}/{total_fmt} {bar} [{elapsed}]",

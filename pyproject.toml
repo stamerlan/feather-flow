@@ -14,20 +14,18 @@ requires-python = ">=3.12"
 
 dependencies = [
     "jinja2>=3.1",
-    "playwright>=1.58"
+    "livereload>=2.7",
+    "pikepdf>=10.3",
+    "playwright>=1.58",
+    "tqdm>=4.67",
 ]
 
 [project.optional-dependencies]
-docs = ["sphinx>=7.0", "sphinx-rtd-theme>=2.0"]
-test = ["pytest>=9.0", "pytest-cov>=7.0"]
-full = [
-    "pikepdf>=10.3",
-    "tqdm>=4.67",
-    "livereload>=2.7"
-]
 dev = [
-    "pyplanner[docs]",
-    "pyplanner[test]",
+    "sphinx>=7.0",
+    "sphinx-rtd-theme>=2.0",
+    "pytest>=9.0",
+    "pytest-cov>=7.0",
 ]
 
 [project.scripts]

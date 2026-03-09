@@ -23,7 +23,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install pyplanner
-        run: pip install .[full]
+        run: pip install .
 
       - name: Install Playwright browsers
         run: python -m playwright install --with-deps chromium

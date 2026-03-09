@@ -1,5 +1,4 @@
 import logging
-import sys
 from unittest.mock import patch, MagicMock
 
 import pytest
@@ -130,22 +129,6 @@ def test_access_filter_always_returns_false():
     record = _make_record("200 GET / (127.0.0.1) 0.1ms")
     assert f.filter(record) is False
 
-
-def test_watch_raises_without_livereload(
-    planner_stub, tmp_path,
-):
-    """watch() raises ImportError when livereload is missing."""
-    saved = sys.modules.pop("livereload", None)
-    try:
-        with patch.dict(sys.modules, {"livereload": None}):
-            with pytest.raises(
-                ImportError,
-                match="livereload is required",
-            ):
-                watch(planner_stub, tmp_path / "out.html")
-    finally:
-        if saved is not None:
-            sys.modules["livereload"] = saved
 
 
 def test_watch_writes_initial_html(

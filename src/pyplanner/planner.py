@@ -4,16 +4,12 @@ import pathlib
 from urllib.parse import urlparse, unquote
 
 import jinja2
+import pikepdf
 from playwright.sync_api import Route, sync_playwright
 
 from .calendar import Calendar
+from .optimize_pdf import optimize_pdf
 from .progress import ProgressTracker, QuietTracker
-
-try:
-    import pikepdf
-    from .optimize_pdf import optimize_pdf
-except ImportError:
-    pikepdf = None  # type: ignore[assignment]
 
 
 def _asset_route(r: Route) -> None:
@@ -94,9 +90,8 @@ class Planner:
 
         :param base: Base URL used to resolve assets paths. If not provided,
             the planner directory is used.
-        :param pdf_optimize: If ``True`` (default) and ``pikepdf`` is
-            available, post-process the PDF to deduplicate images and
-            strip obsolete metadata.
+        :param pdf_optimize: If ``True`` (default), post-process the PDF
+            to deduplicate images and strip obsolete metadata.
         :param tracker: Optional progress tracker.
         :returns: PDF file content as bytes.
         """
@@ -105,10 +100,7 @@ class Planner:
         if base is None:
             base = self.path.parent.as_uri()
 
-        job_count = 4
-        if pikepdf is not None:
-            job_count += 1
-        tracker.set_job_count(job_count)
+        tracker.set_job_count(5)
 
         tracker.job("html render")
         html = self._env.get_template(self.path.name).render(
@@ -137,9 +129,6 @@ class Planner:
             pdf = page.pdf(print_background=True, prefer_css_page_size=True)
 
             browser.close()
-
-        if pikepdf is None:
-            return pdf
 
         tracker.job("pikepdf")
         with pikepdf.open(io.BytesIO(pdf)) as pike_pdf_obj:

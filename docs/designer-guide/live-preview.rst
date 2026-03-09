@@ -13,15 +13,6 @@ file.
 * Troubleshooting common issues.
 
 
-Install the extra dependency
-----------------------------
-
-The watch mode requires the ``livereload`` package. Install it together with the
-other optional dependencies::
-
-    pip install pyplanner[full]
-
-
 Start the live-reload server
 ----------------------------
 

@@ -88,8 +88,7 @@ def main(argv: list[str] | None = None) -> None:
              f"(default: {DEFAULT_LANGUAGE})")
     parser.add_argument("-w", "--watch", action="store_true",
         help="watch template directory for changes and "
-             "serve HTML with live reload "
-             "(requires: pip install pyplanner[full])")
+             "serve HTML with live reload")
     verbosity = parser.add_mutually_exclusive_group()
     verbosity.add_argument("-q", "--quiet", action="store_true",
         help="suppress informational output")

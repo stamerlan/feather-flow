@@ -2,7 +2,6 @@ import logging
 import os
 import pathlib
 import sys
-
 from .planner import Planner
 
 class _LivereloadFilter(logging.Filter):
@@ -79,13 +78,7 @@ def watch(
         work.
     :param verbose: Show browser and rebuild events.
     """
-    try:
-        from livereload import Server
-    except ImportError:
-        raise ImportError(
-            "livereload is required for --watch mode.\n"
-            "Install with: pip install pyplanner[full]"
-        )
+    from livereload import Server
 
     if base is None:
         output = pathlib.Path(output).resolve()

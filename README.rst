@@ -94,10 +94,6 @@ installed::
 
     playwright install chromium
 
-To enable PDF optimization and progress bars, install the ``full`` extra::
-
-    pip install -e .[full]
-
 Usage
 -----
 

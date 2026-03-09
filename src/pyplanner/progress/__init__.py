@@ -5,8 +5,7 @@ Public API
 - ``ProgressTracker`` - structural protocol
 - ``QuietTracker``    - silent no-op
 - ``SimpleProgressTracker`` - one-line print for pipes
-- ``TtyProgressTracker``    - live timer on a TTY
-- ``TqdmTracker``     - tqdm-backed bar (optional dep)
+- ``TqdmTracker``     - tqdm-backed bar
 - ``create_tracker``  - factory that picks the best one
 """
 
@@ -16,13 +15,11 @@ from .protocol import ProgressTracker
 from .quiet import QuietTracker
 from .simple import SimpleProgressTracker
 from .tqdm import TqdmTracker
-from .tty import TtyProgressTracker
 
 __all__ = [
     "ProgressTracker",
     "QuietTracker",
     "SimpleProgressTracker",
-    "TtyProgressTracker",
     "TqdmTracker",
     "create_tracker",
 ]
@@ -44,8 +41,7 @@ def create_tracker(
     Selection logic:
 
     - *quiet* - ``QuietTracker`` (no output at all).
-    - TTY + tqdm installed - ``TqdmTracker``.
-    - TTY without tqdm - ``TtyProgressTracker``.
+    - TTY - ``TqdmTracker``.
     - Non-TTY (pipe/file) - ``SimpleProgressTracker``.
 
     :param quiet: Suppress all output.
@@ -55,7 +51,5 @@ def create_tracker(
     if quiet:
         return QuietTracker()
     if _is_tty():
-        if TqdmTracker.is_available():
-            return TqdmTracker(verbose=verbose)
-        return TtyProgressTracker(verbose=verbose)
+        return TqdmTracker(verbose=verbose)
     return SimpleProgressTracker(verbose=verbose)

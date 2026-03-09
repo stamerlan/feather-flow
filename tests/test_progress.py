@@ -1,7 +1,7 @@
 import time
 import pytest
 from pyplanner.progress import (
-    QuietTracker, SimpleProgressTracker, TtyProgressTracker, create_tracker
+    QuietTracker, SimpleProgressTracker, create_tracker
 )
 
 
@@ -64,44 +64,6 @@ def test_simple_exception_propagates():
     assert len(t.jobs) == 1
 
 
-def test_tty_overwrites_line(capsys):
-    """TTY tracker uses carriage-return to update the line."""
-    t = TtyProgressTracker()
-    with t("Gen"):
-        t.job("a")
-        t.job("b")
-    out = capsys.readouterr().out
-    assert "\r" in out
-
-
-def test_tty_done_message(capsys):
-    """TTY tracker prints 'done' on normal exit."""
-    t = TtyProgressTracker()
-    with t("Gen"):
-        t.job("a")
-    out = capsys.readouterr().out
-    assert "done" in out
-
-
-def test_tty_user_print_intercepted(capsys):
-    """Prints inside the context appear without breaking the progress line."""
-    t = TtyProgressTracker()
-    with t("Gen"):
-        t.job("a")
-        print("hello from user")
-    out = capsys.readouterr().out
-    assert "hello from user" in out
-
-
-def test_tty_stdout_restored_after_exit():
-    """sys.stdout is restored to original after __exit__."""
-    import sys
-    original = sys.stdout
-    t = TtyProgressTracker()
-    with t("Gen"):
-        pass
-    assert sys.stdout is original
-
 
 def test_simple_verbose_prints_durations(capsys):
     """SimpleProgressTracker verbose=True prints per-job durations."""
@@ -116,18 +78,6 @@ def test_simple_verbose_prints_durations(capsys):
     assert "beta" in out
     assert "s" in out
 
-
-def test_tty_verbose_prints_durations(capsys):
-    """TtyProgressTracker verbose=True prints per-job durations."""
-    t = TtyProgressTracker(verbose=True)
-    with t("Build"):
-        t.job("alpha")
-        time.sleep(0.01)
-        t.job("beta")
-        time.sleep(0.01)
-    out = capsys.readouterr().out
-    assert "alpha" in out
-    assert "beta" in out
 
 
 def test_verbose_durations_on_exception(capsys):
