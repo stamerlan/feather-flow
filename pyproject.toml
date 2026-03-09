@@ -23,6 +23,7 @@ test = ["pytest>=9.0", "pytest-cov>=7.0"]
 full = [
     "pikepdf>=10.3",
     "tqdm>=4.67",
+    "livereload>=2.7"
 ]
 dev = [
     "pyplanner[docs]",

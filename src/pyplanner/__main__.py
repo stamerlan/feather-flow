@@ -7,6 +7,7 @@ import textwrap
 from . import __version__
 from .calendar import Calendar
 from .dayinfo import DayInfoProvider
+from .liveserver import watch
 from .planner import Planner
 from .progress import create_tracker
 from .translations import SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE
@@ -38,7 +39,10 @@ def main() -> None:
                   Generate PDF with Polish public holidays.
 
               pyplanner planners/ff-2026 --country us
-                  Holidays for the US; week starts on Sunday."""),
+                  Holidays for the US; week starts on Sunday.
+
+              pyplanner planners/ff-2026 --watch
+                  Serve HTML with live reload on file changes."""),
     )
     parser.add_argument("-v", "--version", action="version",
         version=f"%(prog)s {__version__}")
@@ -67,7 +71,7 @@ def main() -> None:
             "Uses the built-in providers by default; combine with "
             "--provider to use a custom provider instead."
         ))
-    parser.add_argument("-w", "--first-weekday", default=None, metavar="DAY",
+    parser.add_argument("--first-weekday", default=None, metavar="DAY",
         help=(
             "first day of the week: name (monday, tuesday, ..., sunday) "
             "or number (0=monday .. 6=sunday). "
@@ -83,12 +87,23 @@ def main() -> None:
         choices=SUPPORTED_LANGUAGES,
         help="display language for weekday and month names "
              f"(default: {DEFAULT_LANGUAGE})")
+    parser.add_argument("-w", "--watch", action="store_true",
+        help="watch template directory for changes and "
+             "serve HTML with live reload "
+             "(requires: pip install pyplanner[full])")
     verbosity = parser.add_mutually_exclusive_group()
     verbosity.add_argument("-q", "--quiet", action="store_true",
         help="suppress informational output")
     verbosity.add_argument("--verbose", action="store_true",
         help="print per-job durations after each stage")
     args = parser.parse_args()
+
+    if args.watch and args.pdf:
+        parser.error(
+            "--watch cannot be combined with --pdf"
+        )
+    if args.watch:
+        args.html = True
 
     if args.file.is_dir():
         args.file = args.file / f"{args.file.name}.html"
@@ -152,7 +167,9 @@ def main() -> None:
     planner = Planner(args.file, planner_dir=base, calendar=calendar)
     tracker = create_tracker(quiet=args.quiet, verbose=args.verbose)
 
-    if args.html:
+    if args.watch:
+        watch(planner, output, verbose=args.verbose)
+    elif args.html:
         with tracker(f"Generating {output}"):
             with open(output, "w", encoding="utf-8") as f:
                 f.write(planner.html(tracker=tracker))
@@ -163,6 +180,7 @@ def main() -> None:
                     pdf_optimize=args.pdf_optimize,
                     tracker=tracker,
                 ))
+
 
 if __name__ == "__main__":
     main()

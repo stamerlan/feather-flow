@@ -8,10 +8,9 @@ stylesheets, and how to preview your work in a browser while you design.
 
 No programming experience is required. If you are comfortable writing HTML and
 CSS you already have all the skills you need. You will also need Python 3.12 or
-newer, a text editor (we recommend `VS Code <https://code.visualstudio.com/>`_),
-and the Feather Flow repository cloned and set up. Follow the *Getting Started*
-section in the project :doc:`README </index>` to install the virtual environment
-and Playwright.
+newer, a text editor you are comfortable with, and the Feather Flow repository
+cloned and set up. Follow the *Getting Started* section in the project
+:doc:`README </index>` to install the virtual environment and Playwright.
 
 Throughout the guide we build a small **Mini Planner** step by step - a
 simplified planner for a single month with a cover page, a month calendar and

@@ -334,5 +334,5 @@ and weekday.
 What is next
 ------------
 
-Continue to :doc:`live-preview` to learn how to use VS Code Live Server for a
+Continue to :doc:`live-preview` to learn how to use ``--watch`` mode for a
 faster edit-preview workflow.

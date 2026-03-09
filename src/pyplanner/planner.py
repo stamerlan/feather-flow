@@ -65,7 +65,6 @@ class Planner:
             line_statement_prefix="%%",
             line_comment_prefix="##"
         )
-        self._template = self._env.get_template(self.path.name)
 
     def html(self, tracker: ProgressTracker | None = None) -> str:
         """Render the template and return the resulting HTML string.
@@ -76,7 +75,7 @@ class Planner:
         if tracker is None:
             tracker = QuietTracker()
         tracker.job("html render")
-        return self._template.render(
+        return self._env.get_template(self.path.name).render(
             base=self.planner_dir,
             calendar=self.calendar,
             lang=self.calendar.lang,
@@ -111,7 +110,7 @@ class Planner:
         tracker.set_job_count(job_count)
 
         tracker.job("html render")
-        html = self._template.render(
+        html = self._env.get_template(self.path.name).render(
             base=self.planner_dir,
             calendar=self.calendar,
             lang=self.calendar.lang,
