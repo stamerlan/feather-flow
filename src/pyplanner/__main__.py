@@ -13,7 +13,7 @@ from .progress import create_tracker
 from .translations import SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE
 from .weekday import WeekDay
 
-def main() -> None:
+def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(
         prog="pyplanner",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -96,7 +96,7 @@ def main() -> None:
         help="suppress informational output")
     verbosity.add_argument("--verbose", action="store_true",
         help="print per-job durations after each stage")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     if args.watch and args.pdf:
         parser.error(
