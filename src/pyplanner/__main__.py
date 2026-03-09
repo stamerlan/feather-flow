@@ -1,5 +1,4 @@
 import argparse
-import os
 import pathlib
 import sys
 import textwrap
@@ -106,6 +105,8 @@ def main(argv: list[str] | None = None) -> None:
         args.html = True
 
     if args.file.is_dir():
+        # Resolve the directory name so that "." or ".." produce a real name.
+        args.file = args.file.resolve()
         args.file = args.file / f"{args.file.name}.html"
 
     if args.html:
@@ -147,32 +148,21 @@ def main(argv: list[str] | None = None) -> None:
         firstweekday = 0
 
     # Generate the output files.
-    planner_dir = args.file.parent
-    outdir = pathlib.Path(output).parent
-
-    if args.html:
-        outdir_abs = outdir.resolve()
-        planner_abs = planner_dir.resolve()
-        if outdir_abs == planner_abs:
-            base = "."
-        else:
-            base = os.path.relpath(
-                planner_abs, outdir_abs,
-            ).replace("\\", "/")
-    else:
-        base = args.file.parent.absolute().as_uri()
-
     calendar = Calendar(firstweekday=firstweekday, provider=dayinfo,
         lang=args.lang, country=args.country)
-    planner = Planner(args.file, planner_dir=base, calendar=calendar)
+    planner = Planner(args.file, calendar=calendar)
     tracker = create_tracker(quiet=args.quiet, verbose=args.verbose)
 
     if args.watch:
         watch(planner, output, verbose=args.verbose)
     elif args.html:
+        outdir = pathlib.Path(output).resolve().parent
+        template_dir = args.file.parent.resolve()
+        base = template_dir.relative_to(outdir, walk_up=True).as_posix()
+
         with tracker(f"Generating {output}"):
             with open(output, "w", encoding="utf-8") as f:
-                f.write(planner.html(tracker=tracker))
+                f.write(planner.html(base=base, tracker=tracker))
     else:
         with tracker(f"Generating {output}"):
             with open(output, "wb") as f:

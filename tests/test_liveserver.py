@@ -37,7 +37,6 @@ def planner_stub(tmp_path):
     """Minimal Planner mock with a working html() method."""
     stub = MagicMock()
     stub.html.return_value = "<html>ok</html>"
-    stub.planner_dir = str(tmp_path)
     stub.path.parent = tmp_path
     return stub
 
@@ -212,7 +211,6 @@ def test_watch_handles_render_error(tmp_path, capsys):
     """watch() prints render errors to stderr without crashing."""
     stub = MagicMock()
     stub.html.side_effect = RuntimeError("template broken")
-    stub.planner_dir = str(tmp_path)
     stub.path.parent = tmp_path
 
     _run_watch(stub, tmp_path / "out.html")
@@ -252,3 +250,31 @@ def test_watch_verbose_flag_propagates(
     ]
     assert len(filters) == 1
     assert filters[0].verbose is True
+
+
+def test_watch_passes_relative_base(tmp_path):
+    """watch() computes a relative base and passes it to html()."""
+    planner_dir = tmp_path / "planners" / "my"
+    planner_dir.mkdir(parents=True)
+    stub = MagicMock()
+    stub.html.return_value = "<html>ok</html>"
+    stub.path.parent = planner_dir
+
+    output = tmp_path / "build" / "out.html"
+    output.parent.mkdir()
+    _run_watch(stub, output)
+
+    stub.html.assert_called_once()
+    base = stub.html.call_args[0][0]
+    assert base == "../planners/my"
+
+
+def test_watch_base_is_dot_when_same_dir(
+    planner_stub, tmp_path,
+):
+    """watch() sets base to '.' when output is in the template dir."""
+    _run_watch(planner_stub, tmp_path / "out.html")
+
+    planner_stub.html.assert_called_once()
+    base = planner_stub.html.call_args[0][0]
+    assert base == "."

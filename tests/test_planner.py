@@ -69,6 +69,28 @@ def test_base_is_template_directory(tmp_path):
     assert 'href="#page1"' in html
 
 
+def test_explicit_base_overrides_default(tmp_path):
+    """html(base=...) uses the given value instead of file:// URI."""
+    tpl = tmp_path / "tpl.html"
+    tpl.write_text(
+        '<link href="{{ base }}/style.css">',
+        encoding="utf-8",
+    )
+    planner = Planner(tpl)
+    html = planner.html(base="../assets")
+    assert "../assets/style.css" in html
+    assert "file://" not in html
+
+
+def test_default_base_is_file_uri(tmp_path):
+    """html() without base produces a file:// URI."""
+    tpl = tmp_path / "tpl.html"
+    tpl.write_text("{{ base }}", encoding="utf-8")
+    planner = Planner(tpl)
+    html = planner.html()
+    assert html.startswith("file:///")
+
+
 def test_asset_route_windows_path():
     """_asset_route strips the leading slash from Windows file:// URLs."""
     class _FakeRequest:

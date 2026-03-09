@@ -40,6 +40,7 @@ class _AccessFilter(logging.Filter):
 def watch(
     planner: Planner,
     output: str | os.PathLike,
+    base: str | None = None,
     *,
     verbose: bool = False,
 ) -> None:
@@ -64,6 +65,18 @@ def watch(
 
     :param planner: Planner instance for rendering.
     :param output: Output HTML file path.
+    :param base: Base URL used to resolve assets paths. If not provided,
+        the planner directory is used relative to output directory. During live
+        reloading, browser doesn't generate requests for file:// URLs. This
+        parameter is used to provide a base URI relative to the output
+        directory. In this case, both live reloading and preview in browser will
+        work.
+    :param base: Base URL used to resolve assets paths. If not provided,
+        the planner directory is used relative to output directory. During live
+        reloading, browser doesn't generate requests for file:// URLs. This
+        parameter is used to provide a base URI relative to the output
+        directory. In this case, both live reloading and preview in browser will
+        work.
     :param verbose: Show browser and rebuild events.
     """
     try:
@@ -74,13 +87,16 @@ def watch(
             "Install with: pip install pyplanner[full]"
         )
 
-    output_path = pathlib.Path(output).resolve()
-    output_str = str(output_path)
+    if base is None:
+        output = pathlib.Path(output).resolve()
+        planner_dir = planner.path.parent.resolve()
+        base = planner_dir.relative_to(output.parent, walk_up=True).as_posix()
 
     def regenerate() -> None:
         try:
-            with open(output_str, "w", encoding="utf-8") as f:
-                f.write(planner.html())
+            html = planner.html(base)
+            with open(output, "w", encoding="utf-8") as f:
+                f.write(html)
         except Exception as e:
             print(f"{e}", file=sys.stderr)
 
@@ -91,8 +107,8 @@ def watch(
 
     server = Server()
     server.watch(
-        planner.planner_dir, regenerate,
-        ignore=lambda path: pathlib.Path(path).resolve() == output_path,
+        str(planner.path.parent), regenerate,
+        ignore=lambda path: pathlib.Path(path).resolve() == output,
     )
 
     host = '127.0.0.1'
@@ -102,6 +118,7 @@ def watch(
 
     server.serve(
         host=host, port=port,
-        default_filename=output_str,
+        default_filename=str(output),
+        open_url_delay=1,
         root=str(planner.path.parent),
     )

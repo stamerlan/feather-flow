@@ -151,6 +151,40 @@ def test_numeric_weekday(simple_template, tmp_path):
     assert out.exists()
 
 
+def test_html_base_with_output_in_subdirectory(tmp_path):
+    """base resolves to a walk-up path when output is in a subdir."""
+    planner_dir = tmp_path / "myplanner"
+    planner_dir.mkdir()
+    tpl = planner_dir / "myplanner.html"
+    tpl.write_text(
+        '<link href="{{ base }}/style.css">',
+        encoding="utf-8",
+    )
+    build = tmp_path / "build"
+    build.mkdir()
+    out = build / "out.html"
+    main([
+        str(planner_dir),
+        "--html", "-o", str(out), "-q",
+    ])
+    content = out.read_text(encoding="utf-8")
+    assert "../myplanner/style.css" in content
+
+
+def test_directory_input_dot(tmp_path, monkeypatch):
+    """Passing '.' resolves to <cwd>/<cwd_name>.html."""
+    tpl = tmp_path / f"{tmp_path.name}.html"
+    tpl.write_text("<html>{{ base }}</html>", encoding="utf-8")
+    out = tmp_path / "out.html"
+    monkeypatch.chdir(tmp_path)
+    main([
+        ".", "--html", "-o", str(out), "-q",
+    ])
+    assert out.exists()
+    content = out.read_text(encoding="utf-8")
+    assert "file://" not in content
+
+
 def test_russian_language(simple_template, tmp_path):
     """--lang ru generates output using Russian locale data."""
     out = tmp_path / "out.html"

@@ -38,24 +38,17 @@ class Planner:
     """Render a Jinja2/HTML planner template into HTML or PDF.
 
     :param path: Path to the Jinja2/HTML template file.
-    :param planner_dir: Base URL or path to the template directory.
     :param calendar: :class:`~pyplanner.calendar.Calendar` instance used for
         template rendering.
     """
 
     def __init__(self, path: str | os.PathLike,
-                 planner_dir: str | os.PathLike | None = None,
                  calendar: Calendar | None = None,
-    ) -> None:
+                 ) -> None:
         if calendar is None:
             calendar = Calendar()
         self.calendar = calendar
-
         self.path = pathlib.Path(path).absolute()
-
-        if planner_dir is None:
-            planner_dir = self.path.parent.as_uri()
-        self.planner_dir = str(planner_dir)
 
         self._env = jinja2.Environment(
             loader=jinja2.FileSystemLoader(self.path.parent),
@@ -66,22 +59,34 @@ class Planner:
             line_comment_prefix="##"
         )
 
-    def html(self, tracker: ProgressTracker | None = None) -> str:
+    def html(self,
+            base: str | None = None,
+            tracker: ProgressTracker | None = None
+            ) -> str:
         """Render the template and return the resulting HTML string.
 
+        :param base: Base URL used to resolve assets paths. If not provided,
+            the planner directory is used. During live reloading, browser
+            doesn't generate requests for file:// URLs. This parameter is used
+            to provide a base URL relative to the output directory. In this
+            case, both live reloading and preview in browser will work.
         :param tracker: Optional progress tracker.
         :returns: Rendered HTML.
         """
         if tracker is None:
             tracker = QuietTracker()
+        if base is None:
+            base = self.path.parent.as_uri()
+
         tracker.job("html render")
         return self._env.get_template(self.path.name).render(
-            base=self.planner_dir,
+            base=base,
             calendar=self.calendar,
             lang=self.calendar.lang,
         )
 
     def pdf(self,
+            base: str | None = None,
             margin_top: str | float | None = None,
             margin_right: str | float | None = None,
             margin_bottom: str | float | None = None,
@@ -91,6 +96,8 @@ class Planner:
             ) -> bytes:
         """Render the template and return a PDF as raw bytes.
 
+        :param base: Base URL used to resolve assets paths. If not provided,
+            the planner directory is used.
         :param margin_top: Top page margin (CSS length or ``None``).
         :param margin_right: Right page margin (CSS length or ``None``).
         :param margin_bottom: Bottom page margin (CSS length or ``None``).
@@ -103,6 +110,8 @@ class Planner:
         """
         if tracker is None:
             tracker = QuietTracker()
+        if base is None:
+            base = self.path.parent.as_uri()
 
         job_count = 4
         if pikepdf is not None:
@@ -111,7 +120,7 @@ class Planner:
 
         tracker.job("html render")
         html = self._env.get_template(self.path.name).render(
-            base=self.planner_dir,
+            base=base,
             calendar=self.calendar,
             lang=self.calendar.lang,
         )
