@@ -23,10 +23,7 @@ class SimpleProgressTracker(BaseTracker):
         exc_val: BaseException | None,
         exc_tb: object,
     ) -> None:
-        """Finish the last job and optionally print a
-        verbose summary.
-        """
+        """Finish the last job and optionally print a verbose summary."""
         self.finish_current_job()
-        self.active = False
         if self.verbose:
             self.print_verbose_summary()

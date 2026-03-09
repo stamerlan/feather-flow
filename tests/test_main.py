@@ -88,7 +88,7 @@ def test_no_flags_generates_pdf_by_default(simple_template):
         with patch("builtins.open", MagicMock()):
             main([str(simple_template), "-q"])
 
-        mock_instance.pdf.assert_called_once()
+        mock_instance.pdf.assert_called_once_with()
 
 
 def test_country_sets_provider(simple_template, tmp_path):

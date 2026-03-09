@@ -6,7 +6,7 @@ import jinja2
 from playwright.sync_api import Route, sync_playwright
 
 from .calendar import Calendar
-from .progress import ProgressTracker, QuietTracker
+from .tracker import tracker
 
 
 def _asset_route(r: Route) -> None:
@@ -52,10 +52,7 @@ class Planner:
             line_comment_prefix="##"
         )
 
-    def html(self,
-            base: str | None = None,
-            tracker: ProgressTracker | None = None
-            ) -> str:
+    def html(self, base: str | None = None) -> str:
         """Render the template and return the resulting HTML string.
 
         :param base: Base URL used to resolve assets paths. If not provided,
@@ -63,64 +60,51 @@ class Planner:
             doesn't generate requests for file:// URLs. This parameter is used
             to provide a base URL relative to the output directory. In this
             case, both live reloading and preview in browser will work.
-        :param tracker: Optional progress tracker.
         :returns: Rendered HTML.
         """
-        if tracker is None:
-            tracker = QuietTracker()
         if base is None:
             base = self.path.parent.as_uri()
 
-        tracker.job("html render")
+        tracker().job("Render HTML")
         return self._env.get_template(self.path.name).render(
             base=base,
             calendar=self.calendar,
             lang=self.calendar.lang,
         )
 
-    def pdf(self,
-            base: str | None = None,
-            tracker: ProgressTracker | None = None,
-            ) -> bytes:
+    def pdf(self, base: str | None = None) -> bytes:
         """Render the template and return a PDF as raw bytes.
 
         :param base: Base URL used to resolve assets paths. If not provided, the
             planner directory is used.
-        :param tracker: Optional progress tracker.
         :returns: PDF file content as bytes.
         """
-        if tracker is None:
-            tracker = QuietTracker()
         if base is None:
             base = self.path.parent.as_uri()
 
-        tracker.set_job_count(4)
-
-        tracker.job("html render")
-        html = self._env.get_template(self.path.name).render(
-            base=base,
-            calendar=self.calendar,
-            lang=self.calendar.lang,
-        )
+        with tracker().job("Render HTML"):
+            html = self._env.get_template(self.path.name).render(
+                base=base,
+                calendar=self.calendar,
+                lang=self.calendar.lang,
+            )
 
         with sync_playwright() as p:
-            tracker.job("browser launch")
-            browser = p.chromium.launch(args=[
-                "--allow-file-access-from-files",
-                "--disable-web-security",
-            ])
-
-            page = browser.new_page()
-            page.on("requestfailed",
-                lambda r: print(f'Failed to load "{r.url}"'))
-            page.route("file://**/*", _asset_route)
-
-            tracker.job("set content")
-            page.set_content(html, wait_until="load")
-            page.evaluate("() => document.fonts.ready")
-
-            tracker.job("page pdf")
-            pdf = page.pdf(print_background=True, prefer_css_page_size=True)
+            with tracker().job("Launch browser"):
+                browser = p.chromium.launch(args=[
+                    "--allow-file-access-from-files",
+                    "--disable-web-security",
+                ])
+            with tracker().job("Set page content"):
+                page = browser.new_page()
+                page.on("requestfailed",
+                        lambda r: print(f'Failed to load "{r.url}"')
+                )
+                page.route("file://**/*", _asset_route)
+                page.set_content(html, wait_until="load")
+                page.evaluate("() => document.fonts.ready")
+            with tracker().job("Print page to PDF"):
+                pdf = page.pdf(print_background=True, prefer_css_page_size=True)
 
             browser.close()
 

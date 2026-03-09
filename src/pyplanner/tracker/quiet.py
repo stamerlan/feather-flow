@@ -1,3 +1,5 @@
+import contextlib
+from contextlib import AbstractContextManager
 from typing import Self
 
 
@@ -8,12 +10,10 @@ class QuietTracker:
     without conditional checks.
     """
 
-    def __call__(self, stage_name: str) -> Self:
-        """Ignore the stage name; return *self*."""
+    def __call__(self, stage_name: str, *, total: int = 0) -> Self:
         return self
 
     def __enter__(self) -> Self:
-        """No-op enter."""
         return self
 
     def __exit__(
@@ -22,13 +22,7 @@ class QuietTracker:
         exc_val: BaseException | None,
         exc_tb: object,
     ) -> None:
-        """No-op exit."""
         return None
 
-    def job(self, name: str) -> None:
-        """Ignore job start."""
-        return
-
-    def set_job_count(self, count: int) -> None:
-        """Ignore job count."""
-        return
+    def job(self, name: str) -> AbstractContextManager[None]:
+        return contextlib.nullcontext()

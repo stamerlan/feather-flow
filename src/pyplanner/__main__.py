@@ -9,7 +9,7 @@ from .dayinfo import DayInfoProvider
 from .liveserver import watch
 from .pdfopt import optimize
 from .planner import Planner
-from .progress import create_tracker
+from .tracker import setup_tracker, tracker
 from .translations import SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE
 from .weekday import WeekDay
 
@@ -151,7 +151,7 @@ def main(argv: list[str] | None = None) -> None:
     calendar = Calendar(firstweekday=firstweekday, provider=dayinfo,
         lang=args.lang, country=args.country)
     planner = Planner(args.file, calendar=calendar)
-    tracker = create_tracker(quiet=args.quiet, verbose=args.verbose)
+    setup_tracker(quiet=args.quiet, verbose=args.verbose)
 
     if args.watch:
         watch(planner, output, verbose=args.verbose)
@@ -162,13 +162,14 @@ def main(argv: list[str] | None = None) -> None:
 
         with tracker(f"Generating {output}"):
             with open(output, "w", encoding="utf-8") as f:
-                f.write(planner.html(base=base, tracker=tracker))
+                f.write(planner.html(base=base))
     else:
-        with tracker(f"Generating {output}"):
-            pdf_bytes = planner.pdf(tracker=tracker)
+        total = 5 if args.opt else 4
+        with tracker(f"Generating {output}", total=total):
+            pdf_bytes = planner.pdf()
             if args.opt:
-                tracker.job("optimize pdf")
-                pdf_bytes = optimize(pdf_bytes)
+                with tracker().job("Optimize PDF"):
+                    pdf_bytes = optimize(pdf_bytes)
             with open(output, "wb") as f:
                 f.write(pdf_bytes)
 

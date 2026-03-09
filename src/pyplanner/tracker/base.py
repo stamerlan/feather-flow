@@ -6,26 +6,52 @@ from typing import Self
 _REFRESH_INTERVAL = 0.1
 
 
+class _JobContext:
+    """Lightweight context manager returned by ``job()``.
+
+    If used with ``with``, finishes the current job on block exit. If the return
+    value is ignored, the job is auto-finished when the next ``job()`` starts or
+    the stage exits.
+    """
+
+    __slots__ = ("_tracker",)
+
+    def __init__(self, tracker: "BaseTracker") -> None:
+        self._tracker = tracker
+
+    def __enter__(self) -> None:
+        return None
+
+    def __exit__(
+        self,
+        exc_type: type | None,
+        exc_val: BaseException | None,
+        exc_tb: object | None,
+    ) -> bool | None:
+        with self._tracker.lock:
+            self._tracker.finish_current_job()
+        return None
+
+
 class BaseTracker:
     """Common state and timing logic for non-quiet trackers.
 
-    Subclasses must implement ``__enter__``, ``__exit__``, and ``job``. They may
-    also override ``refresh`` to redraw their display on every tick of the
-    background refresh thread.
+    Subclasses must implement ``__enter__``, ``__exit__``, and optionally
+    override ``job``. They may also override ``refresh`` to redraw their display
+    on every tick of the background refresh thread.
 
     Usage example::
 
-        tracker = SomeTracker(verbose=True)
-        with tracker("Stage name"):
-            tracker.set_job_count(3)
-            tracker.job("step-1")
-            ...
-            tracker.job("step-2")
+        setup_tracker(verbose=True)
+        t = tracker()
+        with t("Stage name", total=3):
+            with t.job("step-1"):
+                ...
+            t.job("step-2")
             ...
 
-    Subclasses and cooperating helpers (like interceptors) may read or mutate
-    these fields directly. The rules below describe when each field is safe to
-    access.
+    Subclasses and cooperating helpers may read or mutate these fields directly.
+    The rules below describe when each field is safe to access.
 
     stage_name : str
         Human-readable name of the current stage. Set by ``__call__`` before the
@@ -35,16 +61,11 @@ class BaseTracker:
         active.
     job_count : int
         Expected total number of jobs. Zero means unknown.
-    job_index : int
-        One-based index of the current job within the stage.
-    stage_t0, job_t0 : float
-        ``perf_counter`` timestamps for the current stage and job respectively.
+    job_start_ts : float
+        ``perf_counter`` timestamp for the current job.
     jobs : list[tuple[str, float]]
         Completed ``(name, elapsed_seconds)`` pairs. Filled by
         ``finish_current_job``.
-    active : bool
-        ``True`` between ``__enter__`` and ``__exit__``. Subclasses should check
-        this before drawing so the refresh thread does not write after teardown.
     lock : threading.Lock
         Guards all display-related state. The background refresh thread acquires
         it before calling ``refresh``; subclasses that touch the terminal in
@@ -65,22 +86,23 @@ class BaseTracker:
         self.stage_name: str = ""
         self.job_name: str = ""
         self.job_count: int = 0
-        self.job_index: int = 0
-        self.job_t0: float = 0.0
-        self.stage_t0: float = 0.0
+        self.job_start_ts: float = 0.0
         self.jobs: list[tuple[str, float]] = []
-        self.active: bool = False
         self.lock = threading.Lock()
         self.stop_event = threading.Event()
         self.refresh_thread: threading.Thread | None = None
 
-    def __call__(self, stage_name: str) -> Self:
+    def __call__(self, stage_name: str, *, total: int = 0) -> Self:
         """Set the stage name and return *self*.
 
-        Intended for the ``with tracker("name"):`` idiom so ``__call__`` and
+        Intended for the ``with tracker()("name"):`` idiom so ``__call__`` and
         ``__enter__`` can be chained.
+
+        :param stage_name: Human-readable stage label.
+        :param total: Expected number of jobs (0 = unknown).
         """
         self.stage_name = stage_name
+        self.job_count = total
         return self
 
     def __enter__(self) -> Self:
@@ -96,21 +118,14 @@ class BaseTracker:
         """Finish the stage and clean up resources."""
         return None
 
-    def set_job_count(self, count: int) -> None:
-        """Set or update expected number of jobs."""
-        self.job_count = count
-
     def reset_stage(self) -> None:
-        """Clear per-stage counters and mark the tracker active.
+        """Clear per-stage counters.
 
-        Called at the start of ``__enter__`` in every subclass.
+        Called at the start of ``__enter__`` in every  subclass. Preserves
+        ``job_count`` set by ``__call__``.
         """
-        self.stage_t0 = time.perf_counter()
         self.jobs = []
         self.job_name = ""
-        self.job_index = 0
-        self.job_count = 0
-        self.active = True
 
     def finish_current_job(self) -> None:
         """Record elapsed time for the current job.
@@ -118,7 +133,7 @@ class BaseTracker:
         No-op when no job is active (``job_name`` is empty).
         """
         if self.job_name:
-            elapsed = time.perf_counter() - self.job_t0
+            elapsed = time.perf_counter() - self.job_start_ts
             self.jobs.append((self.job_name, elapsed))
             self.job_name = ""
 
@@ -128,14 +143,18 @@ class BaseTracker:
         Must be called with ``lock`` held.
         """
         self.finish_current_job()
-        self.job_index += 1
         self.job_name = name
-        self.job_t0 = time.perf_counter()
+        self.job_start_ts = time.perf_counter()
 
-    def job(self, name: str) -> None:
-        """Finish the previous job and begin timing *name*."""
+    def job(self, name: str) -> _JobContext:
+        """Finish the previous job and begin timing *name*.
+
+        Returns a ``_JobContext`` that can be used as a context manager or
+        ignored.
+        """
         with self.lock:
             self._start_job(name)
+        return _JobContext(self)
 
     def start_refresh_thread(self) -> None:
         """Spawn a daemon thread that calls ``refresh``

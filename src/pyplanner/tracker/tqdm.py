@@ -1,7 +1,7 @@
 import sys
 from typing import Self
 from tqdm.auto import tqdm
-from .base import BaseTracker
+from .base import BaseTracker, _JobContext
 
 
 class TqdmTracker(BaseTracker):
@@ -37,18 +37,14 @@ class TqdmTracker(BaseTracker):
         """Stop the refresh thread and close the bar."""
         self.stop_refresh_thread()
         self.finish_current_job()
-        self.active = False
         if self._tqdm_bar is not None:
             self._tqdm_bar.close()
             self._tqdm_bar = None
         if self.verbose:
             self.print_verbose_summary()
 
-    def job(self, name: str) -> None:
+    def job(self, name: str) -> _JobContext:
         """Advance the bar by one step and update its label.
-
-        Also syncs ``bar.total`` with ``job_count`` in case ``set_job_count``
-        was called after the bar was created.
         """
         with self.lock:
             self._start_job(name)
@@ -59,17 +55,11 @@ class TqdmTracker(BaseTracker):
                     bar.refresh()
                 bar.set_description(f"{self.stage_name}: {self.job_name}")
                 bar.update(1)
-
-    def set_job_count(self, count: int) -> None:
-        """Update ``job_count`` and the bar's total."""
-        super().set_job_count(count)
-        if self._tqdm_bar is not None:
-            self._tqdm_bar.total = count
-            self._tqdm_bar.refresh()
+        return _JobContext(self)
 
     def refresh(self) -> None:
-        """Refresh the tqdm bar (called by the background
-        refresh thread under ``lock``).
+        """Refresh the tqdm bar (called by the background refresh thread under
+        ``lock``).
         """
         if self._tqdm_bar is not None:
             self._tqdm_bar.refresh()
