@@ -13,6 +13,19 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - country: pl
+            output: ff-2026-pl.pdf
+          - country: by
+            lang: ru
+            output: ff-2026-by.pdf
+          - country: us
+            output: ff-2026-us.pdf
+          - country: kr
+            lang: kr
+            output: ff-2026-kr.pdf
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,31 +41,17 @@ jobs:
       - name: Install Playwright browsers
         run: python -m playwright install --with-deps chromium
 
-      - name: Generate PDF (Poland)
-        run: pyplanner planners/ff-2026 --country pl -o ff-2026-pl.pdf
-
-      - name: Generate PDF (Belarus)
+      - name: Generate PDF
         run: >
-          pyplanner planners/ff-2026 --lang ru --country by
-          -o ff-2026-by.pdf
+          pyplanner planners/ff-2026 --country ${{ matrix.country }}
+          ${{ matrix.lang && format('--lang {0}', matrix.lang) || '' }}
+          -o ${{ matrix.output }}
 
-      - name: Generate PDF (US)
-        run: pyplanner planners/ff-2026 --country us -o ff-2026-us.pdf
-
-      - name: Generate PDF (Korea)
-        run: >
-          pyplanner planners/ff-2026 --lang kr --country kr
-          -o ff-2026-kr.pdf
-
-      - name: Upload PDFs
+      - name: Upload PDF
         uses: actions/upload-artifact@v4
         with:
-          name: ff-2026-pdfs
-          path: |
-            ff-2026-pl.pdf
-            ff-2026-by.pdf
-            ff-2026-us.pdf
-            ff-2026-kr.pdf
+          name: ${{ matrix.output }}
+          path: ${{ matrix.output }}
 
   publish:
     if: github.ref == 'refs/heads/main'
@@ -65,7 +64,7 @@ jobs:
       - name: Download PDFs
         uses: actions/download-artifact@v4
         with:
-          name: ff-2026-pdfs
+          merge-multiple: true
 
       - name: Push to _artifacts branch
         run: |
