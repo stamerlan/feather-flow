@@ -32,16 +32,19 @@ jobs:
         run: pyplanner planners/ff-2026 --country pl -o ff-2026-pl.pdf
 
       - name: Generate PDF (Belarus)
-        run: pyplanner planners/ff-2026 --lang ru --country by -o ff-2026-by.pdf
+        run: >
+          pyplanner planners/ff-2026 --lang ru --country by
+          -o ff-2026-by.pdf
 
       - name: Generate PDF (US)
         run: pyplanner planners/ff-2026 --country us -o ff-2026-us.pdf
 
       - name: Generate PDF (Korea)
-        run: pyplanner planners/ff-2026 --lang kr --country kr -o ff-2026-kr.pdf
+        run: >
+          pyplanner planners/ff-2026 --lang kr --country kr
+          -o ff-2026-kr.pdf
 
-      - name: Upload artifacts (PRs only)
-        if: github.event_name == 'pull_request'
+      - name: Upload PDFs
         uses: actions/upload-artifact@v4
         with:
           name: ff-2026-pdfs
@@ -51,22 +54,35 @@ jobs:
             ff-2026-us.pdf
             ff-2026-kr.pdf
 
-      - name: Move latest tag to HEAD
-        if: github.ref == 'refs/heads/main'
-        run: |
-          git tag -f latest
-          git push -f origin latest
-
-      - name: Publish to release (main only)
-        if: github.ref == 'refs/heads/main'
-        uses: softprops/action-gh-release@v2
+  publish:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    concurrency:
+      group: _artifacts-push
+      cancel-in-progress: false
+    steps:
+      - name: Download PDFs
+        uses: actions/download-artifact@v4
         with:
-          tag_name: latest
-          name: Latest PDF Build
-          body: Auto-generated PDF from the latest commit on main.
-          files: |
-            ff-2026-pl.pdf
-            ff-2026-by.pdf
-            ff-2026-us.pdf
-            ff-2026-kr.pdf
-          prerelease: true
+          name: ff-2026-pdfs
+
+      - name: Push to _artifacts branch
+        run: |
+          REPO_URL="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}"
+          mkdir /tmp/artifacts && cd /tmp/artifacts
+          git init -b _artifacts
+          git remote add origin "$REPO_URL"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin _artifacts && \
+            git checkout FETCH_HEAD -- . || true
+          cp "$GITHUB_WORKSPACE"/*.pdf .
+          git add .
+          SHORT_SHA=$(echo "$GITHUB_SHA" | cut -c1-7)
+          MSG="PDF ${GITHUB_REF_NAME}@${SHORT_SHA}"
+          git diff --cached --quiet && echo "No changes" || \
+            (git commit -m "$MSG" && \
+             git push -f origin _artifacts)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

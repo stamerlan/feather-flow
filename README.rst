@@ -1,17 +1,13 @@
 Feather Flow
 ============
 
-|ff2026_pdf| |tests| |coverage|
-
-.. |ff2026_pdf| image:: https://img.shields.io/badge/Feather_Flow_2026-PDF-blue?logo=adobeacrobatreader&logoColor=white
-   :target: https://github.com/stamerlan/feather-flow/releases/tag/latest
-   :alt: Feather Flow 2026
+|tests| |coverage|
 
 .. |tests| image:: https://github.com/stamerlan/feather-flow/actions/workflows/test.yml/badge.svg
    :target: https://github.com/stamerlan/feather-flow/actions/workflows/test.yml
    :alt: Tests
 
-.. |coverage| image:: https://raw.githubusercontent.com/stamerlan/feather-flow/badges/coverage.svg
+.. |coverage| image:: https://raw.githubusercontent.com/stamerlan/feather-flow/_artifacts/coverage-badge.svg
    :target: https://github.com/stamerlan/feather-flow/actions/workflows/test.yml
    :alt: Coverage
 
@@ -30,6 +26,17 @@ HTML/CSS, feed them to **pyplanner**, and get a print-ready PDF.
    :width: 24%
 .. |day| image:: docs/images/day-page.png
    :width: 24%
+
+Downloads
+---------
+
+Prebuilt PDFs are generated automatically from the latest ``main`` branch.
+Click a link to download the file directly:
+
+* `Feather Flow 2026 - Poland <https://github.com/stamerlan/feather-flow/raw/_artifacts/ff-2026-pl.pdf>`_
+* `Feather Flow 2026 - Belarus <https://github.com/stamerlan/feather-flow/raw/_artifacts/ff-2026-by.pdf>`_
+* `Feather Flow 2026 - US <https://github.com/stamerlan/feather-flow/raw/_artifacts/ff-2026-us.pdf>`_
+* `Feather Flow 2026 - Korea <https://github.com/stamerlan/feather-flow/raw/_artifacts/ff-2026-kr.pdf>`_
 
 Prerequisites
 -------------

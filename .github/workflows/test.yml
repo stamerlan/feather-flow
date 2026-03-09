@@ -33,17 +33,44 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           pip install genbadge[coverage]
-          mkdir -p badges
-          genbadge coverage -i coverage.xml -o badges/coverage.svg
+          genbadge coverage -i coverage.xml -o coverage-badge.svg
 
-      - name: Publish badge
+      - name: Upload coverage badge
         if: github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-badge
+          path: coverage-badge.svg
+
+  publish:
+    if: github.ref == 'refs/heads/main'
+    needs: test
+    runs-on: ubuntu-latest
+    concurrency:
+      group: _artifacts-push
+      cancel-in-progress: false
+    steps:
+      - name: Download coverage badge
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-badge
+
+      - name: Push to _artifacts branch
         run: |
-          cd badges
-          git init -b badges
+          REPO_URL="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}"
+          mkdir /tmp/artifacts && cd /tmp/artifacts
+          git init -b _artifacts
+          git remote add origin "$REPO_URL"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git remote add origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
-          git add coverage.svg
-          git commit -m "Update coverage badge"
-          git push -f origin badges
+          git fetch origin _artifacts && \
+            git checkout FETCH_HEAD -- . || true
+          cp "$GITHUB_WORKSPACE/coverage-badge.svg" .
+          git add .
+          SHORT_SHA=$(echo "$GITHUB_SHA" | cut -c1-7)
+          MSG="Coverage badge ${GITHUB_REF_NAME}@${SHORT_SHA}"
+          git diff --cached --quiet && echo "No changes" || \
+            (git commit -m "$MSG" && \
+             git push -f origin _artifacts)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
