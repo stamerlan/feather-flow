@@ -5,11 +5,6 @@ import sys
 
 from .planner import Planner
 
-try:
-    from livereload import Server
-except ImportError:
-    Server = None
-
 class _LivereloadFilter(logging.Filter):
     """Intercept livereload log records.
 
@@ -50,15 +45,30 @@ def watch(
 ) -> None:
     """Watch template directory and rebuild on changes.
 
-    Starts a livereload server that monitors the planner template directory. On
-    each change the HTML output is regenerated and connected browsers reload
-    automatically.
+    Starts a livereload server that monitors the planner template directory.
+    On each change the HTML output is regenerated and connected browsers
+    reload automatically.
+
+    .. warning::
+
+        The ``livereload`` package is imported lazily inside this function
+        rather than at module level. Importing ``livereload`` at module level
+        has a side effect: it unconditionally configures the root logger via
+        ``logging.basicConfig()``, which alters the global logging state of the
+        host application. By deferring the import to call time the side effect
+        is confined to the moment the user explicitly opts into live-preview,
+        leaving the logging setup untouched for all other code paths. If you use
+        ``pyplanner`` as a library, be aware that calling this function will
+        trigger that ``logging.basicConfig()`` call and may affect your log
+        handlers.
 
     :param planner: Planner instance for rendering.
     :param output: Output HTML file path.
     :param verbose: Show browser and rebuild events.
     """
-    if Server is None:
+    try:
+        from livereload import Server
+    except ImportError:
         raise ImportError(
             "livereload is required for --watch mode.\n"
             "Install with: pip install pyplanner[full]"

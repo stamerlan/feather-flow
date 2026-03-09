@@ -1,4 +1,5 @@
 import logging
+import sys
 from unittest.mock import patch, MagicMock
 
 import pytest
@@ -50,7 +51,7 @@ def _run_watch(planner, output, **kwargs):
     mock_cls = MagicMock(return_value=mock_server)
     mock_server.serve.side_effect = KeyboardInterrupt
 
-    with patch("pyplanner.liveserver.Server", mock_cls):
+    with patch("livereload.Server", mock_cls):
         try:
             watch(planner, output, **kwargs)
         except KeyboardInterrupt:
@@ -135,11 +136,17 @@ def test_watch_raises_without_livereload(
     planner_stub, tmp_path,
 ):
     """watch() raises ImportError when livereload is missing."""
-    with patch("pyplanner.liveserver.Server", None):
-        with pytest.raises(
-            ImportError, match="livereload is required",
-        ):
-            watch(planner_stub, tmp_path / "out.html")
+    saved = sys.modules.pop("livereload", None)
+    try:
+        with patch.dict(sys.modules, {"livereload": None}):
+            with pytest.raises(
+                ImportError,
+                match="livereload is required",
+            ):
+                watch(planner_stub, tmp_path / "out.html")
+    finally:
+        if saved is not None:
+            sys.modules["livereload"] = saved
 
 
 def test_watch_writes_initial_html(
