@@ -87,10 +87,6 @@ class Planner:
 
     def pdf(self,
             base: str | None = None,
-            margin_top: str | float | None = None,
-            margin_right: str | float | None = None,
-            margin_bottom: str | float | None = None,
-            margin_left: str | float | None = None,
             pdf_optimize: bool = True,
             tracker: ProgressTracker | None = None,
             ) -> bytes:
@@ -98,10 +94,6 @@ class Planner:
 
         :param base: Base URL used to resolve assets paths. If not provided,
             the planner directory is used.
-        :param margin_top: Top page margin (CSS length or ``None``).
-        :param margin_right: Right page margin (CSS length or ``None``).
-        :param margin_bottom: Bottom page margin (CSS length or ``None``).
-        :param margin_left: Left page margin (CSS length or ``None``).
         :param pdf_optimize: If ``True`` (default) and ``pikepdf`` is
             available, post-process the PDF to deduplicate images and
             strip obsolete metadata.
@@ -142,16 +134,7 @@ class Planner:
             page.evaluate("() => document.fonts.ready")
 
             tracker.job("page pdf")
-            pdf = page.pdf(
-                print_background=True,
-                prefer_css_page_size=True,
-                margin={
-                    "top": margin_top,
-                    "right": margin_right,
-                    "bottom": margin_bottom,
-                    "left": margin_left,
-                },
-            )
+            pdf = page.pdf(print_background=True, prefer_css_page_size=True)
 
             browser.close()
 
