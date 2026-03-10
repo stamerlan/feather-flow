@@ -234,23 +234,6 @@ def test_watch_verbose_flag_propagates(
     assert filters[0].verbose is True
 
 
-def test_watch_passes_relative_base(tmp_path):
-    """watch() computes a relative base and passes it to html()."""
-    planner_dir = tmp_path / "planners" / "my"
-    planner_dir.mkdir(parents=True)
-    stub = MagicMock()
-    stub.html.return_value = "<html>ok</html>"
-    stub.path.parent = planner_dir
-
-    output = tmp_path / "build" / "out.html"
-    output.parent.mkdir()
-    _run_watch(stub, output)
-
-    stub.html.assert_called_once()
-    base = stub.html.call_args[0][0]
-    assert base == "../planners/my"
-
-
 def test_watch_base_is_dot_when_same_dir(
     planner_stub, tmp_path,
 ):

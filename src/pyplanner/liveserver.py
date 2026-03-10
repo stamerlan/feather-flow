@@ -82,8 +82,7 @@ def watch(
 
     output = pathlib.Path(output).resolve()
     if base is None:
-        planner_dir = planner.path.parent.resolve()
-        base = planner_dir.relative_to(output.parent, walk_up=True).as_posix()
+        base = "."
 
     def regenerate() -> None:
         try:
