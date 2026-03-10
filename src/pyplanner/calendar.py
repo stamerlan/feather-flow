@@ -1,10 +1,7 @@
 import calendar as _stdlib_calendar
 from typing import Iterator, Iterable
 from .dayinfo import DayInfo, DayInfoProvider
-from .translations import (
-    MONTH_NAMES, MONTH_SHORT_NAMES,
-    DEFAULT_LANGUAGE,
-)
+from .lang import Lang
 from .weekday import WeekDay
 
 _EMPTY_DAY_INFO = DayInfo()
@@ -84,7 +81,7 @@ class Calendar:
                  lang: str | None = None,
                  country: str | None = None) -> None:
         self._all_weekdays = WeekDay.all_weekdays(lang, country)
-        self.lang = lang or DEFAULT_LANGUAGE
+        self.lang = lang or Lang.get().code
         self._cal = _stdlib_calendar.Calendar(firstweekday)
         self._provider: DayInfoProvider = (
             provider if provider is not None else _EmptyDayInfoProvider("")
@@ -106,8 +103,8 @@ class Calendar:
         """
         day_info = self._provider.fetch_day_info(the_year) or {}
 
-        month_names = MONTH_NAMES[self.lang]
-        month_short = MONTH_SHORT_NAMES[self.lang]
+        month_names = Lang.get(self.lang).month_names
+        month_short = Lang.get(self.lang).month_short_names
 
         months: list[Month] = []
         for month_num in range(1, 13):

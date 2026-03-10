@@ -43,8 +43,9 @@ pyplanner passes these variables to your template:
    * - ``lang``
      - string
      - The active display language code (e.g. ``"en"``, ``"ru"``, ``"kr"``),
-       set by ``--lang``. Use it to apply language-specific CSS such as font
-       families, font sizes or layout adjustments.
+       set by ``--lang``. ``"ko"`` is accepted as an alias for ``"kr"`` and
+       resolves to the same value. Use the variable to apply language-specific
+       CSS such as font families, font sizes or layout adjustments.
 
 
 Calendar

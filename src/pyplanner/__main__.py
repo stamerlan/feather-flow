@@ -10,7 +10,7 @@ from .liveserver import watch
 from .pdfopt import optimize
 from .planner import Planner
 from .tracker import setup_tracker, tracker
-from .translations import SUPPORTED_LANGUAGES, DEFAULT_LANGUAGE
+from .lang import Lang
 from .weekday import WeekDay
 
 def main(argv: list[str] | None = None) -> None:
@@ -83,10 +83,10 @@ def main(argv: list[str] | None = None) -> None:
         help="load custom day-info provider classes from the given Python "
              "module (may be specified multiple times); "
              "default: pyplanner.providers")
-    parser.add_argument("-l", "--lang", default=DEFAULT_LANGUAGE,
-        choices=SUPPORTED_LANGUAGES,
+    parser.add_argument("-l", "--lang", default=Lang.get().code,
+        choices=Lang.supported(),
         help="display language for weekday and month names "
-             f"(default: {DEFAULT_LANGUAGE})")
+             f"(default: {Lang.get().code})")
     parser.add_argument("-w", "--watch", action="store_true",
         help="watch template directory for changes and "
              "serve HTML with live reload")

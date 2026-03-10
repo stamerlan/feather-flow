@@ -1,7 +1,4 @@
-from itertools import chain
-from .translations import (
-    DEFAULT_LANGUAGE, WEEKDAY_NAMES, WEEKDAY_SHORT_NAMES, WEEKDAY_LETTERS
-)
+from .lang import Lang
 
 # Countries where the week starts on Sunday (6).
 _SUNDAY_START: frozenset[str] = frozenset((
@@ -19,7 +16,7 @@ _SATURDAY_START: frozenset[str] = frozenset((
     "om", "qa", "sd", "sy", "ae",
 ))
 
-# Countries where the weekend is Friday–Saturday (4, 5) instead of Sat–Sun.
+# Countries where the weekend is Friday-Saturday (4, 5) instead of Sat-Sun.
 _FRIDAY_SATURDAY_OFF: frozenset[str] = frozenset((
     "ae", "af", "bh", "bd", "dj", "dz", "eg", "iq", "ir", "jo",
     "kw", "ly", "mv", "om", "ps", "qa", "sa", "sd", "so", "sy", "ye",
@@ -73,11 +70,8 @@ class WeekDay:
         :param day: Weekday number (0 = Monday ... 6 = Sunday).
         :param country: ISO 3166-1 alpha-2 country code (case-insensitive).
             Defaults to Saturday-Sunday weekend when ``None``.
-        :param lang: Language for weekday names. Defaults to
-            :data:`DEFAULT_LANGUAGE` when ``None``.
+        :param lang: Language for weekday names. Default language when ``None``.
         """
-        if lang is None:
-            lang = DEFAULT_LANGUAGE
         cc = (country or _DEFAULT_COUNTRY).lower()
         if cc in _FRIDAY_SATURDAY_OFF:
             is_off = day in (4, 5)
@@ -85,9 +79,10 @@ class WeekDay:
             is_off = day == 4
         else:
             is_off = day >= 5
-        return WeekDay(day, WEEKDAY_NAMES[lang][day],
-                       WEEKDAY_SHORT_NAMES[lang][day],
-                       WEEKDAY_LETTERS[lang][day], is_off)
+
+        return WeekDay(day, Lang.get(lang).weekday_names[day],
+                       Lang.get(lang).weekday_short_names[day],
+                       Lang.get(lang).weekday_letters[day], is_off)
 
     @staticmethod
     def parse_weekday(value: str) -> int:
@@ -100,13 +95,15 @@ class WeekDay:
         """
         low = value.strip().lower()
 
-        for weekdays in chain(WEEKDAY_NAMES.values(),
-                              WEEKDAY_SHORT_NAMES.values()):
-            names = [s.lower() for s in weekdays]
-            try:
-                return names.index(low)
-            except ValueError:
-                continue
+        for code in Lang.supported():
+            loc = Lang.get(code)
+            for weekdays in (loc.weekday_names,
+                             loc.weekday_short_names):
+                names = [s.lower() for s in weekdays]
+                try:
+                    return names.index(low)
+                except ValueError:
+                    continue
 
         try:
             n = int(low)
