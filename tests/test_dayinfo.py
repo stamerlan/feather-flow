@@ -81,7 +81,7 @@ def test_is_provider_class_rejects_non_callable():
 # -- load --
 
 def test_load_builtin_providers():
-    """load('pyplanner.providers') discovers IsDayOff and NagerDate providers."""
+    """load() discovers IsDayOff and NagerDate providers."""
     classes = DayInfoProvider.load("pyplanner.providers")
     assert len(classes) >= 2
     names = {c.__name__ for c in classes}
@@ -136,7 +136,7 @@ def test_load_from_file_without_suffix(tmp_path):
 
 
 def test_load_and_discover_providers(tmp_path):
-    """load() from a file discovers provider classes and ignores non-providers."""
+    """load() from a file discovers providers, ignores non-providers."""
     plugin = tmp_path / "custom_provider.py"
     plugin.write_text(
         "class HolidayProvider:\n"

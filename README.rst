@@ -1,11 +1,15 @@
 Feather Flow
 ============
 
-|tests| |coverage|
+|tests| |lint| |coverage|
 
 .. |tests| image:: https://github.com/stamerlan/feather-flow/actions/workflows/test.yml/badge.svg
    :target: https://github.com/stamerlan/feather-flow/actions/workflows/test.yml
    :alt: Tests
+
+.. |lint| image:: https://raw.githubusercontent.com/stamerlan/feather-flow/_artifacts/lint-badge.svg
+   :target: https://github.com/stamerlan/feather-flow/actions/workflows/test.yml
+   :alt: Lint
 
 .. |coverage| image:: https://raw.githubusercontent.com/stamerlan/feather-flow/_artifacts/coverage-badge.svg
    :target: https://github.com/stamerlan/feather-flow/actions/workflows/test.yml

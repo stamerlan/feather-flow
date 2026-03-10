@@ -66,6 +66,7 @@ Optimizations performed
     streams. Each Form's stored bytes are hashed and duplicates are merged, the
     same way as for images above.
 """
+
 import hashlib
 import io
 from typing import Any
@@ -89,11 +90,11 @@ def _stream_content_bytes(obj: Any) -> bytes:
     :raises Exception: If neither decode level succeeds.
     """
     try:
-        return bytes(obj.get_stream_buffer(
-            decode_level=StreamDecodeLevel.none))
+        return bytes(obj.get_stream_buffer(decode_level=StreamDecodeLevel.none))
     except Exception:
-        return bytes(obj.get_stream_buffer(
-            decode_level=StreamDecodeLevel.specialized))
+        return bytes(
+            obj.get_stream_buffer(decode_level=StreamDecodeLevel.specialized)
+        )
 
 
 def _deduplicate_images(pdf: pikepdf.Pdf) -> None:
@@ -275,9 +276,7 @@ def optimize(pdf_bytes: bytes) -> bytes:
         buf = io.BytesIO()
         pdf.save(
             buf,
-            object_stream_mode=(
-                pikepdf.ObjectStreamMode.generate
-            ),
+            object_stream_mode=pikepdf.ObjectStreamMode.generate,
             recompress_flate=True,
         )
         return buf.getvalue()

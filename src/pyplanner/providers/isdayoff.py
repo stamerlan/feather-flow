@@ -56,8 +56,7 @@ class IsDayOffProvider(DayInfoProvider):
         days_in_year = 366 if calendar.isleap(year) else 365
         if len(data) != days_in_year or not all(c in "01" for c in data):
             warnings.warn(
-                f"Unexpected response from isdayoff.ru "
-                f"for {year}/{self._cc}.",
+                f"Unexpected response from isdayoff.ru for {year}/{self._cc}.",
                 stacklevel=2,
             )
             return None

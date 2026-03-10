@@ -21,27 +21,20 @@ class Lang:
 
     def __post_init__(self) -> None:
         if len(self.weekday_names) != 7:
-            raise ValueError(
-                f"{self.code}: weekday_names must have 7 entries"
-            )
+            raise ValueError(f"{self.code}: weekday_names must have 7 entries")
         if len(self.weekday_short_names) != 7:
             raise ValueError(
-                f"{self.code}: weekday_short_names must have"
-                f" 7 entries"
+                f"{self.code}: weekday_short_names must have 7 entries"
             )
         if len(self.weekday_letters) != 7:
             raise ValueError(
-                f"{self.code}: weekday_letters must have"
-                f" 7 entries"
+                f"{self.code}: weekday_letters must have 7 entries"
             )
         if len(self.month_names) != 12:
-            raise ValueError(
-                f"{self.code}: month_names must have 12 entries"
-            )
+            raise ValueError(f"{self.code}: month_names must have 12 entries")
         if len(self.month_short_names) != 12:
             raise ValueError(
-                f"{self.code}: month_short_names must have"
-                f" 12 entries"
+                f"{self.code}: month_short_names must have 12 entries"
             )
 
     @staticmethod

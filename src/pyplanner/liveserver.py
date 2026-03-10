@@ -38,7 +38,7 @@ class _AccessFilter(logging.Filter):
 
 def watch(
     planner: Planner,
-    output: str | os.PathLike,
+    output: str | os.PathLike[str],
     base: str | None = None,
     *,
     verbose: bool = False,
@@ -80,31 +80,31 @@ def watch(
     """
     from livereload import Server
 
+    output = pathlib.Path(output).resolve()
     if base is None:
-        output = pathlib.Path(output).resolve()
         planner_dir = planner.path.parent.resolve()
         base = planner_dir.relative_to(output.parent, walk_up=True).as_posix()
 
     def regenerate() -> None:
         try:
             html = planner.html(base)
-            with open(output, "w", encoding="utf-8") as f:
+            with output.open("w", encoding="utf-8") as f:
                 f.write(html)
         except Exception as e:
             print(f"{e}", file=sys.stderr)
 
-    logging.getLogger('livereload').addFilter(_LivereloadFilter(verbose))
-    logging.getLogger('tornado.access').addFilter(_AccessFilter())
+    logging.getLogger("livereload").addFilter(_LivereloadFilter(verbose))
+    logging.getLogger("tornado.access").addFilter(_AccessFilter())
 
     regenerate()
 
     server = Server()
     server.watch(
         str(planner.path.parent), regenerate,
-        ignore=lambda path: pathlib.Path(path).resolve() == output,
+        ignore=lambda path: pathlib.Path(path).resolve() == output
     )
 
-    host = '127.0.0.1'
+    host = "127.0.0.1"
     port = 5500
     print(f"Serving on http://{host}:{port}")
     print("Ctrl+C to exit")

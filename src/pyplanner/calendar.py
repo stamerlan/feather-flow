@@ -1,10 +1,11 @@
 import calendar as _stdlib_calendar
-from typing import Iterator, Iterable
+from collections.abc import Iterator, Iterable
 from .dayinfo import DayInfo, DayInfoProvider
 from .lang import Lang
 from .weekday import WeekDay
 
 _EMPTY_DAY_INFO = DayInfo()
+
 
 class _EmptyDayInfoProvider(DayInfoProvider):
     def __init__(self, country_code: str) -> None:
@@ -55,9 +56,9 @@ class Month:
 
 class Year:
     def __init__(self, year: int, months: Iterable[Month], id: str) -> None:
-        self.value    = year
-        self.months   = months
-        self.id       = id
+        self.value   = year
+        self.months  = months
+        self.id      = id
 
     def __int__(self) -> int:
         return self.value
@@ -71,8 +72,7 @@ class Year:
 
     def days(self) -> Iterator[Day]:
         for m in self.months:
-            for d in m.days:
-                yield d
+            yield from m.days
 
 
 class Calendar:
@@ -124,9 +124,7 @@ class Calendar:
 
             table: list[list[Day | None]] = []
             for week in self._cal.monthdayscalendar(the_year, month_num):
-                table.append([
-                    days[d - 1] if d else None for d in week
-                ])
+                table.append([days[d - 1] if d else None for d in week])
 
             months.append(
                 Month(month_num, name, short_name, days, table,

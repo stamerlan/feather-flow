@@ -51,12 +51,10 @@ def setup_tracker(
 @overload
 def tracker() -> ProgressTracker: ...
 @overload
+def tracker(stage_name: str, *, total: int = 0) -> ProgressTracker: ...
+
 def tracker(
-    stage_name: str, *, total: int = 0,
-) -> ProgressTracker: ...
-def tracker(
-    stage_name: str | None = None,
-    *, total: int = 0,
+    stage_name: str | None = None, *, total: int = 0
 ) -> ProgressTracker:
     """Return the global tracker instance.
 

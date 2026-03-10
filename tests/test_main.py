@@ -119,15 +119,14 @@ def test_unsupported_country_raises(simple_template):
     with patch(
         "pyplanner.dayinfo.DayInfoProvider.load",
         return_value=[mock_cls],
+    ), pytest.raises(
+        ValueError, match="No day-info provider found"
     ):
-        with pytest.raises(
-            ValueError, match="No day-info provider found"
-        ):
-            main([
-                str(simple_template),
-                "--html", "--country", "zz",
-                "--provider", "some_module", "-q",
-            ])
+        main([
+            str(simple_template),
+            "--html", "--country", "zz",
+            "--provider", "some_module", "-q",
+        ])
 
 
 def test_explicit_weekday_override(simple_template, tmp_path):

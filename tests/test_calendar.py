@@ -1,7 +1,4 @@
 import calendar as stdlib_calendar
-
-import pytest
-
 from pyplanner.calendar import Calendar, Year, Month, Day
 from pyplanner.dayinfo import DayInfo, DayInfoProvider
 from pyplanner.weekday import WeekDay
@@ -217,7 +214,7 @@ def test_calendar_weekday_assignment_correct():
     cal = Calendar()
     y = cal.year(2026)
     months = list(y.months)
-    day1 = list(months[0].days)[0]
+    day1 = next(iter(months[0].days))
     expected_wd = stdlib_calendar.weekday(2026, 1, 1)
     assert day1.weekday.value == expected_wd
 
@@ -228,7 +225,7 @@ def test_calendar_with_provider():
     cal = Calendar(provider=provider)
     y = cal.year(2026)
     months = list(y.months)
-    jan1 = list(months[0].days)[0]
+    jan1 = next(iter(months[0].days))
     assert jan1.info.is_off_day is True
     assert jan1.is_off_day is True
 
@@ -238,5 +235,5 @@ def test_calendar_without_provider_empty_info():
     cal = Calendar()
     y = cal.year(2026)
     months = list(y.months)
-    jan1 = list(months[0].days)[0]
+    jan1 = next(iter(months[0].days))
     assert jan1.info.is_off_day is None

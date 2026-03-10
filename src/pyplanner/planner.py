@@ -1,6 +1,6 @@
 import os
 import pathlib
-from urllib.parse import urlparse, unquote
+from urllib.parse import unquote, urlparse
 
 import jinja2
 from playwright.sync_api import Route, sync_playwright
@@ -35,7 +35,7 @@ class Planner:
         template rendering.
     """
 
-    def __init__(self, path: str | os.PathLike,
+    def __init__(self, path: str | os.PathLike[str],
                  calendar: Calendar | None = None,
                  ) -> None:
         if calendar is None:
@@ -66,11 +66,11 @@ class Planner:
             base = self.path.parent.as_uri()
 
         tracker().job("Render HTML")
-        return self._env.get_template(self.path.name).render(
+        return str(self._env.get_template(self.path.name).render(
             base=base,
             calendar=self.calendar,
             lang=self.calendar.lang,
-        )
+        ))
 
     def pdf(self, base: str | None = None) -> bytes:
         """Render the template and return a PDF as raw bytes.
@@ -97,8 +97,9 @@ class Planner:
                 ])
             with tracker().job("Set page content"):
                 page = browser.new_page()
-                page.on("requestfailed",
-                        lambda r: print(f'Failed to load "{r.url}"')
+                page.on(
+                    "requestfailed",
+                    lambda r: print(f'Failed to load "{r.url}"'),
                 )
                 page.route("file://**/*", _asset_route)
                 page.set_content(html, wait_until="load")
@@ -108,4 +109,4 @@ class Planner:
 
             browser.close()
 
-        return pdf
+        return bytes(pdf)

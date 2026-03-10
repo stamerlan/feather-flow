@@ -1,3 +1,4 @@
+import contextlib
 import logging
 from unittest.mock import patch, MagicMock
 
@@ -49,11 +50,9 @@ def _run_watch(planner, output, **kwargs):
     mock_cls = MagicMock(return_value=mock_server)
     mock_server.serve.side_effect = KeyboardInterrupt
 
-    with patch("livereload.Server", mock_cls):
-        try:
-            watch(planner, output, **kwargs)
-        except KeyboardInterrupt:
-            pass
+    with patch("livereload.Server", mock_cls), \
+            contextlib.suppress(KeyboardInterrupt):
+        watch(planner, output, **kwargs)
 
     return mock_server
 

@@ -36,7 +36,7 @@ def test_isdayoff_all_supported_countries(cc):
 
 
 def test_isdayoff_fetch_success():
-    """fetch_day_info parses a valid all-workday response into DayInfo objects."""
+    """fetch_day_info parses a valid all-workday response into DayInfo."""
     days_in_2026 = 365
     response_data = "0" * days_in_2026
     mock_resp = MagicMock()
@@ -67,6 +67,7 @@ def test_isdayoff_fetch_with_off_days():
     with patch("urllib.request.urlopen", return_value=mock_resp):
         result = provider.fetch_day_info(2026)
 
+    assert result is not None
     assert result["2026-01-01"].is_off_day is True
     assert result["2026-01-02"].is_off_day is False
 
@@ -75,10 +76,12 @@ def test_isdayoff_fetch_network_error():
     """fetch_day_info returns None and warns on a network error."""
     import urllib.error
     provider = IsDayOffProvider("ru")
-    with patch("urllib.request.urlopen",
-                side_effect=urllib.error.URLError("timeout")):
-        with pytest.warns(UserWarning, match="Failed to fetch"):
-            result = provider.fetch_day_info(2026)
+    with (
+        patch("urllib.request.urlopen",
+              side_effect=urllib.error.URLError("timeout")),
+        pytest.warns(UserWarning, match="Failed to fetch"),
+    ):
+        result = provider.fetch_day_info(2026)
     assert result is None
 
 
@@ -90,9 +93,11 @@ def test_isdayoff_fetch_bad_response_length():
     mock_resp.__exit__ = MagicMock(return_value=False)
 
     provider = IsDayOffProvider("ru")
-    with patch("urllib.request.urlopen", return_value=mock_resp):
-        with pytest.warns(UserWarning, match="Unexpected response"):
-            result = provider.fetch_day_info(2026)
+    with (
+        patch("urllib.request.urlopen", return_value=mock_resp),
+        pytest.warns(UserWarning, match="Unexpected response"),
+    ):
+        result = provider.fetch_day_info(2026)
     assert result is None
 
 
@@ -105,9 +110,11 @@ def test_isdayoff_fetch_bad_response_chars():
     mock_resp.__exit__ = MagicMock(return_value=False)
 
     provider = IsDayOffProvider("ru")
-    with patch("urllib.request.urlopen", return_value=mock_resp):
-        with pytest.warns(UserWarning, match="Unexpected response"):
-            result = provider.fetch_day_info(2026)
+    with (
+        patch("urllib.request.urlopen", return_value=mock_resp),
+        pytest.warns(UserWarning, match="Unexpected response"),
+    ):
+        result = provider.fetch_day_info(2026)
     assert result is None
 
 
@@ -162,10 +169,12 @@ def test_nagerdate_fetch_network_error():
     """fetch_day_info returns None and warns on a network error."""
     import urllib.error
     provider = NagerDateProvider("de")
-    with patch("urllib.request.urlopen",
-                side_effect=urllib.error.URLError("timeout")):
-        with pytest.warns(UserWarning, match="Failed to fetch"):
-            result = provider.fetch_day_info(2026)
+    with (
+        patch("urllib.request.urlopen",
+              side_effect=urllib.error.URLError("timeout")),
+        pytest.warns(UserWarning, match="Failed to fetch"),
+    ):
+        result = provider.fetch_day_info(2026)
     assert result is None
 
 
@@ -177,9 +186,11 @@ def test_nagerdate_fetch_invalid_json():
     mock_resp.__exit__ = MagicMock(return_value=False)
 
     provider = NagerDateProvider("de")
-    with patch("urllib.request.urlopen", return_value=mock_resp):
-        with pytest.warns(UserWarning, match="Invalid JSON"):
-            result = provider.fetch_day_info(2026)
+    with (
+        patch("urllib.request.urlopen", return_value=mock_resp),
+        pytest.warns(UserWarning, match="Invalid JSON"),
+    ):
+        result = provider.fetch_day_info(2026)
     assert result is None
 
 
@@ -191,9 +202,11 @@ def test_nagerdate_fetch_non_list_response():
     mock_resp.__exit__ = MagicMock(return_value=False)
 
     provider = NagerDateProvider("de")
-    with patch("urllib.request.urlopen", return_value=mock_resp):
-        with pytest.warns(UserWarning, match="Unexpected response"):
-            result = provider.fetch_day_info(2026)
+    with (
+        patch("urllib.request.urlopen", return_value=mock_resp),
+        pytest.warns(UserWarning, match="Unexpected response"),
+    ):
+        result = provider.fetch_day_info(2026)
     assert result is None
 
 

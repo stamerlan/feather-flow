@@ -99,8 +99,7 @@ class DayInfoProvider(ABC):
         """
         base = Path(module_name)
         suffixes = (
-            (base.suffix,) if base.suffix
-            else DayInfoProvider._FILE_SUFFIXES
+            (base.suffix,) if base.suffix else DayInfoProvider._FILE_SUFFIXES
         )
         last_err: Exception | None = None
         for suffix in suffixes:
@@ -121,9 +120,8 @@ class DayInfoProvider(ABC):
 
     @staticmethod
     def is_provider_class(obj: object) -> bool:
-        return (
-            isinstance(obj, type)
-            and callable(getattr(obj, "fetch_day_info", None))
+        return isinstance(obj, type) and callable(
+            getattr(obj, "fetch_day_info", None)
         )
 
     @abstractmethod

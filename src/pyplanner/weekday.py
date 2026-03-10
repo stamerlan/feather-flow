@@ -80,9 +80,13 @@ class WeekDay:
         else:
             is_off = day >= 5
 
-        return WeekDay(day, Lang.get(lang).weekday_names[day],
-                       Lang.get(lang).weekday_short_names[day],
-                       Lang.get(lang).weekday_letters[day], is_off)
+        return WeekDay(
+            day,
+            Lang.get(lang).weekday_names[day],
+            Lang.get(lang).weekday_short_names[day],
+            Lang.get(lang).weekday_letters[day],
+            is_off,
+        )
 
     @staticmethod
     def parse_weekday(value: str) -> int:
@@ -96,9 +100,8 @@ class WeekDay:
         low = value.strip().lower()
 
         for code in Lang.supported():
-            loc = Lang.get(code)
-            for weekdays in (loc.weekday_names,
-                             loc.weekday_short_names):
+            lang = Lang.get(code)
+            for weekdays in (lang.weekday_names, lang.weekday_short_names):
                 names = [s.lower() for s in weekdays]
                 try:
                     return names.index(low)
@@ -119,7 +122,8 @@ class WeekDay:
         )
 
     @staticmethod
-    def all_weekdays(lang: str | None = None,
-                     country: str | None = None,
-                     ) -> tuple["WeekDay", ...]:
+    def all_weekdays(
+        lang: str | None = None,
+        country: str | None = None,
+    ) -> tuple["WeekDay", ...]:
         return tuple(WeekDay.create(i, country, lang) for i in range(7))

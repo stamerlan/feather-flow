@@ -162,7 +162,7 @@ class BaseTracker:
         """
         self.stop_event.clear()
         self.refresh_thread = threading.Thread(
-            target=self._refresh_loop, daemon=True,
+            target=self._refresh_loop, daemon=True
         )
         self.refresh_thread.start()
 
@@ -196,11 +196,7 @@ class BaseTracker:
         """
         stream = sys.stdout
         stream.write(f"{self.stage_name}:\n")
-        max_name = max(
-            (len(n) for n, _ in self.jobs), default=0,
-        )
+        max_name = max((len(n) for n, _ in self.jobs), default=0)
         for name, duration in self.jobs:
-            stream.write(
-                f"  {name:<{max_name}s} : {duration:.3f}s\n"
-            )
+            stream.write(f"  {name:<{max_name}s} : {duration:.3f}s\n")
         stream.flush()

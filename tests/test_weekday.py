@@ -51,7 +51,7 @@ def test_monday_start_countries(country):
 
 
 def test_create_default_english():
-    """WeekDay.create() with no lang/country uses English and default weekend."""
+    """create() with no lang/country uses English and default weekend."""
     wd = WeekDay.create(0)
     assert wd.name == "Monday"
     assert wd.short_name == "Mon"

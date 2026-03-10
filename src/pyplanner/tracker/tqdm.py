@@ -17,7 +17,7 @@ class TqdmTracker(BaseTracker):
     def __enter__(self) -> Self:
         """Create the tqdm bar and start the refresh thread."""
         self.reset_stage()
-        self._tqdm_bar = tqdm(
+        self._tqdm_bar = tqdm(  # type: ignore[assignment]
             total=self.job_count or None,
             desc=self.stage_name,
             bar_format="{desc}: {n_fmt}/{total_fmt} {bar} [{elapsed}]",
@@ -44,8 +44,7 @@ class TqdmTracker(BaseTracker):
             self.print_verbose_summary()
 
     def job(self, name: str) -> _JobContext:
-        """Advance the bar by one step and update its label.
-        """
+        """Advance the bar by one step and update its label."""
         with self.lock:
             self._start_job(name)
             if self._tqdm_bar is not None:

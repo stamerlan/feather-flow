@@ -91,7 +91,7 @@ def test_strip_procset():
 
 
 def test_deduplicate_form_xobjects():
-    """_strip_and_dedup_resources merges identical Form XObjects across pages."""
+    """_strip_and_dedup_resources merges identical Form XObjects."""
     pdf = pikepdf.new()
     form_data = b"q 1 0 0 1 0 0 cm Q"
 

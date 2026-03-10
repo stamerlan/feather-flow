@@ -33,9 +33,7 @@ class NagerDateProvider(DayInfoProvider):
             :class:`~pyplanner.dayinfo.DayInfo` instances, or ``None`` if the
             request fails or the response is unusable.
         """
-        url = (
-            f"https://date.nager.at/api/v3/PublicHolidays/{year}/{self._cc}"
-        )
+        url = f"https://date.nager.at/api/v3/PublicHolidays/{year}/{self._cc}"
         try:
             with urllib.request.urlopen(url, timeout=self._timeout) as resp:
                 raw = resp.read().decode("utf-8")
@@ -51,8 +49,7 @@ class NagerDateProvider(DayInfoProvider):
             holidays = json.loads(raw)
         except json.JSONDecodeError:
             warnings.warn(
-                f"Invalid JSON from date.nager.at "
-                f"for {year}/{self._cc}.",
+                f"Invalid JSON from date.nager.at for {year}/{self._cc}.",
                 stacklevel=2,
             )
             return None

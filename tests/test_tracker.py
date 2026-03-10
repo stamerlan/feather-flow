@@ -4,6 +4,7 @@ from pyplanner.tracker import (
     QuietTracker, SimpleProgressTracker,
     setup_tracker, tracker,
 )
+from pyplanner.tracker.base import BaseTracker
 
 
 def test_quiet_context_manager_noop():
@@ -66,10 +67,9 @@ def test_simple_total_via_call():
 def test_simple_exception_propagates():
     """Exceptions propagate out of the context manager."""
     t = SimpleProgressTracker()
-    with pytest.raises(RuntimeError, match="boom"):
-        with t("stage"):
-            t.job("a")
-            raise RuntimeError("boom")
+    with pytest.raises(RuntimeError, match="boom"), t("stage"):
+        t.job("a")
+        raise RuntimeError("boom")
     assert len(t.jobs) == 1
 
 
@@ -90,10 +90,9 @@ def test_simple_verbose_prints_durations(capsys):
 def test_verbose_durations_on_exception(capsys):
     """verbose=True prints durations even on exception."""
     t = SimpleProgressTracker(verbose=True)
-    with pytest.raises(RuntimeError):
-        with t("Build"):
-            t.job("alpha")
-            raise RuntimeError("fail")
+    with pytest.raises(RuntimeError), t("Build"):
+        t.job("alpha")
+        raise RuntimeError("fail")
     out = capsys.readouterr().out
     assert "alpha" in out
 
@@ -143,7 +142,7 @@ def test_setup_tracker_verbose():
     """setup_tracker(verbose=True) installs non-quiet."""
     setup_tracker(verbose=True)
     t = tracker()
-    assert not isinstance(t, QuietTracker)
+    assert isinstance(t, BaseTracker)
     assert t.verbose is True
 
 
@@ -152,7 +151,7 @@ def test_setup_tracker_default():
     """setup_tracker() installs a non-quiet tracker."""
     setup_tracker()
     t = tracker()
-    assert not isinstance(t, QuietTracker)
+    assert isinstance(t, BaseTracker)
     assert t.verbose is False
 
 

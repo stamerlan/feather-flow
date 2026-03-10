@@ -6,12 +6,13 @@ import textwrap
 from . import __version__
 from .calendar import Calendar
 from .dayinfo import DayInfoProvider
+from .lang import Lang
 from .liveserver import watch
 from .pdfopt import optimize
 from .planner import Planner
 from .tracker import setup_tracker, tracker
-from .lang import Lang
 from .weekday import WeekDay
+
 
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(
@@ -44,63 +45,76 @@ def main(argv: list[str] | None = None) -> None:
               pyplanner planners/ff-2026 --watch
                   Serve HTML with live reload on file changes."""),
     )
-    parser.add_argument("-v", "--version", action="version",
-        version=f"%(prog)s {__version__}")
-    parser.add_argument("file", type=pathlib.Path,
-        metavar="FILE",
+    parser.add_argument(
+        "-v", "--version", action="version", version=f"%(prog)s {__version__}"
+    )
+    parser.add_argument(
+        "file", type=pathlib.Path, metavar="FILE",
         help="planner template file or directory "
-             "(if a directory, uses <dir>/<dirname>.html)")
+             "(if a directory, uses <dir>/<dirname>.html)"
+    )
     fmt = parser.add_mutually_exclusive_group()
-    fmt.add_argument("--html", action="store_true",
-        help="generate HTML output instead of PDF")
-    fmt.add_argument("--pdf", action="store_true",
-        help="generate PDF output (the default)")
-    parser.add_argument("-o", "--output", default=None, metavar="FILE",
+    fmt.add_argument(
+        "--html",
+        action="store_true", help="generate HTML output instead of PDF"
+    )
+    fmt.add_argument(
+        "--pdf", action="store_true", help="generate PDF output (the default)"
+    )
+    parser.add_argument(
+        "-o", "--output", default=None, metavar="FILE",
         help="output filename (default: <template_stem>.pdf or "
-             "<template_stem>.html depending on format)")
-    parser.add_argument("--opt", action=argparse.BooleanOptionalAction,
-        default=True,
+             "<template_stem>.html depending on format)"
+    )
+    parser.add_argument(
+        "--opt", action=argparse.BooleanOptionalAction, default=True,
         help="post-process PDF to deduplicate images/streams and strip "
-             "obsolete metadata (default: enabled)")
-    parser.add_argument("-c", "--country", default=None, metavar="CC",
-        help=(
-            "ISO 3166-1 alpha-2 country code for holidays / off-days "
-            "(e.g., PL, US, DE, FR, etc.). "
-            "Also sets the first day of the week for that country "
-            "unless --first-weekday is given explicitly. "
-            "Uses the built-in providers by default; combine with "
-            "--provider to use a custom provider instead."
-        ))
-    parser.add_argument("--first-weekday", default=None, metavar="DAY",
-        help=(
-            "first day of the week: name (monday, tuesday, ..., sunday) "
-            "or number (0=monday .. 6=sunday). "
-            "Overrides the country default when --country is also set. "
-            "Default: monday"
-        ))
-    parser.add_argument("--provider", action="append",
-        metavar="MODULE",
+             "obsolete metadata (default: enabled)"
+    )
+    parser.add_argument(
+        "-c", "--country", default=None, metavar="CC",
+        help="ISO 3166-1 alpha-2 country code for holidays / off-days "
+             "(e.g., PL, US, DE, FR, etc.). Also sets the first day of the "
+             "week for that country unless --first-weekday is given "
+             "explicitly. Uses the built-in providers by default; combine with "
+             "--provider to use a custom provider instead."
+    )
+    parser.add_argument(
+        "--first-weekday", default=None, metavar="DAY",
+        help="first day of the week: name (monday, tuesday, ..., sunday) "
+             "or number (0=monday .. 6=sunday). Overrides the country default "
+             "when --country is also set. Default: monday"
+    )
+    parser.add_argument(
+        "--provider", action="append", metavar="MODULE",
         help="load custom day-info provider classes from the given Python "
              "module (may be specified multiple times); "
-             "default: pyplanner.providers")
-    parser.add_argument("-l", "--lang", default=Lang.get().code,
-        choices=Lang.supported(),
-        help="display language for weekday and month names "
-             f"(default: {Lang.get().code})")
-    parser.add_argument("-w", "--watch", action="store_true",
-        help="watch template directory for changes and "
-             "serve HTML with live reload")
+             "default: pyplanner.providers",
+    )
+    parser.add_argument(
+        "-l", "--lang", default=Lang.get().code, choices=Lang.supported(),
+        help=f"display language for weekday and month names "
+             f"(default: {Lang.get().code})",
+    )
+    parser.add_argument(
+        "-w", "--watch", action="store_true",
+        help="watch template directory for changes and serve HTML with live "
+             "reload"
+    )
     verbosity = parser.add_mutually_exclusive_group()
-    verbosity.add_argument("-q", "--quiet", action="store_true",
-        help="suppress informational output")
-    verbosity.add_argument("--verbose", action="store_true",
-        help="print per-job durations after each stage")
+    verbosity.add_argument(
+        "-q", "--quiet", action="store_true",
+        help="suppress informational output"
+    )
+    verbosity.add_argument(
+        "--verbose", action="store_true",
+        help="print per-job durations after each stage; "
+             "in --watch mode, also show livereload logs"
+    )
     args = parser.parse_args(argv)
 
     if args.watch and args.pdf:
-        parser.error(
-            "--watch cannot be combined with --pdf"
-        )
+        parser.error("--watch cannot be combined with --pdf")
     if args.watch:
         args.html = True
 
@@ -148,8 +162,10 @@ def main(argv: list[str] | None = None) -> None:
         firstweekday = 0
 
     # Generate the output files.
-    calendar = Calendar(firstweekday=firstweekday, provider=dayinfo,
-        lang=args.lang, country=args.country)
+    calendar = Calendar(
+        firstweekday=firstweekday, provider=dayinfo, lang=args.lang,
+        country=args.country
+    )
     planner = Planner(args.file, calendar=calendar)
     setup_tracker(quiet=args.quiet, verbose=args.verbose)
 
@@ -160,9 +176,11 @@ def main(argv: list[str] | None = None) -> None:
         template_dir = args.file.parent.resolve()
         base = template_dir.relative_to(outdir, walk_up=True).as_posix()
 
-        with tracker(f"Generating {output}"):
-            with open(output, "w", encoding="utf-8") as f:
-                f.write(planner.html(base=base))
+        with (
+            tracker(f"Generating {output}"),
+            pathlib.Path(output).open("w", encoding="utf-8") as f
+        ):
+            f.write(planner.html(base=base))
     else:
         total = 5 if args.opt else 4
         with tracker(f"Generating {output}", total=total):
@@ -170,7 +188,7 @@ def main(argv: list[str] | None = None) -> None:
             if args.opt:
                 with tracker().job("Optimize PDF"):
                     pdf_bytes = optimize(pdf_bytes)
-            with open(output, "wb") as f:
+            with pathlib.Path(output).open("wb") as f:
                 f.write(pdf_bytes)
 
 

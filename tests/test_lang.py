@@ -42,10 +42,10 @@ def test_default_in_supported():
 def test_langs_are_frozen():
     """Each registered Lang is a frozen dataclass."""
     for code in Lang.supported():
-        loc = Lang.get(code)
-        assert isinstance(loc, Lang)
+        lang = Lang.get(code)
+        assert isinstance(lang, Lang)
         with pytest.raises(AttributeError):
-            loc.code = "xx"  # type: ignore[misc]
+            lang.code = "xx"  # type: ignore[misc]
 
 
 @pytest.mark.parametrize("code", Lang.supported())
