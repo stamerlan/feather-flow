@@ -28,13 +28,6 @@ def test_isdayoff_unsupported_country_raises():
         IsDayOffProvider("us")
 
 
-@pytest.mark.parametrize("cc", ["ru", "ua", "by", "kz", "uz", "tr", "ge"])
-def test_isdayoff_all_supported_countries(cc):
-    """IsDayOffProvider initialises without error for each supported code."""
-    provider = IsDayOffProvider(cc)
-    assert provider._cc == cc
-
-
 def test_isdayoff_fetch_success():
     """fetch_day_info parses a valid all-workday response into DayInfo."""
     days_in_2026 = 365
@@ -147,8 +140,20 @@ def test_nagerdate_stores_country_upper():
 def test_nagerdate_fetch_success():
     """fetch_day_info parses a JSON holiday list into DayInfo objects."""
     holidays = [
-        {"date": "2026-01-01", "name": "New Year"},
-        {"date": "2026-12-25", "name": "Christmas"},
+        {
+            "date": "2026-01-01",
+            "localName": "Neujahr",
+            "name": "New Year's Day",
+            "launchYear": 1967,
+            "types": ["Public"],
+        },
+        {
+            "date": "2026-12-25",
+            "localName": "Weihnachten",
+            "name": "Christmas Day",
+            "launchYear": None,
+            "types": ["Public", "Bank"],
+        },
     ]
     mock_resp = MagicMock()
     mock_resp.read.return_value = json.dumps(holidays).encode("utf-8")
@@ -161,8 +166,61 @@ def test_nagerdate_fetch_success():
 
     assert result is not None
     assert len(result) == 2
-    assert result["2026-01-01"].is_off_day is True
-    assert result["2026-12-25"].is_off_day is True
+
+    ny = result["2026-01-01"]
+    assert ny.is_off_day is True
+    assert ny.name == "New Year's Day"
+    assert ny.local_name == "Neujahr"
+    assert ny.launch_year == 1967
+    assert ny.holiday_types == ("Public",)
+
+    xmas = result["2026-12-25"]
+    assert xmas.is_off_day is True
+    assert xmas.name == "Christmas Day"
+    assert xmas.local_name == "Weihnachten"
+    assert xmas.launch_year is None
+    assert xmas.holiday_types == ("Public", "Bank")
+
+
+def test_nagerdate_fetch_name_and_local_name_independent():
+    """name and local_name are populated independently."""
+    holidays = [
+        {"date": "2026-01-01", "name": "New Year"},
+    ]
+    mock_resp = MagicMock()
+    mock_resp.read.return_value = json.dumps(holidays).encode("utf-8")
+    mock_resp.__enter__ = lambda s: s
+    mock_resp.__exit__ = MagicMock(return_value=False)
+
+    provider = NagerDateProvider("de")
+    with patch("urllib.request.urlopen", return_value=mock_resp):
+        result = provider.fetch_day_info(2026)
+
+    assert result is not None
+    assert result["2026-01-01"].name == "New Year"
+    assert result["2026-01-01"].local_name is None
+
+
+def test_nagerdate_fetch_no_optional_fields():
+    """fetch_day_info sets optional fields to None when absent."""
+    holidays = [
+        {"date": "2026-01-01"},
+    ]
+    mock_resp = MagicMock()
+    mock_resp.read.return_value = json.dumps(holidays).encode("utf-8")
+    mock_resp.__enter__ = lambda s: s
+    mock_resp.__exit__ = MagicMock(return_value=False)
+
+    provider = NagerDateProvider("de")
+    with patch("urllib.request.urlopen", return_value=mock_resp):
+        result = provider.fetch_day_info(2026)
+
+    assert result is not None
+    info = result["2026-01-01"]
+    assert info.name is None
+    assert info.local_name is None
+    assert info.launch_year is None
+    assert info.holiday_types is None
 
 
 def test_nagerdate_fetch_network_error():

@@ -12,8 +12,16 @@ class _StubProvider(DayInfoProvider):
 
     def fetch_day_info(self, year: int) -> dict[str, DayInfo]:
         return {
-            f"{year}-01-01": DayInfo(is_off_day=True),
-            f"{year}-12-25": DayInfo(is_off_day=True),
+            f"{year}-01-01": DayInfo(
+                is_off_day=True,
+                name="New Year's Day",
+                local_name="New Year's Day",
+            ),
+            f"{year}-12-25": DayInfo(
+                is_off_day=True,
+                name="Christmas Day",
+                local_name="Christmas Day",
+            ),
         }
 
 
@@ -49,6 +57,64 @@ def test_day_dayinfo_none_falls_through():
     mon = WeekDay.create(0)
     d = Day(1, mon, "2026-01-01", DayInfo(is_off_day=None))
     assert d.is_off_day is False
+
+
+def test_day_name_from_dayinfo():
+    """Day.name returns the holiday name from DayInfo."""
+    mon = WeekDay.create(0)
+    d = Day(1, mon, "2026-01-01", DayInfo(name="New Year's Day"))
+    assert d.name == "New Year's Day"
+
+
+def test_day_name_defaults_to_none():
+    """Day.name is None when DayInfo has no name."""
+    mon = WeekDay.create(0)
+    d = Day(1, mon, "2026-01-01")
+    assert d.name is None
+
+
+def test_day_local_name_from_dayinfo():
+    """Day.local_name returns the localized name from DayInfo."""
+    mon = WeekDay.create(0)
+    d = Day(1, mon, "2026-01-01", DayInfo(local_name="Neujahr"))
+    assert d.local_name == "Neujahr"
+
+
+def test_day_local_name_defaults_to_none():
+    """Day.local_name is None when DayInfo has no local_name."""
+    mon = WeekDay.create(0)
+    d = Day(1, mon, "2026-01-01")
+    assert d.local_name is None
+
+
+def test_day_launch_year_from_dayinfo():
+    """Day.launch_year returns the value from DayInfo."""
+    mon = WeekDay.create(0)
+    d = Day(1, mon, "2026-01-01", DayInfo(launch_year=1967))
+    assert d.launch_year == 1967
+
+
+def test_day_launch_year_defaults_to_none():
+    """Day.launch_year is None when DayInfo has no launch_year."""
+    mon = WeekDay.create(0)
+    d = Day(1, mon, "2026-01-01")
+    assert d.launch_year is None
+
+
+def test_day_holiday_types_from_dayinfo():
+    """Day.holiday_types returns the value from DayInfo."""
+    mon = WeekDay.create(0)
+    d = Day(1, mon, "2026-01-01", DayInfo(
+        holiday_types=("Public",),
+    ))
+    assert d.holiday_types == ("Public",)
+
+
+def test_day_holiday_types_defaults_to_none():
+    """Day.holiday_types is None when DayInfo has no types."""
+    mon = WeekDay.create(0)
+    d = Day(1, mon, "2026-01-01")
+    assert d.holiday_types is None
 
 
 # -- Month --
@@ -228,6 +294,8 @@ def test_calendar_with_provider():
     jan1 = next(iter(months[0].days))
     assert jan1.info.is_off_day is True
     assert jan1.is_off_day is True
+    assert jan1.name == "New Year's Day"
+    assert jan1.local_name == "New Year's Day"
 
 
 def test_calendar_without_provider_empty_info():

@@ -35,6 +35,22 @@ class Day:
             return self.info.is_off_day
         return self.weekday.is_off_day
 
+    @property
+    def name(self) -> str | None:
+        return self.info.name
+
+    @property
+    def local_name(self) -> str | None:
+        return self.info.local_name
+
+    @property
+    def launch_year(self) -> int | None:
+        return self.info.launch_year
+
+    @property
+    def holiday_types(self) -> tuple[str, ...] | None:
+        return self.info.holiday_types
+
 
 class Month:
     def __init__(self, value: int, name: str, short_name: str,

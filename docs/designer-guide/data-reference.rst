@@ -260,6 +260,34 @@ Each item in ``month.days`` or in the cells of ``month.table``.
      - bool
      - ``true``
      - Whether this is a day off (weekend or public holiday).
+   * - ``name``
+     - string or None
+     - ``"Christmas Day"``
+     - International holiday name if the day is a public holiday, otherwise
+       ``None``. Populated by providers that supply holiday names
+       (e.g. Nager.Date).
+   * - ``local_name``
+     - string or None
+     - ``"Weihnachten"``
+     - Localized holiday name in the country's language, otherwise ``None``.
+       Populated by providers that supply holiday names (e.g. Nager.Date).
+   * - ``launch_year``
+     - int or None
+     - ``1967``
+     - The year the public holiday was established, otherwise ``None``.
+   * - ``holiday_types``
+     - tuple of strings or None
+     - ``("Public",)``
+     - Holiday type labels. ``None`` when not supplied by the provider.
+       Possible values (Nager.Date definitions):
+
+       * ``"Public"`` - general public holiday, a day off for the population.
+       * ``"Bank"`` - bank holiday; banks and offices are closed.
+       * ``"School"`` - school holiday; schools are closed.
+       * ``"Authorities"`` - government offices are closed.
+       * ``"Optional"`` - majority of people take a day off but it is not
+         mandatory.
+       * ``"Observance"`` - optional festivity, no paid day off.
 
 **String representation:** ``{{ day }}`` outputs the day number, for example
 ``15``.
@@ -410,6 +438,10 @@ Quick cheat sheet
       .weekday           -> WeekDay
       .id                -> "2026-01-15"
       .is_off_day        -> true / false
+      .name              -> "Christmas Day" / None
+      .local_name        -> "Weihnachten" / None
+      .launch_year       -> 1967 / None
+      .holiday_types     -> ("Public",) / None
 
     WeekDay
       .value             -> 0

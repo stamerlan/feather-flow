@@ -12,9 +12,24 @@ class DayInfo:
 
     Every field defaults to ``None`` (no data - fall back to default
     calendar logic). New fields can be added as the framework grows.
+
+    ``holiday_types`` values (Nager.Date definitions):
+
+    * ``"Public"`` - general public holiday, a day off for
+      the population.
+    * ``"Bank"`` - bank holiday; banks and offices are closed.
+    * ``"School"`` - school holiday; schools are closed.
+    * ``"Authorities"`` - government offices are closed.
+    * ``"Optional"`` - majority of people take a day off but
+      it is not mandatory.
+    * ``"Observance"`` - optional festivity, no paid day off.
     """
 
     is_off_day: bool | None = None
+    name: str | None = None
+    local_name: str | None = None
+    launch_year: int | None = None
+    holiday_types: tuple[str, ...] | None = None
 
 
 class DayInfoProvider(ABC):
@@ -32,6 +47,10 @@ class DayInfoProvider(ABC):
         @dataclass
         class DayInfo:
             is_off_day: bool | None = None
+            name: str | None = None
+            local_name: str | None = None
+            launch_year: int | None = None
+            holiday_types: tuple[str, ...] | None = None
 
         class MyHolidayProvider:
             def __init__(self, country_code: str) -> None:
@@ -40,8 +59,14 @@ class DayInfoProvider(ABC):
 
             def fetch_day_info(self, year: int):
                 return {
-                    f"{year}-12-25": DayInfo(is_off_day=True),
-                    f"{year}-01-01": DayInfo(is_off_day=True),
+                    f"{year}-12-25": DayInfo(
+                        is_off_day=True,
+                        name="Christmas Day",
+                    ),
+                    f"{year}-01-01": DayInfo(
+                        is_off_day=True,
+                        name="New Year's Day",
+                    ),
                 }
 
     Usage::

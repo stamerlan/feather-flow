@@ -9,9 +9,13 @@ from pyplanner.dayinfo import DayInfo, DayInfoProvider
 # -- DayInfo --
 
 def test_dayinfo_defaults_to_none():
-    """DayInfo() has is_off_day=None by default."""
+    """DayInfo() has all fields set to None by default."""
     info = DayInfo()
     assert info.is_off_day is None
+    assert info.name is None
+    assert info.local_name is None
+    assert info.launch_year is None
+    assert info.holiday_types is None
 
 
 def test_dayinfo_is_off_day_true():

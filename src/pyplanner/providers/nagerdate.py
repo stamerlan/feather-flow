@@ -62,10 +62,22 @@ class NagerDateProvider(DayInfoProvider):
             )
             return None
 
-        result: dict[str, DayInfo] = {}
+        info: dict[str, DayInfo] = {}
         for entry in holidays:
             date_str = entry.get("date")
             if isinstance(date_str, str):
-                result[date_str] = DayInfo(is_off_day=True)
+                raw_types = entry.get("types")
+                if isinstance(raw_types, list):
+                    holiday_types = tuple(raw_types)
+                else:
+                    holiday_types = None
 
-        return result
+                info[date_str] = DayInfo(
+                    is_off_day=True,
+                    name=entry.get("name"),
+                    local_name=entry.get("localName"),
+                    launch_year=entry.get("launchYear"),
+                    holiday_types=holiday_types,
+                )
+
+        return info
