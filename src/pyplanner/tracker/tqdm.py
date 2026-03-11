@@ -52,7 +52,7 @@ class TqdmTracker(BaseTracker):
                 if self.job_count and bar.total != self.job_count:
                     bar.total = self.job_count
                     bar.refresh()
-                bar.set_description(f"{self.stage_name}: {self.job_name}")
+                bar.set_description_str(f"{self.stage_name}: {self.job_name}")
                 bar.update(1)
         return _JobContext(self)
 
