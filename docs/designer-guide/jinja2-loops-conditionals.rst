@@ -368,7 +368,7 @@ This uses three nested concepts you learned on this page:
 
 Regenerate::
 
-    pyplanner planners/mini-planner --html
+    pyplanner planners/mini-planner
 
 You should now see two pages - the cover and a month calendar.
 

@@ -160,7 +160,7 @@ Generate and preview
 
 From the repository root run::
 
-    pyplanner planners/mini-planner --html
+    pyplanner planners/mini-planner
 
 A file called ``mini-planner.html`` (the rendered output) appears in the
 repository root. Open it in your browser.
@@ -173,9 +173,10 @@ If the background image shows and the title is visible you are ready to move on.
 
 .. tip::
 
-   Use ``--html`` during development. It is much faster than PDF generation
-   because it skips the Chromium step. See :doc:`live-preview` for a workflow
-   that reloads the browser automatically.
+   HTML is the default output format and is much faster than PDF generation
+   because it skips the Chromium step. Use ``--pdf`` when you need the final
+   file. See :doc:`live-preview` for a workflow that reloads the browser
+   automatically.
 
 
 Do and don't

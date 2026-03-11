@@ -24,20 +24,20 @@ def main(argv: list[str] | None = None) -> None:
             Each planner lives in its own directory. The input can be a template
             file or a planner directory (the template is then
             <dirname>/<dirname>.html). Use --html or --pdf to select the output
-            format (default: PDF). Use -o to set a custom output filename."""),
+            format (default: HTML). Use -o to set a custom output filename."""),
         epilog=textwrap.dedent("""\
             examples:
               pyplanner planners/ff-2026
-                  Generate ff-2026.pdf in the current directory.
+                  Generate ff-2026.html in the current directory.
 
-              pyplanner planners/ff-2026 --html
-                  Generate ff-2026.html instead of PDF.
+              pyplanner planners/ff-2026 --pdf
+                  Generate ff-2026.pdf instead of HTML.
 
-              pyplanner planners/ff-2026 -o planner.pdf
-                  Generate PDF with a custom output filename.
+              pyplanner planners/ff-2026 -o planner.html
+                  Generate HTML with a custom output filename.
 
               pyplanner planners/ff-2026 --country pl
-                  Generate PDF with Polish public holidays.
+                  Generate HTML with Polish public holidays.
 
               pyplanner planners/ff-2026 --country us
                   Holidays for the US; week starts on Sunday.
@@ -55,16 +55,15 @@ def main(argv: list[str] | None = None) -> None:
     )
     fmt = parser.add_mutually_exclusive_group()
     fmt.add_argument(
-        "--html",
-        action="store_true", help="generate HTML output instead of PDF"
+        "--html", action="store_true", help="generate HTML output (the default)"
     )
     fmt.add_argument(
-        "--pdf", action="store_true", help="generate PDF output (the default)"
+        "--pdf", action="store_true", help="generate PDF output instead of HTML"
     )
     parser.add_argument(
         "-o", "--output", default=None, metavar="FILE",
-        help="output filename (default: <template_stem>.pdf or "
-             "<template_stem>.html depending on format)"
+        help="output filename (default: <template_stem>.html or "
+             "<template_stem>.pdf depending on format)"
     )
     parser.add_argument(
         "--opt", action=argparse.BooleanOptionalAction, default=True,
@@ -116,6 +115,9 @@ def main(argv: list[str] | None = None) -> None:
     if args.watch and args.pdf:
         parser.error("--watch cannot be combined with --pdf")
     if args.watch:
+        args.html = True
+
+    if not args.html and not args.pdf:
         args.html = True
 
     if args.file.is_dir():

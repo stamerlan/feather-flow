@@ -316,7 +316,7 @@ should now look like this:
 
 Regenerate::
 
-    pyplanner planners/mini-planner --html
+    pyplanner planners/mini-planner
 
 The output should look the same as before, but the template is now shorter and
 easier to maintain. The ``day_color`` macro can be reused on day pages later.

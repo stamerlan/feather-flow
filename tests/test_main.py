@@ -1,7 +1,5 @@
-from unittest.mock import patch, MagicMock
-
+from unittest.mock import patch
 import pytest
-
 from pyplanner.__main__ import main
 
 
@@ -77,18 +75,13 @@ def test_default_html_filename(simple_template, tmp_path, monkeypatch):
     assert out.exists()
 
 
-def test_no_flags_generates_pdf_by_default(simple_template):
-    """No --html/--pdf flag generates PDF by default."""
-    with patch("pyplanner.__main__.Planner") as mock_planner_cls, \
-         patch("pyplanner.__main__.optimize", side_effect=lambda d: d):
-        mock_instance = MagicMock()
-        mock_instance.pdf.return_value = b"%PDF-1.4"
-        mock_planner_cls.return_value = mock_instance
-
-        with patch("builtins.open", MagicMock()):
-            main([str(simple_template), "-q"])
-
-        mock_instance.pdf.assert_called_once_with()
+def test_no_flags_generates_html_by_default(simple_template, tmp_path):
+    """No --html/--pdf flag generates HTML by default."""
+    out = tmp_path / "out.html"
+    main([str(simple_template), "-o", str(out), "-q"])
+    assert out.exists()
+    content = out.read_text(encoding="utf-8")
+    assert "2026" in content
 
 
 def test_country_sets_provider(simple_template, tmp_path):

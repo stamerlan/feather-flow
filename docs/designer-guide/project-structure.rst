@@ -67,27 +67,26 @@ When you run pyplanner it follows these steps:
    evaluated and plain HTML is produced.
 4. **Write the output** to the current working directory.
 
-   * ``--html`` flag - writes an ``.html`` file you can open in any browser.
-   * ``--pdf`` flag (the default) - opens the HTML in a headless Chromium
-     browser and prints it to PDF. Asset paths are resolved relative to the
-     template's directory so the PDF is correct regardless of where you run the
-     command.
+   * ``--html`` flag (the default) - writes an ``.html`` file you can open in
+     any browser.
+   * ``--pdf`` flag - opens the HTML in a headless Chromium browser and prints
+     it to PDF. Asset paths are resolved relative to the template's directory so
+     the PDF is correct regardless of where you run the command.
 
 ::
 
     planners/my-planner/
     |-- my-planner.html  --+
-    +-- assets/            |   +----------+   +---------------+
-        |-- my.css         +-->| pyplanner |-->| my-planner.pdf|
-        +-- back.png           +----------+   +---------------+
-                               (Jinja2 +       (in current
-                                Playwright)     directory)
+    +-- assets/            |   +-----------+   +----------------+
+        |-- my.css         +-->| pyplanner |-->| my-planner.html|
+        +-- back.png           +-----------+   +----------------+
+                               (Jinja2)        (in current directory)
 
 .. warning::
 
    The output files are written to the directory where you run the command. If
-   you run ``pyplanner --html my-planner.html`` from the planner directory, the
-   output lands in the planner directory and overwrites the template file.
+   you run ``pyplanner my-planner.html`` from the planner directory, the output
+   lands in the planner directory and overwrites the template file.
 
 
 What is next

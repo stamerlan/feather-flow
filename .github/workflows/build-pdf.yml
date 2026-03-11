@@ -43,7 +43,7 @@ jobs:
 
       - name: Generate PDF
         run: >
-          pyplanner planners/ff-2026 --country ${{ matrix.country }}
+          pyplanner planners/ff-2026 --pdf --country ${{ matrix.country }}
           ${{ matrix.lang && format('--lang {0}', matrix.lang) || '' }}
           -o ${{ matrix.output }}
 

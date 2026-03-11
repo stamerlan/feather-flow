@@ -313,7 +313,7 @@ The cover shows both the month name and the year dynamically:
 
 Regenerate and check::
 
-    pyplanner planners/mini-planner --html
+    pyplanner planners/mini-planner
 
 The title should now read "Mini Planner - January 2026".
 

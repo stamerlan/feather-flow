@@ -320,7 +320,7 @@ update automatically.
 
 Regenerate::
 
-    pyplanner planners/mini-planner --html
+    pyplanner planners/mini-planner
 
 You should see 33 pages: 1 cover + 1 month calendar + 31 day pages. Each day
 page has a square grid background and a header with the day number, month name
