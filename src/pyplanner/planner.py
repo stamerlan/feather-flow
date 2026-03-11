@@ -1,12 +1,62 @@
 import os
 import pathlib
+import re
 from urllib.parse import unquote, urlparse
 
 import jinja2
 from playwright.sync_api import Route, sync_playwright
 
 from .calendar import Calendar
+from .lang import Lang
+from .pdfbookmarks import add_bookmarks
 from .tracker import tracker
+
+
+def _add_pdf_bookmarks(
+    pdf_bytes: bytes, page_ids: list[str | None], calendar: Calendar
+) -> bytes:
+    """Build year and month bookmarks from page IDs.
+
+    Scans *page_ids* for year (``YYYY``) and month (``YYYY-MM``) entries,
+    resolves localized month names via *calendar*, and calls
+    :func:`add_bookmarks` to insert a two-level outline.
+
+    :param pdf_bytes: Raw PDF content.
+    :param page_ids: List of page IDs extracted from the HTML.
+    :param calendar: :class:`~pyplanner.calendar.Calendar` instance used for
+        resolving localized month names.
+    :returns: PDF bytes with bookmarks added.
+    """
+    years: list[tuple[str, int]] = []
+    months: dict[str, list[tuple[str, int]]] = {}
+    month_names = Lang.get(calendar.lang).month_names
+
+    pattern = re.compile(r"^(?P<year>\d{4})(-(?P<month>\d{2}))?$")
+
+    for page_nr, page_id in enumerate(page_ids):
+        if not page_id:
+            continue
+
+        match = pattern.match(page_id)
+        if match is None:
+            continue
+
+        try:
+            year  = match.group("year")
+            month = match.group("month")
+            if month is None:
+                years.append((year, page_nr))
+            else:
+                month_name = month_names[int(month) - 1]
+                months.setdefault(year, []).append((month_name, page_nr))
+        except ValueError:
+            continue
+
+    if years:
+        pdf_bytes = add_bookmarks(pdf_bytes, years)
+    for yr, items in sorted(months.items()):
+        pdf_bytes = add_bookmarks(pdf_bytes, items, parent=[yr])
+    return pdf_bytes
 
 
 def _asset_route(r: Route) -> None:
@@ -104,9 +154,17 @@ class Planner:
                 page.route("file://**/*", _asset_route)
                 page.set_content(html, wait_until="load")
                 page.evaluate("() => document.fonts.ready")
+                page_ids: list[str | None] = page.evaluate(
+                    "() => Array.from("
+                    "document.querySelectorAll('.page'))"
+                    ".map(element => element.id || null)"
+                )
             with tracker().job("Print page to PDF"):
                 pdf = page.pdf(print_background=True, prefer_css_page_size=True)
 
             browser.close()
+
+        with tracker().job("Add bookmarks"):
+            pdf = _add_pdf_bookmarks(pdf, page_ids, self.calendar)
 
         return bytes(pdf)

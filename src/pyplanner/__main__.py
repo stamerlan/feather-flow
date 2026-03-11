@@ -182,7 +182,7 @@ def main(argv: list[str] | None = None) -> None:
         ):
             f.write(planner.html(base=base))
     else:
-        total = 5 if args.opt else 4
+        total = 6 if args.opt else 5
         with tracker(f"Generating {output}", total=total):
             pdf_bytes = planner.pdf()
             if args.opt:
