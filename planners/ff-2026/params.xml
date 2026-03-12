@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<params>
+  <year type="int" help="Planner year">2026</year>
+  <page_pattern help="Day page pattern (dots, lines, squared, isometric, blank)">
+    dots
+  </page_pattern>
+  <patterns help="SVG pattern definitions">
+    <dots help="Dotted grid"><![CDATA[
+      <svg xmlns="http://www.w3.org/2000/svg"
+           width="210mm" height="297mm" viewBox="0 0 210 297">
+        <defs>
+          <pattern id="d" width="2.116666" height="9.058333"
+                   patternUnits="userSpaceOnUse">
+            <circle cx="0.5291665" cy="0.5291665" r="0.15875" fill="#404040"/>
+          </pattern>
+        </defs>
+        <rect x="5" y="40" width="200" height="247" fill="url(#d)"/>
+      </svg>
+    ]]></dots>
+    <lines help="Horizontal ruled lines"><![CDATA[
+      <svg xmlns="http://www.w3.org/2000/svg"
+           width="210mm" height="297mm" viewBox="0 0 210 297">
+        <defs>
+          <pattern id="d" width="10" height="9" patternUnits="userSpaceOnUse">
+            <line x1="0" y1="9" x2="10" y2="9"
+                  stroke="#c0c0c0" stroke-width="0.2"
+            />
+          </pattern>
+        </defs>
+        <rect x="5" y="40" width="200" height="247" fill="url(#d)"/>
+      </svg>
+    ]]></lines>
+    <squared help="Square grid"><![CDATA[
+      <svg xmlns="http://www.w3.org/2000/svg"
+           width="210mm" height="297mm" viewBox="0 0 210 297">
+        <defs>
+          <pattern id="d" width="5" height="5" patternUnits="userSpaceOnUse">
+            <path d="M 5 0 L 0 0 0 5" fill="none"
+                  stroke="#c0c0c0" stroke-width="0.2"
+            />
+          </pattern>
+        </defs>
+        <!-- +0.1 = half stroke-width, captures closing edge strokes -->
+        <rect x="5" y="40" width="200.1" height="245.1" fill="url(#d)"/>
+      </svg>
+    ]]></squared>
+    <isometric help="Isometric dot grid"><![CDATA[
+      <svg xmlns="http://www.w3.org/2000/svg"
+           width="210mm" height="297mm" viewBox="0 0 210 297">
+        <defs>
+          <pattern id="d" width="10" height="8.66"
+                   patternUnits="userSpaceOnUse">
+            <circle cx="0"  cy="0"    r="0.2" fill="#c0c0c0"/>
+            <circle cx="10" cy="0"    r="0.2" fill="#c0c0c0"/>
+            <circle cx="5"  cy="4.33" r="0.2" fill="#c0c0c0"/>
+            <circle cx="0"  cy="8.66" r="0.2" fill="#c0c0c0"/>
+            <circle cx="10" cy="8.66" r="0.2" fill="#c0c0c0"/>
+          </pattern>
+        </defs>
+        <rect x="4.8" y="40" width="200.4" height="247" fill="url(#d)"/>
+      </svg>
+    ]]></isometric>
+    <blank type="str" help="No pattern"/>
+  </patterns>
+</params>

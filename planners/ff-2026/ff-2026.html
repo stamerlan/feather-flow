@@ -1,4 +1,4 @@
-%% set year = calendar.year(2026)
+%% set year = calendar.year(params.year)
 %% set month_backgrounds = (
   "assets/jan.png", "assets/feb.png", "assets/mar.png",
   "assets/apr.png", "assets/may.png", "assets/jun.png",
@@ -6,8 +6,8 @@
   "assets/oct.png", "assets/nov.png", "assets/dec.png",
 )
 
-%% macro day_style(day)
-  {% if day.is_off_day %}color: #C00000{% endif %}
+%% macro day_off(day)
+{%- if day.is_off_day %} class="off-day"{%- endif -%}
 %% endmacro
 
 %% macro month_table(month)
@@ -15,7 +15,7 @@
     <tr>
       %% for day in week
         %% if day is not none
-          <td style="{{ day_style(day) }}"><a href="#{{ day.id }}">{{ day }}</a></td>
+          <td{{ day_off(day) }}><a href="#{{ day.id }}">{{ day }}</a></td>
         %% else
           <td></td>
         %% endif
@@ -57,7 +57,7 @@
           <thead>
             <tr>
               %% for day in calendar.weekdays
-              <th style="{{ day_style(day) }}">{{ day.letter }}</th>
+              <th{{ day_off(day) }}>{{ day.letter }}</th>
               %% endfor
             </tr>
           </thead>
@@ -84,7 +84,7 @@
       <thead>
         <tr>
           %% for day in calendar.weekdays
-          <th style="{{ day_style(day) }}">{{ day.short_name }}</th>
+          <th{{ day_off(day) }}>{{ day.short_name }}</th>
           %% endfor
         </tr>
       </thead>
@@ -98,25 +98,21 @@
   <div class="page" id="{{ day.id }}">
     <img class="background" src="{{ base }}/assets/day.png" style="z-index: -2;">
 
-    <!-- Dotted lines to write on -->
+    %% set svg = params.patterns | attr(params.page_pattern)
+    %% if svg
     <div class="background" style="z-index: -1;">
-      <svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm" viewBox="0 0 210 297">
-        <defs>
-          <!-- Dot spacing: 8px horizontal, 4px line height + 8mm between lines (8px ~ 2.117mm) -->
-          <pattern id="d" width="2.116666" height="9.058333" patternUnits="userSpaceOnUse">
-            <circle cx="0.5291665" cy="0.5291665" r="0.15875" fill="#404040"/>
-          </pattern>
-        </defs>
-        <!-- A4 with padding: top 40mm, bottom 10mm, left/right 5mm. Dots only in content area. -->
-        <rect x="5" y="40" width="200" height="247" fill="url(#d)"/>
-      </svg>
+      {{ svg | safe }}
     </div>
+    %% endif
 
     <div class="day-header">
       <div class="day-header-date">
         <p class="day-header-day">{{ day }}</p>
         <p class="day-header-month">{{ month }}</p>
-        <p class="day-header-weekday" style="{{ day_style(day) }}">{{ day.weekday }}</p>
+        <p class="day-header-weekday
+          {%- if day.is_off_day %} off-day{%- endif %}">
+          {{- day.weekday }}
+        </p>
       </div>
 
       <div class="day-header-tables">

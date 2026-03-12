@@ -20,9 +20,11 @@ jobs:
             output: ff-2026-pl.pdf
           - country: by
             lang: ru
+            defines: page_pattern=squared
             output: ff-2026-by.pdf
           - country: us
             output: ff-2026-us.pdf
+            defines: page_pattern=lines
           - country: kr
             lang: kr
             output: ff-2026-kr.pdf
@@ -45,6 +47,7 @@ jobs:
         run: >
           pyplanner planners/ff-2026 --pdf --country ${{ matrix.country }}
           ${{ matrix.lang && format('--lang {0}', matrix.lang) || '' }}
+          ${{ matrix.defines && format('--define {0}', matrix.defines) || '' }}
           -o ${{ matrix.output }}
 
       - name: Upload PDF
