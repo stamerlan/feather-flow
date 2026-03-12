@@ -1,6 +1,7 @@
 import os
 import pathlib
 import re
+import types
 from urllib.parse import unquote, urlparse
 
 import jinja2
@@ -83,14 +84,20 @@ class Planner:
     :param path: Path to the Jinja2/HTML template file.
     :param calendar: :class:`~pyplanner.calendar.Calendar` instance used for
         template rendering.
+    :param params: Template parameters namespace. Passed to templates
+        as ``params``. Defaults to an empty namespace.
     """
 
     def __init__(self, path: str | os.PathLike[str],
                  calendar: Calendar | None = None,
+                 params: types.SimpleNamespace | None = None,
                  ) -> None:
         if calendar is None:
             calendar = Calendar()
+        if params is None:
+            params = types.SimpleNamespace()
         self.calendar = calendar
+        self.params = params
         self.path = pathlib.Path(path).absolute()
 
         self._env = jinja2.Environment(
@@ -120,6 +127,7 @@ class Planner:
             base=base,
             calendar=self.calendar,
             lang=self.calendar.lang,
+            params=self.params,
         ))
 
     def pdf(self, base: str | None = None) -> bytes:
@@ -137,6 +145,7 @@ class Planner:
                 base=base,
                 calendar=self.calendar,
                 lang=self.calendar.lang,
+                params=self.params,
             )
 
         with sync_playwright() as p:

@@ -41,13 +41,16 @@ def watch(
     output: str | os.PathLike[str],
     base: str | None = None,
     *,
+    defines: list[str] | None = None,
     verbose: bool = False,
 ) -> None:
     """Watch template directory and rebuild on changes.
 
     Starts a livereload server that monitors the planner template directory.
     On each change the HTML output is regenerated and connected browsers
-    reload automatically.
+    reload automatically. When a ``params.xml`` file exists next to the template
+    it is reloaded on every regeneration so that parameter changes take effect
+    immediately.
 
     .. warning::
 
@@ -70,22 +73,21 @@ def watch(
         parameter is used to provide a base URI relative to the output
         directory. In this case, both live reloading and preview in browser will
         work.
-    :param base: Base URL used to resolve assets paths. If not provided,
-        the planner directory is used relative to output directory. During live
-        reloading, browser doesn't generate requests for file:// URLs. This
-        parameter is used to provide a base URI relative to the output
-        directory. In this case, both live reloading and preview in browser will
-        work.
+    :param defines: ``-D`` overrides to re-apply on each reload.
     :param verbose: Show browser and rebuild events.
     """
     from livereload import Server
+    from .params import Params
 
     output = pathlib.Path(output).resolve()
+    params_xml = planner.path.parent / "params.xml"
     if base is None:
         base = "."
 
     def regenerate() -> None:
         try:
+            if params_xml.exists():
+                planner.params = Params.load_xml(params_xml).apply(defines)
             html = planner.html(base)
             with output.open("w", encoding="utf-8") as f:
                 f.write(html)

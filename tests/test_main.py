@@ -187,3 +187,106 @@ def test_russian_language(simple_template, tmp_path):
         "--lang", "ru", "-q",
     ])
     assert out.exists()
+
+
+def test_define_overrides_param(tmp_path):
+    """-D accent=#FFF overrides the template parameter."""
+    tpl = tmp_path / "tpl.html"
+    tpl.write_text(
+        '<p>{{ params.accent }}</p>',
+        encoding="utf-8",
+    )
+    xml = tmp_path / "params.xml"
+    xml.write_text(
+        '<params>'
+        '  <accent help="Color">#000</accent>'
+        '</params>',
+        encoding="utf-8",
+    )
+    out = tmp_path / "out.html"
+    main([
+        str(tpl), "--html", "-o", str(out), "-q",
+        "-D", "accent=#FFF",
+    ])
+    content = out.read_text(encoding="utf-8")
+    assert "<p>#FFF</p>" in content
+
+
+def test_define_dotted_namespace(tmp_path):
+    """-D with dot notation overrides nested params."""
+    tpl = tmp_path / "tpl.html"
+    tpl.write_text(
+        '<p>{{ params.colors.primary }}</p>',
+        encoding="utf-8",
+    )
+    xml = tmp_path / "params.xml"
+    xml.write_text(
+        '<params>'
+        '  <colors>'
+        '    <primary help="Primary">#000</primary>'
+        '  </colors>'
+        '</params>',
+        encoding="utf-8",
+    )
+    out = tmp_path / "out.html"
+    main([
+        str(tpl), "--html", "-o", str(out), "-q",
+        "-D", "colors.primary=#F00",
+    ])
+    content = out.read_text(encoding="utf-8")
+    assert "<p>#F00</p>" in content
+
+
+def test_define_without_params_xml_errors(simple_template):
+    """-D without params.xml next to template raises."""
+    with pytest.raises(SystemExit):
+        main([
+            str(simple_template), "--html", "-q",
+            "-D", "accent=#FFF",
+        ])
+
+
+def test_define_multiple_values(tmp_path):
+    """-D with multiple KEY=VALUE pairs in one flag."""
+    tpl = tmp_path / "tpl.html"
+    tpl.write_text(
+        '<p>{{ params.a }}-{{ params.b }}</p>',
+        encoding="utf-8",
+    )
+    xml = tmp_path / "params.xml"
+    xml.write_text(
+        '<params>'
+        '  <a help="A">x</a>'
+        '  <b help="B">y</b>'
+        '</params>',
+        encoding="utf-8",
+    )
+    out = tmp_path / "out.html"
+    main([
+        str(tpl), "--html", "-o", str(out), "-q",
+        "-D", "a=1", "b=2",
+    ])
+    content = out.read_text(encoding="utf-8")
+    assert "<p>1-2</p>" in content
+
+
+def test_no_define_uses_defaults(tmp_path):
+    """Without -D, template uses default values from params.xml."""
+    tpl = tmp_path / "tpl.html"
+    tpl.write_text(
+        '<p>{{ params.accent }}</p>',
+        encoding="utf-8",
+    )
+    xml = tmp_path / "params.xml"
+    xml.write_text(
+        '<params>'
+        '  <accent help="Color">#4A90D9</accent>'
+        '</params>',
+        encoding="utf-8",
+    )
+    out = tmp_path / "out.html"
+    main([
+        str(tpl), "--html", "-o", str(out), "-q",
+    ])
+    content = out.read_text(encoding="utf-8")
+    assert "<p>#4A90D9</p>" in content

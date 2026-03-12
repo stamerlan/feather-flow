@@ -38,5 +38,6 @@ rendering pipeline works.
    jinja2-loops-conditionals
    jinja2-macros
    data-reference
+   template-parameters
    assets-and-styling
    live-preview

@@ -1,6 +1,9 @@
+import types
+
 import pytest
 
 from pyplanner.calendar import Calendar
+from pyplanner.params import Params
 from pyplanner.planner import Planner, _asset_route
 
 
@@ -121,3 +124,55 @@ def test_asset_route_unix_path():
     route = _FakeRoute()
     _asset_route(route)
     assert route.fulfilled_path == "/home/user/assets/style.css"
+
+
+def test_html_renders_params(tmp_path):
+    """Planner passes params namespace into the template."""
+    tpl = tmp_path / "tpl.html"
+    tpl.write_text(
+        '<p>{{ params.accent }}</p>',
+        encoding="utf-8",
+    )
+    xml = tmp_path / "params.xml"
+    xml.write_text(
+        '<params>'
+        '  <accent help="Color">#4A90D9</accent>'
+        '</params>',
+        encoding="utf-8",
+    )
+    params = Params.load_xml(xml).apply()
+    planner = Planner(tpl, params=params)
+    html = planner.html()
+    assert "<p>#4A90D9</p>" in html
+
+
+def test_html_renders_nested_params(tmp_path):
+    """Planner renders nested namespace params."""
+    tpl = tmp_path / "tpl.html"
+    tpl.write_text(
+        '<p>{{ params.colors.primary }}</p>',
+        encoding="utf-8",
+    )
+    xml = tmp_path / "params.xml"
+    xml.write_text(
+        '<params>'
+        '  <colors>'
+        '    <primary help="Primary">#000</primary>'
+        '  </colors>'
+        '</params>',
+        encoding="utf-8",
+    )
+    params = Params.load_xml(xml).apply(["colors.primary=#F00"])
+    planner = Planner(tpl, params=params)
+    html = planner.html()
+    assert "<p>#F00</p>" in html
+
+
+def test_html_default_params_is_empty_namespace(tmp_path):
+    """Planner without params gets an empty SimpleNamespace."""
+    tpl = tmp_path / "tpl.html"
+    tpl.write_text("<html>ok</html>", encoding="utf-8")
+    planner = Planner(tpl)
+    assert isinstance(planner.params, types.SimpleNamespace)
+    html = planner.html()
+    assert "ok" in html

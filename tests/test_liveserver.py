@@ -243,3 +243,54 @@ def test_watch_base_is_dot_when_same_dir(
     planner_stub.html.assert_called_once()
     base = planner_stub.html.call_args[0][0]
     assert base == "."
+
+
+def test_watch_reloads_params_xml(tmp_path):
+    """watch() reloads params.xml on each regeneration."""
+    params_xml = tmp_path / "params.xml"
+    params_xml.write_text(
+        '<params>'
+        '  <accent help="Color">#000</accent>'
+        '</params>',
+        encoding="utf-8",
+    )
+
+    stub = MagicMock()
+    stub.html.return_value = "<html>ok</html>"
+    stub.path.parent = tmp_path
+
+    _run_watch(stub, tmp_path / "out.html")
+
+    assert stub.params.accent == "#000"
+
+
+def test_watch_reloads_params_with_defines(tmp_path):
+    """watch() applies -D overrides on each reload."""
+    params_xml = tmp_path / "params.xml"
+    params_xml.write_text(
+        '<params>'
+        '  <accent help="Color">#000</accent>'
+        '</params>',
+        encoding="utf-8",
+    )
+
+    stub = MagicMock()
+    stub.html.return_value = "<html>ok</html>"
+    stub.path.parent = tmp_path
+
+    _run_watch(
+        stub, tmp_path / "out.html",
+        defines=["accent=#FFF"],
+    )
+
+    assert stub.params.accent == "#FFF"
+
+
+def test_watch_no_params_xml_skips_reload(
+    planner_stub, tmp_path,
+):
+    """watch() without params.xml does not touch planner.params."""
+    original_params = planner_stub.params
+    _run_watch(planner_stub, tmp_path / "out.html")
+
+    assert planner_stub.params is original_params

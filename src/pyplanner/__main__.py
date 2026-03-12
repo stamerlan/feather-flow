@@ -2,12 +2,14 @@ import argparse
 import pathlib
 import sys
 import textwrap
+import types
 
 from . import __version__
 from .calendar import Calendar
 from .dayinfo import DayInfoProvider
 from .lang import Lang
 from .liveserver import watch
+from .params import Params
 from .pdfopt import optimize
 from .planner import Planner
 from .tracker import setup_tracker, tracker
@@ -43,7 +45,13 @@ def main(argv: list[str] | None = None) -> None:
                   Holidays for the US; week starts on Sunday.
 
               pyplanner planners/ff-2026 --watch
-                  Serve HTML with live reload on file changes."""),
+                  Serve HTML with live reload on file changes.
+
+              pyplanner planners/ff-2026 --pdf -D accent=#E74C3C
+                  Override the accent template parameter.
+
+              pyplanner planners/ff-2026 -D colors.primary=#000
+                  Override a nested template parameter."""),
     )
     parser.add_argument(
         "-v", "--version", action="version", version=f"%(prog)s {__version__}"
@@ -110,6 +118,12 @@ def main(argv: list[str] | None = None) -> None:
         help="print per-job durations after each stage; "
              "in --watch mode, also show livereload logs"
     )
+    parser.add_argument(
+        "-D", "--define", nargs="+", action="extend",
+        metavar="KEY=VALUE", default=[],
+        help="template parameter overrides (KEY=VALUE); use dot notation for "
+             "nested params (e.g. colors.primary=#FFF)"
+    )
     args = parser.parse_args(argv)
 
     if args.watch and args.pdf:
@@ -129,6 +143,16 @@ def main(argv: list[str] | None = None) -> None:
         output = args.output or f"{args.file.stem}.html"
     else:
         output = args.output or f"{args.file.stem}.pdf"
+
+    params_xml = args.file.parent / "params.xml"
+    if params_xml.exists():
+        params = Params.load_xml(params_xml).apply(args.define)
+    else:
+        if args.define:
+            parser.error(
+                "-D/--define requires a params.xml next to the template"
+            )
+        params = types.SimpleNamespace()
 
     dayinfo: DayInfoProvider | None = None
     if args.country:
@@ -168,11 +192,11 @@ def main(argv: list[str] | None = None) -> None:
         firstweekday=firstweekday, provider=dayinfo, lang=args.lang,
         country=args.country
     )
-    planner = Planner(args.file, calendar=calendar)
+    planner = Planner(args.file, calendar=calendar, params=params)
     setup_tracker(quiet=args.quiet, verbose=args.verbose)
 
     if args.watch:
-        watch(planner, output, verbose=args.verbose)
+        watch(planner, output, defines=args.define, verbose=args.verbose)
     elif args.html:
         outdir = pathlib.Path(output).resolve().parent
         template_dir = args.file.parent.resolve()

@@ -24,6 +24,7 @@ All assets go in the ``assets/`` subfolder inside the planner directory::
     planners/
     +-- mini-planner/
         |-- mini-planner.html
+        |-- params.xml
         +-- assets/
             |-- cover.png
             |-- mini-planner.css

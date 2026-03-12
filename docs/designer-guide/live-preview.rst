@@ -123,8 +123,10 @@ You have completed the Designer Guide. Here is a recap of what you learned:
 5. **Macros** - reusable blocks with ``macro``/``endmacro``.
 6. **Data reference** - ``calendar``, Year, Month, Day, WeekDay and all their
    properties.
-7. **Assets** - path rules, CSS patterns, custom fonts.
-8. **Live preview** - ``pyplanner --watch`` for fast iteration with any editor
+7. **Template parameters** - declaring typed parameters in ``params.xml`` and
+   overriding them with ``-D`` from the command line.
+8. **Assets** - path rules, CSS patterns, custom fonts.
+9. **Live preview** - ``pyplanner --watch`` for fast iteration with any editor
    and browser.
 
 Try changing colors, fonts or layouts in the Mini Planner. When you are

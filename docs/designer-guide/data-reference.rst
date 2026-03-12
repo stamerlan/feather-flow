@@ -8,8 +8,8 @@ produce. Keep it open while you design - it answers "what can I put inside
 
 **Key topics**
 
-* The variables injected into every template (``base``, ``calendar`` and
-  ``lang``).
+* The variables injected into every template (``base``, ``calendar``, ``lang``
+  and ``params``).
 * Year, Month, Day, WeekDay objects and their properties.
 * The ``month.table`` grid explained visually.
 * String representation shortcuts.
@@ -46,6 +46,13 @@ pyplanner passes these variables to your template:
        set by ``--lang``. ``"ko"`` is accepted as an alias for ``"kr"`` and
        resolves to the same value. Use the variable to apply language-specific
        CSS such as font families, font sizes or layout adjustments.
+   * - ``params``
+     - namespace
+     - Template parameters loaded from ``params.xml``. Access values with dot
+       notation: ``{{ params.accent }}``, ``{{ params.colors.primary }}``.
+       Defaults to an empty namespace when no ``params.xml`` exists. See
+       :doc:`template-parameters` for details on declaring and overriding
+       parameters.
 
 
 Calendar
@@ -412,6 +419,11 @@ Quick cheat sheet
 
     lang                 -> "en"  (set by --lang)
 
+    params               -> namespace from params.xml
+      .year              -> 2026  (example int param)
+      .accent            -> "#4A90D9"  (example str param)
+      .colors.primary    -> "#000"  (nested namespace)
+
     calendar
       .year(2026)        -> Year
       .weekdays          -> (Mon, Tue, ..., Sun)  *rotated by --first-weekday*
@@ -454,5 +466,5 @@ Quick cheat sheet
 What is next
 ------------
 
-Continue to :doc:`assets-and-styling` to learn how to manage stylesheets, images
-and fonts in your template.
+Continue to :doc:`template-parameters` to learn how to declare customizable
+parameters for your template.
