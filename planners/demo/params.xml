@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<params>
+  <year type="int" help="Planner year">2026</year>
+  <month type="int" help="Month (1=January, 12=December)">1</month>
+  <day_off_color help="Color for off-day and weekend text">
+  #C00000
+  </day_off_color>
+</params>

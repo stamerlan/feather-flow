@@ -268,12 +268,11 @@ Use ``##`` or ``{# #}`` for notes to yourself. Use ``<!-- -->`` only if you want
 the comment to survive into the final HTML.
 
 
-Update the Mini Planner
+Update the Demo Planner
 -----------------------
 
-Open ``planners/mini-planner/mini-planner.html`` and add variables for the year
-and the month.
-Our Mini Planner covers a single month, so we pick January (``year.months[0]``).
+Open ``planners/demo/demo.html`` and add variables for the year and the month.
+Our Demo Planner covers a single month, so we pick January (``year.months[0]``).
 The cover shows both the month name and the year dynamically:
 
 .. code-block:: html+jinja
@@ -305,7 +304,7 @@ The cover shows both the month name and the year dynamically:
      <div class="page">
        <img class="back" src="{{ base }}/assets/cover.png">
        <h1 style="text-align: center; padding-top: 70mm;">
-         Mini Planner - {{ month }} {{ year }}
+         Demo Planner - {{ month }} {{ year }}
        </h1>
      </div>
    </body>
@@ -313,11 +312,11 @@ The cover shows both the month name and the year dynamically:
 
 Regenerate and check::
 
-    pyplanner planners/mini-planner
+    pyplanner planners/demo
 
-The title should now read "Mini Planner - January 2026".
+The title should now read "Demo Planner - January 2026".
 
-.. image:: ../images/mini-planner-year-title.png
+.. image:: ../images/demo-year-title.png
    :width: 60%
    :align: center
 

@@ -309,12 +309,12 @@ Do and don't summary
      - Forget ``%% endif``.
 
 
-Update the Mini Planner
+Update the Demo Planner
 -----------------------
 
 Add a second page that shows a calendar table for the month. Open
-``planners/mini-planner/mini-planner.html`` and add the following
-after the cover page div (before ``</body>``):
+``planners/demo/demo.html`` and add the following after the cover page div
+(before ``</body>``):
 
 .. code-block:: html+jinja
 
@@ -336,7 +336,7 @@ after the cover page div (before ``</body>``):
          <tr>
            %% for wd in calendar.weekdays
            %% if wd.is_off_day
-           <th style="color: red;">{{ wd.short_name }}</th>
+           <th style="color: #C00000;">{{ wd.short_name }}</th>
            %% else
            <th>{{ wd.short_name }}</th>
            %% endif
@@ -368,11 +368,11 @@ This uses three nested concepts you learned on this page:
 
 Regenerate::
 
-    pyplanner planners/mini-planner
+    pyplanner planners/demo
 
 You should now see two pages - the cover and a month calendar.
 
-.. image:: ../images/mini-planner-month-cal.png
+.. image:: ../images/demo-month-cal.png
    :width: 60%
    :align: center
 

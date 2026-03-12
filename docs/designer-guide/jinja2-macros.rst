@@ -222,11 +222,11 @@ Do and don't summary
      - Forget ``endmacro`` - the template will not render.
 
 
-Update the Mini Planner
+Update the Demo Planner
 -----------------------
 
 Refactor the month calendar from the previous page. Move the off-day styling
-and the table rows into macros. Your ``planners/mini-planner/mini-planner.html``
+and the table rows into macros. Your ``planners/demo/demo.html``
 should now look like this:
 
 .. code-block:: html+jinja
@@ -279,7 +279,7 @@ should now look like this:
      <div class="page">
        <img class="back" src="{{ base }}/assets/cover.png">
        <h1 style="text-align: center; padding-top: 70mm;">
-         Mini Planner - {{ month }} {{ year }}
+         Demo Planner - {{ month }} {{ year }}
        </h1>
      </div>
 
@@ -316,7 +316,7 @@ should now look like this:
 
 Regenerate::
 
-    pyplanner planners/mini-planner
+    pyplanner planners/demo
 
 The output should look the same as before, but the template is now shorter and
 easier to maintain. The ``day_color`` macro can be reused on day pages later.

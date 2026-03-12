@@ -18,9 +18,9 @@ Start the live-reload server
 
 From the repository root run::
 
-    pyplanner planners/mini-planner --watch
+    pyplanner planners/demo --watch
 
-pyplanner generates ``mini-planner.html``, starts a local server and prints the
+pyplanner generates ``demo.html``, starts a local server and prints the
 address::
 
     Serving on http://127.0.0.1:5500
@@ -35,7 +35,7 @@ The edit - save - reload loop
 
 With the server running your workflow looks like this:
 
-1. **Edit** the template ``planners/mini-planner/mini-planner.html`` or any
+1. **Edit** the template ``planners/demo/demo.html`` or any
    asset (CSS, images) in any editor you like.
 
 2. **Save** the file.
@@ -129,7 +129,7 @@ You have completed the Designer Guide. Here is a recap of what you learned:
 9. **Live preview** - ``pyplanner --watch`` for fast iteration with any editor
    and browser.
 
-Try changing colors, fonts or layouts in the Mini Planner. When you are
+Try changing colors, fonts or layouts in the Demo Planner. When you are
 comfortable, create your own template from scratch.
 
 Happy designing!

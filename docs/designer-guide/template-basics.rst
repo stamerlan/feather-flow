@@ -2,7 +2,7 @@ Template Basics
 ===============
 
 This page shows the minimal HTML structure every Feather Flow template needs.
-You will create the first file of the Mini Planner running example - a single
+You will create the first file of the Demo Planner running example - a single
 cover page with a background image and a title.
 
 **Key topics**
@@ -17,10 +17,10 @@ cover page with a background image and a title.
 Minimal template
 ----------------
 
-Create a new file ``planners/mini-planner/mini-planner.html`` with the following
-content. The ``planners/mini-planner/`` directory and its ``assets/`` subfolder
-already exist in the repository with pre-made background images. Our Mini
-Planner uses half-letter paper (5.5 x 8.5 in):
+Create a new file ``planners/demo/demo.html`` with the following content. The
+``planners/demo/`` directory and its ``assets/`` subfolder already exist in the
+repository with pre-made background images. Our Demo Planner uses half-letter
+paper (5.5 x 8.5 in):
 
 .. code-block:: html+jinja
 
@@ -43,7 +43,7 @@ Planner uses half-letter paper (5.5 x 8.5 in):
    <body>
      <div class="page">
        <h1 style="text-align: center; padding-top: 70mm;">
-         Mini Planner
+         Demo Planner
        </h1>
      </div>
    </body>
@@ -128,7 +128,7 @@ Add this rule to the ``<style>`` block and then use it inside a ``.page`` div:
    <div class="page">
      <img class="back" src="{{ base }}/assets/cover.png">
      <h1 style="text-align: center; padding-top: 70mm;">
-       Mini Planner
+       Demo Planner
      </h1>
    </div>
 
@@ -147,7 +147,7 @@ with ``{{ base }}/`` so that the browser can find the file:
 
 .. code-block:: html+jinja
 
-   <link rel="stylesheet" href="{{ base }}/assets/mini-planner.css">
+   <link rel="stylesheet" href="{{ base }}/assets/demo.css">
 
 The ``assets/`` folder sits right next to the template inside the planner
 directory, so the path is simply ``assets/<filename>``.
@@ -160,12 +160,12 @@ Generate and preview
 
 From the repository root run::
 
-    pyplanner planners/mini-planner
+    pyplanner planners/demo
 
-A file called ``mini-planner.html`` (the rendered output) appears in the
-repository root. Open it in your browser.
+A file called ``demo.html`` (the rendered output) appears in the repository
+root. Open it in your browser.
 
-.. image:: ../images/mini-planner-cover.png
+.. image:: ../images/demo-cover.png
    :width: 60%
    :align: center
 
@@ -196,8 +196,8 @@ Do and don't
      - Keep hundreds of lines of CSS inline when a linked file would be cleaner.
 
 
-Current state of the Mini Planner
----------------------------------
+Current state of the Demo Planner
+----------------------------------
 
 After this page your template looks like this:
 
@@ -228,7 +228,7 @@ After this page your template looks like this:
      <div class="page">
        <img class="back" src="{{ base }}/assets/cover.png">
        <h1 style="text-align: center; padding-top: 70mm;">
-         Mini Planner
+         Demo Planner
        </h1>
      </div>
    </body>

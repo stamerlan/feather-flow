@@ -19,7 +19,7 @@ customize the planner from the command line without editing the template source.
 Why use parameters?
 -------------------
 
-Consider the off-day color in the Mini Planner. Without parameters you would
+Consider the off-day color in the Demo Planner. Without parameters you would
 hard-code it:
 
 .. code-block:: html+jinja
@@ -30,7 +30,7 @@ hard-code it:
 
 If a user wants red instead of dark red they have to open the template, find the
 color and change it. With parameters you declare the color in ``params.xml``,
-use ``{{ params.off_day_color }}`` in the template, and the user overrides it
+use ``{{ params.day_off_color }}`` in the template, and the user overrides it
 on the command line.
 
 
@@ -42,8 +42,8 @@ Create a file called ``params.xml`` in the same directory as the template:
 .. code-block:: text
 
    planners/
-     mini-planner/
-       mini-planner.html
+     demo/
+       demo.html
        params.xml           <-- new
        assets/
          ...
@@ -233,7 +233,7 @@ Access parameters with ``{{ params.name }}``:
    %% set year = calendar.year(params.year)
 
    %% macro day_style(day)
-     {% if day.is_off_day %}color: {{ params.off_day_color }}{% endif %}
+     {% if day.is_off_day %}color: {{ params.day_off_color }}{% endif %}
    %% endmacro
 
    <h1 style="color: {{ params.accent }};">
@@ -263,7 +263,7 @@ Template:
    %% set year = calendar.year(params.year)
 
    %% macro day_style(day)
-     {% if day.is_off_day %}color: {{ params.off_day_color }}{% endif %}
+     {% if day.is_off_day %}color: {{ params.day_off_color }}{% endif %}
    %% endmacro
 
    ...
@@ -281,25 +281,25 @@ pyplanner:
 
 .. code-block:: bash
 
-   pyplanner planners/mini-planner -D off_day_color=#E74C3C
+   pyplanner planners/demo -D day_off_color=#E74C3C
 
 Multiple parameters in one flag:
 
 .. code-block:: bash
 
-   pyplanner planners/mini-planner -D year=2027 off_day_color=#FF0000
+   pyplanner planners/demo -D year=2027 day_off_color=#FF0000
 
 Repeated ``-D`` flags work too:
 
 .. code-block:: bash
 
-   pyplanner planners/mini-planner -D year=2027 -D off_day_color=#FF0000
+   pyplanner planners/demo -D year=2027 -D day_off_color=#FF0000
 
 Use dot notation for nested parameters:
 
 .. code-block:: bash
 
-   pyplanner planners/mini-planner -D colors.accent=#000000
+   pyplanner planners/demo -D colors.accent=#000000
 
 pyplanner validates every ``-D`` override:
 
@@ -317,18 +317,18 @@ immediately:
 
 .. code-block:: bash
 
-   pyplanner planners/mini-planner --watch -D off_day_color=#FF0000
+   pyplanner planners/demo --watch -D day_off_color=#FF0000
 
 Any ``-D`` overrides you pass on the command line are re-applied after each
 reload.
 
 
-Update the Mini Planner
+Update the Demo Planner
 -----------------------
 
-Create ``planners/mini-planner/params.xml`` with two parameters - the planner
-year and the off-day color that was previously hard-coded in the ``day_color``
-macro:
+Create ``planners/demo/params.xml`` with three parameters - the planner year,
+the month and the off-day color that was previously hard-coded in the
+``day_color`` macro:
 
 .. code-block:: xml
 
@@ -341,17 +341,17 @@ macro:
      </day_off_color>
    </params>
 
-Open ``planners/mini-planner/mini-planner.html`` and replace the hard-coded
-year and color with parameter references. After this page your template should
-look like this:
+Open ``planners/demo/demo.html`` and replace the hard-coded year, month and
+color with parameter references. After this page your template should look like
+this:
 
 .. code-block:: html+jinja
 
    %% set year = calendar.year(params.year)
-   %% set month = year.months[0]
+   %% set month = year.months[params.month - 1]
 
    %% macro day_color(day)
-     {% if day.is_off_day %}{{ params.off_day_color }}{% else %}#000000{% endif %}
+     {% if day.is_off_day %}{{ params.day_off_color }}{% else %}#000000{% endif %}
    %% endmacro
 
    %% macro month_table(month)
@@ -395,7 +395,7 @@ look like this:
      <div class="page">
        <img class="back" src="{{ base }}/assets/cover.png">
        <h1 style="text-align: center; padding-top: 70mm;">
-         Mini Planner - {{ month }} {{ year }}
+         Demo Planner - {{ month }} {{ year }}
        </h1>
      </div>
 
@@ -430,23 +430,26 @@ look like this:
    </body>
    </html>
 
-Two lines changed compared to the previous version:
+Three lines changed compared to the previous version:
 
 1. ``calendar.year(2026)`` became ``calendar.year(params.year)`` - the year is
    now configurable.
-2. ``#C00000`` in ``day_color`` became ``{{ params.off_day_color }}`` - the
+2. ``year.months[0]`` became ``year.months[params.month - 1]`` - the month is
+   now configurable. We subtract 1 because the list is zero-indexed but the
+   parameter uses human-friendly numbering (1 = January).
+3. ``#C00000`` in ``day_color`` became ``{{ params.day_off_color }}`` - the
    color is now configurable.
 
 Regenerate with the defaults::
 
-    pyplanner planners/mini-planner
+    pyplanner planners/demo
 
-The output looks exactly the same as before. Now try overriding both
+The output looks exactly the same as before. Now try overriding all three
 parameters::
 
-    pyplanner planners/mini-planner -D year=2027 off_day_color=#0000CC
+    pyplanner planners/demo -D year=2027 month=6 day_off_color=#0000CC
 
-The cover now reads "Mini Planner - January 2027" and weekends appear in blue
+The cover now reads "Demo Planner - June 2027" and weekends appear in blue
 instead of dark red. The template itself did not change - only the command-line
 arguments did.
 

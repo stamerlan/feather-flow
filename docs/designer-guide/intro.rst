@@ -12,19 +12,30 @@ newer, a text editor you are comfortable with, and the Feather Flow repository
 cloned and set up. Follow the *Getting Started* section in the project
 :doc:`README </index>` to install the virtual environment and Playwright.
 
-Throughout the guide we build a small **Mini Planner** step by step - a
+Throughout the guide we build a small **Demo Planner** step by step - a
 simplified planner for a single month with a cover page, a month calendar and
 individual day pages. By the end you will have a working template you can extend
 into a full design.
 
 |year-title| |month-cal| |day-page|
 
-.. |year-title| image:: ../images/mini-planner-year-title.png
+.. |year-title| image:: ../images/demo-year-title.png
    :width: 25%
-.. |month-cal| image:: ../images/mini-planner-month-cal.png
+.. |month-cal| image:: ../images/demo-month-cal.png
    :width: 25%
-.. |day-page| image:: ../images/mini-planner-day-page.png
+.. |day-page| image:: ../images/demo-day-page.png
    :width: 25%
+
+The finished Demo Planner lives in ``planners/demo/``. To see the final result
+before you start, generate it with::
+
+    pyplanner planners/demo
+
+If you would like to follow the guide hands-on, delete everything in
+``planners/demo/`` except the ``assets/`` folder and build the template from
+scratch. You can always restore the original files with git::
+
+    git checkout -- planners/demo/
 
 Start with :doc:`project-structure` to learn where files live and how the
 rendering pipeline works.

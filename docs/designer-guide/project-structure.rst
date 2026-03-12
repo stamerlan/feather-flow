@@ -19,23 +19,19 @@ After you clone the repository you will see a structure like this::
 
     feather-flow/
     |-- planners/
-    |   +-- ff-2026/
-    |       |-- ff-2026.html
+    |   +-- demo/
+    |       |-- demo.html
     |       +-- assets/
-    |           |-- ff-2026.css
+    |           |-- calendar.png
     |           |-- cover.png
-    |           |-- year.png
-    |           |-- day.png
-    |           |-- jan.png
-    |           |-- ...
-    |           |-- cormorant-garamond.css
-    |           |-- cormorant-garamond-normal-latin.woff2
-    |           +-- cormorant-garamond-italic-latin.woff2
+    |           +-- page.png
     |
-    |-- src/pyplanner/           <-- Python source (you rarely
-    |   |-- ...                      need to touch this)
+    |-- src/pyplanner/          <-- Python source (you rarely need to touch
+    |   |-- ...                     this)
     |
     +-- docs/                   <-- Sphinx documentation
+    +-- tests/                  <-- Python tests (used only when files in
+        |-- ...                     src/pyplanner are changed)
 
 Each planner lives in its own self-contained directory under ``planners/``.
 The directory holds the Jinja2/HTML template and an ``assets/`` subfolder
@@ -75,18 +71,19 @@ When you run pyplanner it follows these steps:
 
 ::
 
-    planners/my-planner/
-    |-- my-planner.html  --+
-    +-- assets/            |   +-----------+   +----------------+
-        |-- my.css         +-->| pyplanner |-->| my-planner.html|
-        +-- back.png           +-----------+   +----------------+
-                               (Jinja2)        (in current directory)
+    planners/demo/
+    |-- demo.html    --+
+    +-- assets/        |   +-----------+   +----------------------+
+        |-- demo.css   +-->| pyplanner |-->|      demo.html       |
+        +-- cover.png      +-----------+   +----------------------+
+                             (Jinja2)       (in current directory)
 
 .. warning::
 
    The output files are written to the directory where you run the command. If
-   you run ``pyplanner my-planner.html`` from the planner directory, the output
-   lands in the planner directory and overwrites the template file.
+   you run ``pyplanner demo.html`` from the planner directory, the output lands
+   in the planner directory and overwrites the template file. Use ``-o`` to set
+   a custom output filename.
 
 
 What is next

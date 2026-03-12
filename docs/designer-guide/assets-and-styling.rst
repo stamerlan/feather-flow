@@ -22,12 +22,12 @@ Where assets live
 All assets go in the ``assets/`` subfolder inside the planner directory::
 
     planners/
-    +-- mini-planner/
-        |-- mini-planner.html
+    +-- demo/
+        |-- demo.html
         |-- params.xml
         +-- assets/
             |-- cover.png
-            |-- mini-planner.css
+            |-- demo.css
             +-- cormorant-garamond.woff2
 
 This layout matters because paths inside your template are resolved relative to
@@ -113,7 +113,7 @@ the ``back`` class:
 Key CSS patterns
 ----------------
 
-These are the essential CSS patterns every planner template needs. The Mini
+These are the essential CSS patterns every planner template needs. The Demo
 Planner already uses them in its ``<style>`` block.
 
 
@@ -259,11 +259,11 @@ Do and don't summary
      - Use TTF or OTF (larger files, slower loading).
 
 
-Update the Mini Planner
+Update the Demo Planner
 -----------------------
 
-Add day pages to the Mini Planner. Each day gets its own page with a background
-image and a header. Open ``planners/mini-planner/mini-planner.html`` and add
+Add day pages to the Demo Planner. Each day gets its own page with a background
+image and a header. Open ``planners/demo/demo.html`` and add
 the following after the month calendar div, just before ``</body>``:
 
 .. code-block:: html+jinja
@@ -321,13 +321,13 @@ update automatically.
 
 Regenerate::
 
-    pyplanner planners/mini-planner
+    pyplanner planners/demo
 
 You should see 33 pages: 1 cover + 1 month calendar + 31 day pages. Each day
 page has a square grid background and a header with the day number, month name
 and weekday.
 
-.. image:: ../images/mini-planner-day-page.png
+.. image:: ../images/demo-day-page.png
    :width: 60%
    :align: center
 

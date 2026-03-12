@@ -1,0 +1,121 @@
+%% set year = calendar.year(params.year)
+%% set month = year.months[params.month - 1]
+
+%% macro day_color(day)
+  {% if day.is_off_day %}{{ params.day_off_color }}{% else %}#000000{% endif %}
+%% endmacro
+
+%% macro month_table(month)
+  %% for week in month.table
+  <tr>
+    %% for day in week
+    %% if day is not none
+    <td style="color: {{ day_color(day) }}">{{ day }}</td>
+    %% else
+    <td></td>
+    %% endif
+    %% endfor
+  </tr>
+  %% endfor
+%% endmacro
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    @page { size: 139.7mm 215.9mm; margin: 0; }
+    html, body { margin: 0; padding: 0; height: 100%; }
+    .page {
+      position: relative;
+      width: 139.7mm; height: 215.9mm;
+      overflow: hidden;
+      page-break-after: always;
+      break-after: page;
+    }
+    .back {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover; z-index: -1;
+    }
+  </style>
+</head>
+<body>
+
+  ## -- Cover page --
+  <div class="page">
+    <img class="back" src="{{ base }}/assets/cover.png">
+    <h1 style="text-align: center; padding-top: 70mm;">
+      Demo Planner - {{ month }} {{ year }}
+    </h1>
+  </div>
+
+  ## -- Month calendar --
+  <div class="page" id="{{ month.id }}">
+    <img class="back" src="{{ base }}/assets/calendar.png">
+    <h2 style="text-align: center; margin-top: 15mm;
+               font-size: 22pt; letter-spacing: 5mm;">
+      {{ month }}
+    </h2>
+    <p style="text-align: center; font-size: 14pt;">
+      {{ year }}
+    </p>
+    <table style="width: calc(100% - 10mm);
+                  margin: 10mm 5mm 0 5mm;
+                  border-collapse: collapse;
+                  font-size: 14pt; text-align: center;
+                  table-layout: fixed;">
+      <thead>
+        <tr>
+          %% for wd in calendar.weekdays
+          <th style="color: {{ day_color(wd) }}">{{ wd.short_name }}</th>
+          %% endfor
+        </tr>
+      </thead>
+      <tbody>
+        {{ month_table(month) }}
+      </tbody>
+    </table>
+  </div>
+
+  ## -- Day pages --
+  %% for day in month.days
+  <div class="page" id="{{ day.id }}">
+
+    <img class="back" src="{{ base }}/assets/page.png"
+         style="z-index: -2;">
+
+    <div class="back">
+      <svg xmlns="http://www.w3.org/2000/svg"
+           width="139.7mm" height="215.9mm"
+           viewBox="0 0 139.7 215.9">
+        <defs>
+          <pattern id="grid" width="5" height="5"
+                   patternUnits="userSpaceOnUse">
+            <path d="M 5 0 L 0 0 0 5"
+                  fill="none" stroke="#c0c0c0"
+                  stroke-width="0.2"/>
+          </pattern>
+        </defs>
+        <rect x="10" y="25" width="120.1" height="180.1"
+              fill="url(#grid)"/>
+      </svg>
+    </div>
+
+    <div style="margin: 5mm; font-style: italic;">
+      <p style="font-size: 18pt; font-weight: bold;
+                margin: 0;">
+        {{ day }}
+      </p>
+      <p style="font-size: 12pt; margin: 0;">
+        {{ month }}
+      </p>
+      <p style="font-size: 10pt; margin: 0; opacity: 0.75; color: {{- day_color(day) }};">
+        {{ day.weekday }}
+      </p>
+    </div>
+  </div>
+  %% endfor
+
+</body>
+</html>
