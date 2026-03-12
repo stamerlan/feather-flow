@@ -22,13 +22,13 @@ HTML/CSS, feed them to **pyplanner**, and get a print-ready PDF.
 
 |cover| |year| |month| |day|
 
-.. |cover| image:: docs/images/cover-page.png
+.. |cover| image:: docs/images/ff-2026-cover.png
    :width: 24%
-.. |year| image:: docs/images/year-calendar-page.png
+.. |year| image:: docs/images/ff-2026-year.png
    :width: 24%
-.. |month| image:: docs/images/month-calendar-page.png
+.. |month| image:: docs/images/ff-2026-month.png
    :width: 24%
-.. |day| image:: docs/images/day-page.png
+.. |day| image:: docs/images/ff-2026-day.png
    :width: 24%
 
 Downloads
