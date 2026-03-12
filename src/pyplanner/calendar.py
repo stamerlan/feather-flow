@@ -1,3 +1,11 @@
+"""Calendar model used by planner templates.
+
+Provides :class:`Day`, :class:`Month`, :class:`Year` and the top-level
+:class:`Calendar` factory that assembles them. A
+:class:`~pyplanner.dayinfo.DayInfoProvider` can be plugged in to enrich days
+with additional info.
+"""
+
 import calendar as _stdlib_calendar
 from collections.abc import Iterator, Iterable
 from .dayinfo import DayInfo, DayInfoProvider
@@ -16,6 +24,19 @@ class _EmptyDayInfoProvider(DayInfoProvider):
 
 
 class Day:
+    """A single calendar day.
+
+    :param day: Day-of-month number (1-31).
+    :param weekday: :class:`~pyplanner.weekday.WeekDay` for this day.
+    :param id: Date identifier in ``YYYY-MM-DD`` format.
+    :param info: Optional :class:`~pyplanner.dayinfo.DayInfo` with additional
+        information about the day. Defaults to an empty ``DayInfo()``.
+
+    Templates typically use ``day.value``, ``day.weekday``, ``day.is_off_day``
+    and ``day.id``. The ``is_off_day`` property checks the provider data first
+    and falls back to the weekday's default weekend rule.
+    """
+
     def __init__(self, day: int, weekday: WeekDay, id: str,
                  info: DayInfo = _EMPTY_DAY_INFO) -> None:
         self.value   = day
@@ -53,6 +74,18 @@ class Day:
 
 
 class Month:
+    """A calendar month containing its days and a week-aligned table.
+
+    :param value: Month number (1-12).
+    :param name: Full localized month name (e.g. ``"January"``).
+    :param short_name: Abbreviated month name (e.g. ``"Jan"``).
+    :param days: Sequence of :class:`Day` objects for every day in the month.
+    :param table: Week-aligned grid. Each row is a 7-element list where cells
+        are either a :class:`Day` or ``None`` (padding for days outside the
+        month).
+    :param id: Month identifier in ``YYYY-MM`` format.
+    """
+
     def __init__(self, value: int, name: str, short_name: str,
                  days: Iterable[Day],
                  table: Iterable[Iterable[Day | None]], id: str) -> None:
@@ -71,6 +104,13 @@ class Month:
 
 
 class Year:
+    """A calendar year containing twelve months.
+
+    :param year: Four-digit year number.
+    :param months: Sequence of twelve :class:`Month` objects.
+    :param id: Year identifier (``YYYY`` string).
+    """
+
     def __init__(self, year: int, months: Iterable[Month], id: str) -> None:
         self.value   = year
         self.months  = months
@@ -92,6 +132,18 @@ class Year:
 
 
 class Calendar:
+    """Factory that builds :class:`Year` objects from the stdlib
+    :mod:`calendar` module, optionally enriched with holiday data.
+
+    :param firstweekday: First day of the week (0 = Monday ... 6 = Sunday).
+    :param provider: Optional :class:`~pyplanner.dayinfo.DayInfoProvider` for
+        holidays.
+    :param lang: Language code for month/weekday names (default
+        ``"en"``).
+    :param country: ISO 3166-1 alpha-2 code used to determine default weekend
+        days.
+    """
+
     def __init__(self, firstweekday: int = 0,
                  provider: DayInfoProvider | None = None,
                  lang: str | None = None,
@@ -110,9 +162,8 @@ class Calendar:
     def year(self, the_year: int) -> Year:
         """Construct a :class:`Year` calendar object.
 
-        When a provider was supplied at construction time it is queried
-        for supplementary day information (holidays, transferred
-        workdays, etc.).
+        When a provider was supplied at construction time it is queried for
+        supplementary day information (holidays, transferred workdays, etc.).
 
         :param the_year: Calendar year to build.
         :returns: Fully populated :class:`Year` instance.

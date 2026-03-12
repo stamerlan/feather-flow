@@ -4,6 +4,7 @@ import pathlib
 import sys
 from .planner import Planner
 
+
 class _LivereloadFilter(logging.Filter):
     """Intercept livereload log records.
 

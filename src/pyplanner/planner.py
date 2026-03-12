@@ -84,8 +84,8 @@ class Planner:
     :param path: Path to the Jinja2/HTML template file.
     :param calendar: :class:`~pyplanner.calendar.Calendar` instance used for
         template rendering.
-    :param params: Template parameters namespace. Passed to templates
-        as ``params``. Defaults to an empty namespace.
+    :param params: Template parameters namespace. Passed to templates as
+        ``params``. Defaults to an empty namespace.
     """
 
     def __init__(self, path: str | os.PathLike[str],
@@ -116,7 +116,7 @@ class Planner:
             the planner directory is used. During live reloading, browser
             doesn't generate requests for file:// URLs. This parameter is used
             to provide a base URL relative to the output directory. In this
-            case, both live reloading and preview in browser will work.
+            case preview in browser works correctly.
         :returns: Rendered HTML.
         """
         if base is None:

@@ -1,3 +1,11 @@
+"""Localized weekday and month name registry.
+
+:class:`Lang` is a frozen dataclass that holds translated calendar strings for a
+single language. Instances are stored in a global registry and retrieved with
+:meth:`Lang.get`. Built-in languages are ``en``, ``ru`` and ``kr`` (with ``ko``
+as an alias for ``kr``).
+"""
+
 from dataclasses import dataclass
 from itertools import chain
 

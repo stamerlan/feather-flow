@@ -82,16 +82,14 @@ class Params:
         The XML schema uses ``<params>`` as the root element. Each child element
         defines a parameter or a namespace:
 
-        - **Leaf parameter** - has a ``type`` or ``help`` attribute
-          and no child elements. The element's text content is the
-          default value (use CDATA for values containing XML special
-          characters). The ``help`` attribute is a human-readable
-          description. Omitting ``type`` defaults to ``str``. Empty
-          or absent text content defaults to ``None``.
-        - **Namespace** - has child elements and no ``type``
-          attribute. An optional ``help`` attribute is allowed for
-          documentation. Groups related parameters under a nested
-          :class:`~types.SimpleNamespace`.
+        - **Leaf parameter** - has a ``type`` or ``help`` attribute and no child
+          elements. The element's text content is the default value (use CDATA
+          for values containing XML special characters). The ``help`` attribute
+          is a human-readable description. Omitting ``type`` defaults to
+          ``str``. Empty or absent text content defaults to ``None``.
+        - **Namespace** - has child elements and no ``type`` attribute. An
+          optional ``help`` attribute is allowed for documentation. Groups
+          related parameters under a nested :class:`~types.SimpleNamespace`.
 
         Allowed types: ``str``, ``int``, ``float``, ``bool``. Element names must
         be valid Python identifiers (no hyphens - use underscores).

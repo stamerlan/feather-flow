@@ -9,11 +9,8 @@ from ..dayinfo import DayInfo, DayInfoProvider
 class NagerDateProvider(DayInfoProvider):
     """DayInfoProvider backed by the Nager.Date public-holiday API.
 
-    Covers 100+ countries (ISO 3166-1 alpha-2 codes). Unlike isdayoff.ru
-    this source only knows about public holidays - it cannot tell whether
-    a weekend day has been transferred to a workday.
-
-    Free, no API key required. https://date.nager.at
+    Covers 100+ countries (ISO 3166-1 alpha-2 codes). Free, no API key required.
+    https://date.nager.at
     """
 
     def __init__(self, country_code: str, *, timeout: float = 10) -> None:

@@ -10,18 +10,17 @@ from pathlib import Path
 class DayInfo:
     """Supplementary information about a calendar day.
 
-    Every field defaults to ``None`` (no data - fall back to default
-    calendar logic). New fields can be added as the framework grows.
+    Every field defaults to ``None`` (no data - fall back to default calendar
+    logic). New fields can be added as the framework grows.
 
     ``holiday_types`` values (Nager.Date definitions):
 
-    * ``"Public"`` - general public holiday, a day off for
-      the population.
+    * ``"Public"`` - general public holiday, a day off for the population.
     * ``"Bank"`` - bank holiday; banks and offices are closed.
     * ``"School"`` - school holiday; schools are closed.
     * ``"Authorities"`` - government offices are closed.
-    * ``"Optional"`` - majority of people take a day off but
-      it is not mandatory.
+    * ``"Optional"`` - majority of people take a day off but it is not
+      mandatory.
     * ``"Observance"`` - optional festivity, no paid day off.
     """
 

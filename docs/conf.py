@@ -5,6 +5,10 @@
 
 import pathlib
 import shutil
+import sys
+
+# Make the package importable for autodoc.
+sys.path.insert(0, str(pathlib.Path(__file__).parent.parent / 'src'))
 
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
@@ -17,12 +21,19 @@ release = '1.0'
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions: list[str] = []
+extensions = [
+    'sphinx.ext.autodoc',
+    'sphinx.ext.intersphinx',
+]
+
+autodoc_member_order = 'bysource'
+
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', None),
+}
 
 templates_path = ['_templates']
 exclude_patterns = ['html', 'Thumbs.db', '.DS_Store', 'docs']
-
-
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

@@ -1,3 +1,10 @@
+"""Weekday names, first-weekday rules and weekend rules by country.
+
+:class:`WeekDay` carries a day's localized name, abbreviation and whether it
+counts as an off day. Country-specific lookup tables determine which day starts
+the week and which days form the weekend.
+"""
+
 from .lang import Lang
 
 # Countries where the week starts on Sunday (6).
@@ -29,6 +36,18 @@ _DEFAULT_COUNTRY = "gb"
 
 
 class WeekDay:
+    """A weekday with localized names and an off-day flag.
+
+    :param day: Weekday number (0 = Monday ... 6 = Sunday).
+    :param name: Full localized name (e.g. ``"Monday"``).
+    :param short_name: Abbreviated name (e.g. ``"Mon"``).
+    :param letter: Single-letter abbreviation (e.g. ``"M"``).
+    :param is_off_day: Whether this weekday is a day off or not.
+
+    Use the :meth:`create` factory to build instances with the correct names and
+    weekend flag for a given country and language.
+    """
+
     def __init__(self, day: int, name: str, short_name: str,
                  letter: str, is_off_day: bool) -> None:
         self.value      = day
@@ -92,8 +111,8 @@ class WeekDay:
     def parse_weekday(value: str) -> int:
         """Parse a weekday given as a name or integer string.
 
-        Accepts full English names (case-insensitive) or an integer ``0``-``6``
-        where ``0`` = Monday and ``6`` = Sunday.
+        Accepts any supported language names (case-insensitive) or an integer
+        ``0``-``6`` where ``0`` = Monday and ``6`` = Sunday.
 
         :raises ValueError: If *value* is not a recognized weekday.
         """
