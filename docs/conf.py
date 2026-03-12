@@ -16,7 +16,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent.parent / 'src'))
 project = 'Feather Flow'
 copyright = '2026, Vlad Vovchenko'
 author = 'Vlad Vovchenko'
-release = '1.0'
+release = '2.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
